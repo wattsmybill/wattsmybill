@@ -1066,21 +1066,17 @@ export default function Page() {
             <div className="grid md:grid-cols-2 gap-6 mt-6">
               <div className="border rounded-3xl p-5 bg-gray-50">
                 <img
-                  src="/maya-qr.jpg"
-                  alt="Maya QR"
+                  src="/Gcash-qr.jpg"
+                  alt="Gcash QR"
                   className="w-52 h-52 object-contain rounded-2xl mx-auto"
                 />
 
                 <h3 className="font-bold text-lg mt-4">
-                  Maya
+                  Gcash
                 </h3>
 
-                <p className="text-sm opacity-70 mt-1">
-                  09087228037
-                </p>
-
                 <p className="text-xs opacity-50 mt-3">
-                  Scan using Maya or InstaPay-supported banking apps.
+                  Scan using Gcash or InstaPay-supported banking apps.
                 </p>
               </div>
 
@@ -1094,15 +1090,6 @@ export default function Page() {
                 <h3 className="font-bold text-lg mt-4">
                   PayPal
                 </h3>
-
-                <a
-                  href="https://paypal.me/subidajab"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 px-5 py-3 rounded-2xl font-semibold shadow bg-emerald-600 hover:bg-emerald-700 text-white transition"
-                >
-                  Donate via PayPal
-                </a>
 
                 <p className="text-xs opacity-50 mt-3">
                   Scan the QR code or use the PayPal link.
