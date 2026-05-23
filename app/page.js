@@ -151,6 +151,38 @@ function getWattageGuide(applianceName = "", category = "") {
   return "For the most accurate estimate, use the actual wattage printed on the appliance sticker, power adapter, user manual, or official product page.";
 }
 
+
+function getApplianceInsight(applianceName = "", category = "") {
+  const name = applianceName.toLowerCase();
+  const type = category.toLowerCase();
+
+  if (name.includes("aircon") || name.includes("air-conditioning")) {
+    return "Air-conditioning usually drives the bill the most. For a better estimate, check if it is inverter or non-inverter, confirm the HP size, and use the actual rated or average wattage from the unit label.";
+  }
+
+  if (name.includes("refrigerator") || name.includes("freezer")) {
+    return "Refrigerators run all day but cycle on and off. If the estimate feels high, check the energy label or model page instead of relying only on running watts.";
+  }
+
+  if (name.includes("tv") || name.includes("television")) {
+    return "TV wattage changes by size and panel type. A 32-inch LED TV can be far lower than a 55-inch Smart TV or OLED TV, so searching the exact model can improve accuracy.";
+  }
+
+  if (name.includes("desktop") || name.includes("gaming pc")) {
+    return "Computers vary a lot. Office use may be moderate, while gaming or rendering can use much more power. Use the power supply only as a maximum, not always the actual usage.";
+  }
+
+  if (name.includes("dryer") || name.includes("kettle") || name.includes("oven") || name.includes("microwave") || name.includes("induction") || name.includes("stove") || name.includes("range")) {
+    return "This is a high-wattage appliance. Even short use can add up quickly, so accurate hours and days matter more here.";
+  }
+
+  if (name.includes("led bulb") || name.includes("lighting") || type.includes("lighting")) {
+    return "Lighting is usually easy to estimate. Use the quantity field for multiple bulbs, then enter the wattage printed on one bulb.";
+  }
+
+  return "For a more accurate estimate, update the wattage using the appliance label, adapter, manual, or official product page.";
+}
+
 function Logo() {
   return (
     <div className="flex items-center gap-3">
@@ -184,6 +216,8 @@ export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showDonate, setShowDonate] = useState(false);
   const [showAllPresets, setShowAllPresets] = useState(false);
+  const [showWattageHelp, setShowWattageHelp] = useState(false);
+  const [showEstimateHelp, setShowEstimateHelp] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
 
   const applianceSectionRef = useRef(null);
@@ -216,6 +250,8 @@ export default function Page() {
         setSearchTerm(parsed.searchTerm || "");
         setSelectedCategory(parsed.selectedCategory || "All");
         setShowAllPresets(parsed.showAllPresets || false);
+        setShowWattageHelp(parsed.showWattageHelp || false);
+        setShowEstimateHelp(parsed.showEstimateHelp || false);
 
         if (parsed.country?.name) {
           const foundCountry = COUNTRIES.find(
@@ -251,7 +287,9 @@ export default function Page() {
         country,
         searchTerm,
         selectedCategory,
-        showAllPresets
+        showAllPresets,
+        showWattageHelp,
+        showEstimateHelp
       })
     );
   }, [
@@ -267,7 +305,9 @@ export default function Page() {
     country,
     searchTerm,
     selectedCategory,
-    showAllPresets
+    showAllPresets,
+    showWattageHelp,
+    showEstimateHelp
   ]);
 
   const categories = ["All", ...new Set(PRESETS.map((item) => item.category))];
@@ -307,6 +347,30 @@ export default function Page() {
     }, 100);
   };
 
+  const clearAll = () => {
+    const confirmed = window.confirm(
+      "Clear all saved inputs and start over?"
+    );
+
+    if (!confirmed) return;
+
+    localStorage.removeItem("watts-my-bill-data");
+    setCountry(COUNTRIES[0]);
+    setActualBill("");
+    setCustomRate("");
+    setCustomCountryName("");
+    setCustomCurrency("");
+    setReportName("");
+    setReportAddress("");
+    setSearchTerm("");
+    setSelectedCategory("All");
+    setShowDonate(false);
+    setShowAllPresets(false);
+    setShowWattageHelp(false);
+    setShowEstimateHelp(false);
+    setAppliances([{ ...DEFAULT_APPLIANCE }]);
+  };
+
   const addAppliance = () => {
     setAppliances([
       ...appliances,
@@ -321,6 +385,7 @@ export default function Page() {
       ...appliances,
       {
         name: preset.name,
+        category: preset.category,
         watts: preset.watts,
         quantity: 1,
         hours: preset.hours,
@@ -380,10 +445,31 @@ export default function Page() {
       activeRate
     : 0;
 
+  const topApplianceShare =
+    topAppliance && totalKwh > 0 ? (topAppliance.kwh / totalKwh) * 100 : 0;
+
+  const applianceInsight = topAppliance
+    ? getApplianceInsight(topAppliance.name, topAppliance.category)
+    : "";
+
+  const billComparisonInsight = Number(actualBill) > 0
+    ? difference > 0
+      ? `Your entered bill is ${displayCurrency}${Math.abs(difference).toFixed(
+          2
+        )} higher than this estimate. That gap may come from taxes, provider charges, appliances not listed yet, or wattages that are lower than actual.`
+      : `Your estimate is ${displayCurrency}${Math.abs(difference).toFixed(
+          2
+        )} higher than your entered bill. Check if some wattages, hours, or days are too high.`
+    : "Add your actual bill to compare it with this estimate.";
+
   const auditMessage = topAppliance
-    ? `${topAppliance.name} appears to be your highest estimated energy user. Reducing its use by 1 hour per day may save around ${displayCurrency}${possibleSavings.toFixed(
+    ? `${topAppliance.name} is your top estimated energy user at ${topAppliance.kwh.toFixed(
         2
-      )} per month.`
+      )} kWh, about ${topApplianceShare.toFixed(
+        0
+      )}% of your listed usage. Reducing its use by 1 hour per day may save around ${displayCurrency}${possibleSavings.toFixed(
+        2
+      )} per month. ${applianceInsight}`
     : "Add appliance details to generate an energy audit insight.";
 
   const downloadPDF = () => {
@@ -670,12 +756,21 @@ export default function Page() {
         <div className="flex justify-between items-start gap-4 mb-6">
           <Logo />
 
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition whitespace-nowrap"
-          >
-            {darkMode ? "Light Mode" : "Dark Mode"}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition whitespace-nowrap"
+            >
+              {darkMode ? "Light Mode" : "Dark Mode"}
+            </button>
+
+            <button
+              onClick={clearAll}
+              className="px-4 py-2 rounded-xl bg-white text-gray-800 hover:bg-gray-100 transition shadow whitespace-nowrap"
+            >
+              Start Over
+            </button>
+          </div>
         </div>
 
         <div className="mb-6 p-6 rounded-3xl bg-gradient-to-r from-[#059669] via-[#10B981] to-[#2DD4BF] text-white shadow-2xl">
@@ -724,11 +819,22 @@ export default function Page() {
             </div>
           )}
 
-          <p className="text-xs opacity-80 mt-5">
-            Estimates only. Actual electric bills may include taxes, generation
-            charges, transmission, distribution, service fees, VAT, and
-            provider-specific adjustments.
-          </p>
+          <div className="mt-5">
+            <button
+              onClick={() => setShowEstimateHelp(!showEstimateHelp)}
+              className="text-xs underline underline-offset-4 opacity-90 hover:opacity-100"
+            >
+              {showEstimateHelp ? "Hide estimate note" : "Why is this only an estimate?"}
+            </button>
+
+            {showEstimateHelp && (
+              <p className="text-xs opacity-80 mt-2 max-w-3xl">
+                Actual electric bills may include generation, transmission,
+                distribution, service fees, VAT, taxes, and provider-specific
+                adjustments that are not included in a simple appliance estimate.
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-4 mb-6">
@@ -823,10 +929,20 @@ export default function Page() {
             <div>
               <h2 className="font-bold text-lg">Quick Add Appliances</h2>
 
-              <p className="text-xs opacity-60 mt-2 max-w-xl">
-                Don’t know the wattage? Check the appliance sticker, power adapter,
-                user manual, or search the appliance model online for a more accurate estimate.
-              </p>
+              <button
+                onClick={() => setShowWattageHelp(!showWattageHelp)}
+                className="text-xs text-emerald-700 font-semibold mt-2 hover:underline"
+              >
+                {showWattageHelp ? "Hide wattage help" : "Need help finding wattage?"}
+              </button>
+
+              {showWattageHelp && (
+                <p className="text-xs opacity-60 mt-2 max-w-xl">
+                  Check the appliance sticker, power adapter, user manual, or
+                  search the exact appliance model online. Using the actual
+                  wattage gives a better estimate than using generic presets.
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col md:flex-row gap-2">
@@ -1005,11 +1121,35 @@ export default function Page() {
 
           <h2 className="font-black text-xl mb-2">
             {topAppliance?.name
-              ? "Your biggest energy driver is clear."
+              ? "Here’s what is driving your estimate."
               : "Your audit is waiting for appliance data."}
           </h2>
 
           <p className="text-sm opacity-75">{auditMessage}</p>
+
+          {topAppliance?.name && (
+            <div className="grid md:grid-cols-3 gap-3 mt-4">
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                <p className="text-xs opacity-60">Top Appliance Share</p>
+                <p className="font-black text-lg text-emerald-700">
+                  {topApplianceShare.toFixed(0)}%
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                <p className="text-xs opacity-60">Potential Monthly Saving</p>
+                <p className="font-black text-lg text-emerald-700">
+                  {displayCurrency}{possibleSavings.toFixed(2)}
+                </p>
+                <p className="text-xs opacity-60 mt-1">If reduced by 1 hour/day</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-gray-50 border">
+                <p className="text-xs opacity-60">Bill Check</p>
+                <p className="text-sm opacity-75 mt-1">{billComparisonInsight}</p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
