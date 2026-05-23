@@ -1059,7 +1059,7 @@ export default function Page() {
             onClick={() => setShowDonate(!showDonate)}
             className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow transition"
           >
-            {showDonate ? "Hide Donation Options" : "Support"}
+            {showDonate ? "Hide" : "Support"}
           </button>
 
           {showDonate && (
