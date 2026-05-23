@@ -12,11 +12,12 @@ const DEFAULT_APPLIANCE = {
 };
 
 const COUNTRIES = [
-  { name: "Philippines", rate: 12.5, currency: "₱", flag: "🇵🇭" },
+  { name: "Philippines", rate: 15.44, currency: "₱", flag: "🇵🇭" },
   { name: "United States", rate: 0.18, currency: "$", flag: "🇺🇸" },
   { name: "United Kingdom", rate: 0.28, currency: "£", flag: "🇬🇧" },
   { name: "India", rate: 0.09, currency: "₹", flag: "🇮🇳" },
   { name: "Australia", rate: 0.32, currency: "A$", flag: "🇦🇺" },
+  { name: "New Zealand", rate: 0.33, currency: "NZ$", flag: "🇳🇿" },
   { name: "Japan", rate: 0.3, currency: "¥", flag: "🇯🇵" },
   { name: "Canada", rate: 0.17, currency: "C$", flag: "🇨🇦" },
   { name: "Germany", rate: 0.35, currency: "€", flag: "🇩🇪" },
@@ -98,6 +99,57 @@ const PRESETS = [
   { category: "Other", name: "Aquarium Heater", watts: 100, hours: 8, days: 30 },
   { category: "Other", name: "Sewing Machine", watts: 100, hours: 2, days: 12 }
 ];
+
+function getWattageGuide(applianceName = "", category = "") {
+  const name = applianceName.toLowerCase();
+  const type = category.toLowerCase();
+
+  if (name.includes("aircon") || name.includes("air-conditioning")) {
+    return "Typical aircon wattage varies a lot: small inverter units may average around 600W–1000W, while larger or non-inverter units can be 1200W–2500W+. Check the nameplate or model for best accuracy.";
+  }
+
+  if (name.includes("refrigerator") || name.includes("freezer")) {
+    return "Refrigerators and freezers cycle on and off. Check the energy label, nameplate, or model number. Typical listed running wattage can range from 100W–400W.";
+  }
+
+  if (name.includes("tv") || name.includes("television")) {
+    return "TV wattage depends on size and type. Typical ranges: 32 inch LED 30W–55W, 43 inch 60W–100W, 55 inch 80W–150W, large OLED/older TVs can be higher.";
+  }
+
+  if (name.includes("desktop") || name.includes("gaming pc")) {
+    return "Computer wattage depends on workload. Office PCs may use 100W–250W, while gaming PCs can use 300W–700W+ during gaming.";
+  }
+
+  if (name.includes("laptop")) {
+    return "Laptop chargers usually show wattage on the adapter. Common ranges: 45W–100W for regular laptops, 120W–240W for gaming or workstation laptops.";
+  }
+
+  if (name.includes("led bulb") || name.includes("lighting") || type.includes("lighting")) {
+    return "Bulb wattage is usually printed on the bulb or box. LED bulbs are commonly 5W–15W each. Use quantity for multiple bulbs.";
+  }
+
+  if (name.includes("charger")) {
+    return "Phone and tablet chargers usually show output watts on the adapter. Common phone chargers range from 5W–30W, fast chargers can be higher.";
+  }
+
+  if (name.includes("router") || name.includes("modem") || name.includes("wifi")) {
+    return "Routers and modems are usually low power. Check the adapter label. Typical range is around 8W–20W each.";
+  }
+
+  if (name.includes("washing")) {
+    return "Washing machine wattage varies by cycle. Check the label or manual. Typical running wattage can range from 400W–1000W.";
+  }
+
+  if (name.includes("dryer")) {
+    return "Dryers are usually high-consumption appliances. Check the rating label. Electric dryers can commonly range from 2000W–5000W.";
+  }
+
+  if (name.includes("kettle") || name.includes("oven") || name.includes("microwave") || name.includes("induction") || name.includes("stove") || name.includes("range")) {
+    return "Kitchen heating appliances are usually high wattage. Check the label or manual. Common range is around 1000W–2500W+ depending on appliance.";
+  }
+
+  return "For the most accurate estimate, use the actual wattage printed on the appliance sticker, power adapter, user manual, or official product page.";
+}
 
 function Logo() {
   return (
@@ -272,7 +324,8 @@ export default function Page() {
         watts: preset.watts,
         quantity: 1,
         hours: preset.hours,
-        days: preset.days
+        days: preset.days,
+        wattageGuide: preset.wattageGuide || getWattageGuide(preset.name, preset.category)
       }
     ]);
 
@@ -353,6 +406,7 @@ export default function Page() {
       "₹": "INR ",
       "A$": "AUD ",
       "C$": "CAD ",
+      "NZ$": "NZD ",
       "S$": "SGD ",
       "¥": "JPY ",
       "₩": "KRW ",
@@ -710,7 +764,7 @@ export default function Page() {
             <input
               type="number"
               className="w-full p-4 rounded-2xl border bg-white text-black shadow"
-              placeholder={`Your electricity provider rate per kWh (${displayCurrency || "currency"})`}
+              placeholder={`Electricity provider rate per kWh (${displayCurrency || "currency"})`}
               value={customRate}
               onChange={(e) => setCustomRate(e.target.value)}
             />
@@ -766,7 +820,14 @@ export default function Page() {
 
         <div className="mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
-            <h2 className="font-bold text-lg">Quick Add Appliances</h2>
+            <div>
+              <h2 className="font-bold text-lg">Quick Add Appliances</h2>
+
+              <p className="text-xs opacity-60 mt-2 max-w-xl">
+                Don’t know the wattage? Check the appliance sticker, power adapter,
+                user manual, or search the appliance model online for a more accurate estimate.
+              </p>
+            </div>
 
             <div className="flex flex-col md:flex-row gap-2">
               <input
@@ -894,6 +955,29 @@ export default function Page() {
                 />
               </div>
 
+              {(item.name || item.wattageGuide) && (
+                <div className="mt-3 space-y-2">
+                  {item.wattageGuide && (
+                    <p className="text-xs text-emerald-700 font-medium">
+                      💡 {item.wattageGuide}
+                    </p>
+                  )}
+
+                  {item.name && (
+                    <a
+                      href={`https://www.google.com/search?q=${encodeURIComponent(
+                        `${item.name} wattage`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-xs text-emerald-700 font-semibold hover:underline"
+                    >
+                      🔎 Search actual wattage for “{item.name}”
+                    </a>
+                  )}
+                </div>
+              )}
+
               <div className="mt-4 flex justify-between items-center">
                 <div>
                   <p className="text-sm opacity-60">Consumption</p>
@@ -975,7 +1059,7 @@ export default function Page() {
             onClick={() => setShowDonate(!showDonate)}
             className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow transition"
           >
-            {showDonate ? "Hide Donation Options" : "Donate / Support"}
+            {showDonate ? "Hide Donation Options" : "Support"}
           </button>
 
           {showDonate && (
