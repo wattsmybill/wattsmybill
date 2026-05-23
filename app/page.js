@@ -827,7 +827,7 @@ export default function Page() {
 
             <button
               onClick={clearAll}
-              className="px-4 py-2 rounded-xl border border-red-200 bg-white/80 text-red-600 hover:bg-red-50 transition shadow-sm whitespace-nowrap"
+              className="px-4 py-2 rounded-xl bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 transition shadow-sm whitespace-nowrap"
             >
               Start Over
             </button>
