@@ -218,9 +218,13 @@ export default function Page() {
   const [showAllPresets, setShowAllPresets] = useState(false);
   const [showWattageHelp, setShowWattageHelp] = useState(false);
   const [showEstimateHelp, setShowEstimateHelp] = useState(false);
+  const [addedToast, setAddedToast] = useState("");
+  const [highlightedIndex, setHighlightedIndex] = useState(null);
   const [hasLoaded, setHasLoaded] = useState(false);
 
   const applianceSectionRef = useRef(null);
+  const feedbackTimerRef = useRef(null);
+  const highlightTimerRef = useRef(null);
 
   const [appliances, setAppliances] = useState([DEFAULT_APPLIANCE]);
 
@@ -338,13 +342,25 @@ export default function Page() {
     ? customCurrency || ""
     : country.currency;
 
-  const scrollToAppliances = () => {
-    setTimeout(() => {
-      applianceSectionRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }, 100);
+  const showAddedFeedback = (name, index) => {
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+    }
+
+    if (highlightTimerRef.current) {
+      clearTimeout(highlightTimerRef.current);
+    }
+
+    setAddedToast(`✅ ${name || "Appliance"} added`);
+    setHighlightedIndex(index);
+
+    feedbackTimerRef.current = setTimeout(() => {
+      setAddedToast("");
+    }, 2200);
+
+    highlightTimerRef.current = setTimeout(() => {
+      setHighlightedIndex(null);
+    }, 1600);
   };
 
   const clearAll = () => {
@@ -368,20 +384,23 @@ export default function Page() {
     setShowAllPresets(false);
     setShowWattageHelp(false);
     setShowEstimateHelp(false);
+    setAddedToast("");
+    setHighlightedIndex(null);
     setAppliances([{ ...DEFAULT_APPLIANCE }]);
   };
 
   const addAppliance = () => {
-    setAppliances([
+    const newAppliances = [
       ...appliances,
       { ...DEFAULT_APPLIANCE }
-    ]);
+    ];
 
-    scrollToAppliances();
+    setAppliances(newAppliances);
+    showAddedFeedback("Blank appliance", newAppliances.length - 1);
   };
 
   const addPreset = (preset) => {
-    setAppliances([
+    const newAppliances = [
       ...appliances,
       {
         name: preset.name,
@@ -392,9 +411,10 @@ export default function Page() {
         days: preset.days,
         wattageGuide: preset.wattageGuide || getWattageGuide(preset.name, preset.category)
       }
-    ]);
+    ];
 
-    scrollToAppliances();
+    setAppliances(newAppliances);
+    showAddedFeedback(preset.name, newAppliances.length - 1);
   };
 
   const updateAppliance = (i, field, value) => {
@@ -1006,11 +1026,20 @@ export default function Page() {
         </div>
 
         <div ref={applianceSectionRef} className="space-y-4 scroll-mt-24">
-          {breakdown.map((item, i) => (
-            <div
-              key={i}
-              className="p-5 rounded-3xl bg-white text-black shadow-lg relative"
-            >
+          {breakdown.map((item, i) => {
+            const wattageGuide = item.name
+              ? item.wattageGuide || getWattageGuide(item.name, item.category)
+              : "";
+
+            return (
+              <div
+                key={i}
+                className={`p-5 rounded-3xl text-black shadow-lg relative transition-all duration-500 ${
+                  highlightedIndex === i
+                    ? "bg-emerald-50 ring-2 ring-emerald-400 shadow-2xl"
+                    : "bg-white"
+                }`}
+              >
               <button
                 onClick={() => removeAppliance(i)}
                 className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 transition"
@@ -1071,27 +1100,27 @@ export default function Page() {
                 />
               </div>
 
-              {(item.name || item.wattageGuide) && (
-                <div className="mt-3 space-y-2">
-                  {item.wattageGuide && (
-                    <p className="text-xs text-emerald-700 font-medium">
-                      💡 {item.wattageGuide}
-                    </p>
-                  )}
+              {item.name && (
+                <details className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/80 px-4 py-3">
+                  <summary className="cursor-pointer text-xs font-semibold text-emerald-800">
+                    Need wattage guidance for this appliance?
+                  </summary>
 
-                  {item.name && (
-                    <a
-                      href={`https://www.google.com/search?q=${encodeURIComponent(
-                        `${item.name} wattage`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block text-xs text-emerald-700 font-semibold hover:underline"
-                    >
-                      🔎 Search actual wattage for “{item.name}”
-                    </a>
-                  )}
-                </div>
+                  <p className="mt-2 text-xs leading-relaxed text-gray-700">
+                    💡 {wattageGuide}
+                  </p>
+
+                  <a
+                    href={`https://www.google.com/search?q=${encodeURIComponent(
+                      `${item.name} wattage`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-block text-xs font-semibold text-emerald-700 hover:underline"
+                  >
+                    🔎 Search actual wattage for “{item.name}”
+                  </a>
+                </details>
               )}
 
               <div className="mt-4 flex justify-between items-center">
@@ -1112,8 +1141,9 @@ export default function Page() {
                   </h3>
                 </div>
               </div>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
 
         <div className="mt-8 mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
@@ -1242,6 +1272,12 @@ export default function Page() {
             Your support helps keep Watts My Bill? free and improving.
           </p>
         </div>
+
+        {addedToast && (
+          <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-2xl">
+            {addedToast}
+          </div>
+        )}
 
         <button
           onClick={addAppliance}
