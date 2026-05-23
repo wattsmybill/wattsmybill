@@ -183,6 +183,41 @@ function getApplianceInsight(applianceName = "", category = "") {
   return "For a more accurate estimate, update the wattage using the appliance label, adapter, manual, or official product page.";
 }
 
+
+const INFO_SECTIONS = [
+  {
+    id: "about",
+    title: "About Watts My Bill?",
+    description:
+      "Watts My Bill? is a free electricity usage calculator that helps users estimate monthly electricity costs based on appliance wattage, quantity, usage hours, days used, and electricity rate. It is built to help everyday users better understand how appliances may contribute to their bill."
+  },
+  {
+    id: "privacy",
+    title: "Privacy Policy",
+    description:
+      "Watts My Bill? currently stores your calculator inputs locally in your browser using localStorage so your session can be restored when you revisit the page. This data stays on your device and is not sent to our server by this calculator. If ads, analytics, or other third-party services are added in the future, this policy should be updated to explain how those services may use cookies or similar technologies."
+  },
+  {
+    id: "terms",
+    title: "Terms of Use",
+    description:
+      "By using Watts My Bill?, you understand that the tool provides estimates for educational and personal budgeting purposes only. You are responsible for checking your actual utility bill, provider rates, and appliance information before making financial or household decisions."
+  },
+  {
+    id: "disclaimer",
+    title: "Disclaimer",
+    description:
+      "Watts My Bill? is not an electricity provider and is not affiliated with Meralco or any utility company. Results are estimates only. Actual electric bills may include generation charges, transmission, distribution, service fees, VAT, taxes, fuel adjustments, demand charges, and other provider-specific charges."
+  },
+  {
+    id: "contact",
+    title: "Contact",
+    description:
+      "For questions, feedback, corrections, or suggestions, you can contact the creator of Watts My Bill? through the official contact details or social links that will be added to this project. Please do not send sensitive billing information unless you are comfortable sharing it."
+  }
+];
+
+
 function Logo() {
   return (
     <div className="flex items-center gap-3">
@@ -218,6 +253,7 @@ export default function Page() {
   const [showAllPresets, setShowAllPresets] = useState(false);
   const [showWattageHelp, setShowWattageHelp] = useState(false);
   const [showEstimateHelp, setShowEstimateHelp] = useState(false);
+  const [activeInfoPage, setActiveInfoPage] = useState(null);
   const [addedToast, setAddedToast] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(null);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -384,6 +420,7 @@ export default function Page() {
     setShowAllPresets(false);
     setShowWattageHelp(false);
     setShowEstimateHelp(false);
+    setActiveInfoPage(null);
     setAddedToast("");
     setHighlightedIndex(null);
     setAppliances([{ ...DEFAULT_APPLIANCE }]);
@@ -491,6 +528,10 @@ export default function Page() {
         2
       )} per month. ${applianceInsight}`
     : "Add appliance details to generate an energy audit insight.";
+
+  const activeInfoSection = INFO_SECTIONS.find(
+    (section) => section.id === activeInfoPage
+  );
 
   const downloadPDF = () => {
     const doc = new jsPDF("p", "mm", "a4");
@@ -767,7 +808,7 @@ export default function Page() {
   };
 
   const theme = darkMode
-    ? "bg-[#0B0F17] text-white"
+    ? "bg-[#101826] text-white"
     : "bg-gray-50 text-gray-900";
 
   return (
@@ -786,7 +827,7 @@ export default function Page() {
 
             <button
               onClick={clearAll}
-              className="px-4 py-2 rounded-xl bg-white text-gray-800 hover:bg-gray-100 transition shadow whitespace-nowrap"
+              className="px-4 py-2 rounded-xl border border-red-200 bg-white/80 text-red-600 hover:bg-red-50 transition shadow-sm whitespace-nowrap"
             >
               Start Over
             </button>
@@ -1272,6 +1313,63 @@ export default function Page() {
             Your support helps keep Watts My Bill? free and improving.
           </p>
         </div>
+
+
+        <footer className="mb-28 rounded-3xl border border-gray-200 bg-white p-5 text-black shadow-sm">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div>
+              <p className="font-bold">© 2026 Watts My Bill? All rights reserved.</p>
+              <p className="mt-1 max-w-2xl text-xs text-gray-600">
+                Estimates only. Watts My Bill? is not affiliated with any electricity
+                provider. Use this tool as a guide, not as an official bill.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {INFO_SECTIONS.map((section) => (
+                <button
+                  key={section.id}
+                  onClick={() =>
+                    setActiveInfoPage(
+                      activeInfoPage === section.id ? null : section.id
+                    )
+                  }
+                  className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                    activeInfoPage === section.id
+                      ? "border-emerald-600 bg-emerald-600 text-white"
+                      : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+                  }`}
+                >
+                  {section.title.replace("Watts My Bill?", "").trim()}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {activeInfoSection && (
+            <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="font-black text-emerald-900">
+                    {activeInfoSection.title}
+                  </h3>
+
+                  <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                    {activeInfoSection.description}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setActiveInfoPage(null)}
+                  className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-600 shadow-sm hover:bg-gray-100"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+        </footer>
+
 
         {addedToast && (
           <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-2xl">
