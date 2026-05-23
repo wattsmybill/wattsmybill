@@ -12,22 +12,23 @@ const DEFAULT_APPLIANCE = {
 };
 
 const COUNTRIES = [
-  { name: "Philippines", rate: 15.44, currency: "₱", flag: "🇵🇭" },
-  { name: "United States", rate: 0.18, currency: "$", flag: "🇺🇸" },
-  { name: "United Kingdom", rate: 0.28, currency: "£", flag: "🇬🇧" },
-  { name: "India", rate: 0.09, currency: "₹", flag: "🇮🇳" },
+  { name: "Select your country", rate: 0, currency: "", flag: "🌍", isPlaceholder: true },
   { name: "Australia", rate: 0.32, currency: "A$", flag: "🇦🇺" },
-  { name: "New Zealand", rate: 0.33, currency: "NZ$", flag: "🇳🇿" },
-  { name: "Japan", rate: 0.3, currency: "¥", flag: "🇯🇵" },
   { name: "Canada", rate: 0.17, currency: "C$", flag: "🇨🇦" },
-  { name: "Germany", rate: 0.35, currency: "€", flag: "🇩🇪" },
-  { name: "France", rate: 0.3, currency: "€", flag: "🇫🇷" },
-  { name: "Italy", rate: 0.29, currency: "€", flag: "🇮🇹" },
-  { name: "Spain", rate: 0.27, currency: "€", flag: "🇪🇸" },
-  { name: "South Korea", rate: 0.22, currency: "₩", flag: "🇰🇷" },
   { name: "China", rate: 0.1, currency: "¥", flag: "🇨🇳" },
+  { name: "France", rate: 0.3, currency: "€", flag: "🇫🇷" },
+  { name: "Germany", rate: 0.35, currency: "€", flag: "🇩🇪" },
+  { name: "India", rate: 0.09, currency: "₹", flag: "🇮🇳" },
+  { name: "Italy", rate: 0.29, currency: "€", flag: "🇮🇹" },
+  { name: "Japan", rate: 0.3, currency: "¥", flag: "🇯🇵" },
+  { name: "New Zealand", rate: 0.33, currency: "NZ$", flag: "🇳🇿" },
+  { name: "Philippines", rate: 15.44, currency: "₱", flag: "🇵🇭" },
   { name: "Singapore", rate: 0.25, currency: "S$", flag: "🇸🇬" },
+  { name: "South Korea", rate: 0.22, currency: "₩", flag: "🇰🇷" },
+  { name: "Spain", rate: 0.27, currency: "€", flag: "🇪🇸" },
   { name: "UAE", rate: 0.2, currency: "د.إ", flag: "🇦🇪" },
+  { name: "United Kingdom", rate: 0.28, currency: "£", flag: "🇬🇧" },
+  { name: "United States", rate: 0.18, currency: "$", flag: "🇺🇸" },
   { name: "Other Country", rate: 0, currency: "", flag: "🌍" }
 ];
 
