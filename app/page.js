@@ -275,8 +275,8 @@ function Logo() {
         )}
       </div>
 
-      <div>
-        <div className="font-black text-[1.7rem] sm:text-[2rem] md:text-[2.3rem] tracking-tight leading-none">
+      <div className="min-w-0">
+        <div className="font-black text-[1.6rem] min-[390px]:text-[1.7rem] sm:text-[2rem] md:text-[2.3rem] tracking-tight leading-none">
           Watts My Bill?
         </div>
 
@@ -1440,7 +1440,7 @@ export default function Page() {
 
 
         <footer className="mb-28 rounded-3xl border border-gray-200 bg-white p-5 text-black shadow-sm">
-          <div className="flex-1 min-w-0">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
               <p className="font-bold">© 2026 Watts My Bill? All rights reserved.</p>
               <p className="mt-1 max-w-2xl text-xs text-gray-600">
