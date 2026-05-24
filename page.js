@@ -11,8 +11,6 @@ const DEFAULT_APPLIANCE = {
   days: ""
 };
 
-const LOGO_PATH = "/logo.png";
-
 const COUNTRIES = [
   { name: "Select your country", rate: 0, currency: "", flag: "🌍", isPlaceholder: true },
   { name: "Australia", rate: 0.32, currency: "A$", flag: "🇦🇺" },
@@ -210,7 +208,7 @@ const INFO_SECTIONS = [
     id: "disclaimer",
     title: "Disclaimer",
     description:
-      "Watts My Bill? is not an electricity provider and is not affiliated with any utility company. Results are estimates only. Actual electric bills may include generation charges, transmission, distribution, service fees, VAT, taxes, fuel adjustments, demand charges, and other provider-specific charges."
+      "Watts My Bill? is not an electricity provider and is not affiliated with Meralco or any utility company. Results are estimates only. Actual electric bills may include generation charges, transmission, distribution, service fees, VAT, taxes, fuel adjustments, demand charges, and other provider-specific charges."
   },
   {
     id: "contact",
@@ -221,67 +219,20 @@ const INFO_SECTIONS = [
 ];
 
 
-
-function loadImageAsDataUrl(src) {
-  return new Promise((resolve) => {
-    if (typeof window === "undefined") {
-      resolve(null);
-      return;
-    }
-
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-
-    image.onload = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = image.naturalWidth || image.width;
-        canvas.height = image.naturalHeight || image.height;
-
-        const context = canvas.getContext("2d");
-        context.drawImage(image, 0, 0);
-
-        resolve({
-          dataUrl: canvas.toDataURL("image/png"),
-          width: canvas.width,
-          height: canvas.height
-        });
-      } catch {
-        resolve(null);
-      }
-    };
-
-    image.onerror = () => resolve(null);
-    image.src = src;
-  });
-}
-
-
 function Logo() {
-  const [logoFailed, setLogoFailed] = useState(false);
-
   return (
-    <div className="flex items-center gap-2">
-      <div className="w-[64px] h-[64px] flex items-center justify-center overflow-hidden shrink-0">
-        {logoFailed ? (
-          <span aria-hidden="true" className="text-3xl">💡</span>
-        ) : (
-          <img
-            src={LOGO_PATH}
-            alt="Watts My Bill? logo"
-            className="w-full h-full object-contain scale-[1.02]"
-            onError={() => setLogoFailed(true)}
-          />
-        )}
+    <div className="flex items-center gap-3">
+      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#059669] via-[#10B981] to-[#2DD4BF] flex items-center justify-center shadow-xl text-white text-2xl">
+        💡
       </div>
 
       <div>
-        <div className="font-black text-[2.6rem] tracking-tight leading-none">
+        <div className="font-black text-2xl tracking-tight leading-none">
           Watts My Bill?
         </div>
 
-        <div className="text-sm text-gray-600 mt-1">
-          Electricity usage calculator
+        <div className="text-xs opacity-60 mt-1">
+          Real-world electricity usage calculator
         </div>
       </div>
     </div>
@@ -583,337 +534,278 @@ export default function Page() {
     (section) => section.id === activeInfoPage
   );
 
-  const downloadPDF = async () => {
-    try {
-      const doc = new jsPDF("p", "mm", "a4");
+  const downloadPDF = () => {
+    const doc = new jsPDF("p", "mm", "a4");
 
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-      const margin = 25.4;
-      const contentWidth = pageWidth - margin * 2;
+    const margin = 25.4;
+    const contentWidth = pageWidth - margin * 2;
 
-      let y = margin;
-      let pageNumber = 1;
-      const logoImage = await loadImageAsDataUrl(LOGO_PATH);
+    let y = margin;
+    let pageNumber = 1;
 
-      const currencyMap = {
-        "₱": "PHP ",
-        "$": "USD ",
-        "£": "GBP ",
-        "€": "EUR ",
-        "₹": "INR ",
-        "A$": "AUD ",
-        "C$": "CAD ",
-        "NZ$": "NZD ",
-        "S$": "SGD ",
-        "¥": "JPY ",
-        "₩": "KRW ",
-        "د.إ": "AED "
-      };
+    const currencyMap = {
+      "₱": "PHP ",
+      "$": "USD ",
+      "£": "GBP ",
+      "€": "EUR ",
+      "₹": "INR ",
+      "A$": "AUD ",
+      "C$": "CAD ",
+      "NZ$": "NZD ",
+      "S$": "SGD ",
+      "¥": "JPY ",
+      "₩": "KRW ",
+      "د.إ": "AED "
+    };
 
-      const pdfCurrency = currencyMap[displayCurrency] || displayCurrency || "";
+    const pdfCurrency = currencyMap[displayCurrency] || displayCurrency || "";
 
-      const cleanText = (value) =>
-        String(value || "")
-          .replace(/₱/g, "PHP ")
-          .replace(/₹/g, "INR ")
-          .replace(/₩/g, "KRW ")
-          .replace(/¥/g, "JPY ")
-          .replace(/€/g, "EUR ")
-          .replace(/£/g, "GBP ")
-          .replace(/د.إ/g, "AED ")
-          .replace(/[^\x20-\x7E]/g, "")
-          .replace(/\s+/g, " ")
-          .trim();
+    const cleanText = (value) =>
+      String(value || "")
+        .replace(/₱/g, "PHP ")
+        .replace(/₹/g, "INR ")
+        .replace(/₩/g, "KRW ")
+        .replace(/¥/g, "JPY ")
+        .replace(/€/g, "EUR ")
+        .replace(/£/g, "GBP ")
+        .replace(/د.إ/g, "AED ")
+        .replace(/[^\x20-\x7E]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
 
-      const money = (value) =>
-        `${pdfCurrency}${Number(value || 0).toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        })}`;
+    const money = (value) => `${pdfCurrency}${Number(value || 0).toFixed(2)}`;
 
-      const writeWrappedText = (text, x, startY, maxWidth, lineHeight = 5.2) => {
-        const lines = doc.splitTextToSize(cleanText(text), maxWidth);
-        doc.text(lines, x, startY);
-        return startY + lines.length * lineHeight;
-      };
+    const writeWrappedText = (text, x, startY, maxWidth, lineHeight = 5) => {
+      const lines = doc.splitTextToSize(cleanText(text), maxWidth);
+      doc.text(lines, x, startY);
+      return startY + lines.length * lineHeight;
+    };
 
-      const writeJustifiedText = (text, x, startY, maxWidth, lineHeight = 5.2) => {
-        const lines = doc.splitTextToSize(cleanText(text), maxWidth);
-        doc.text(lines, x, startY, {
-          maxWidth,
-          align: "left"
-        });
+    const footer = () => {
+      doc.setDrawColor(220, 220, 220);
+      doc.line(margin, pageHeight - margin + 5, pageWidth - margin, pageHeight - margin + 5);
 
-        return startY + lines.length * lineHeight;
-      };
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(120, 120, 120);
 
-      const footer = () => {
-        doc.setDrawColor(220, 220, 220);
-        doc.setLineWidth(0.25);
-        doc.line(
-          margin,
-          pageHeight - margin + 5,
-          pageWidth - margin,
-          pageHeight - margin + 5
-        );
+      doc.text(
+        "Estimates only. This report does not replace your official utility bill.",
+        margin,
+        pageHeight - margin + 11
+      );
+
+      doc.text(`Page ${pageNumber}`, pageWidth - margin, pageHeight - margin + 11, {
+        align: "right"
+      });
+    };
+
+    const checkPage = (needed = 20) => {
+      if (y + needed > pageHeight - margin - 5) {
+        footer();
+        doc.addPage();
+        pageNumber += 1;
+        y = margin;
+      }
+    };
+
+    const sectionTitle = (title) => {
+      checkPage(15);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor(30, 30, 30);
+      doc.text(title, margin, y);
+
+      y += 4;
+
+      doc.setDrawColor(5, 150, 105);
+      doc.setLineWidth(0.4);
+      doc.line(margin, y, pageWidth - margin, y);
+
+      y += 8;
+    };
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(30, 30, 30);
+    doc.text("Watts My Bill?", margin, y);
+
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.setTextColor(90, 90, 90);
+    doc.text("Energy Audit Report", margin, y);
+
+    y += 9;
+
+    doc.setFontSize(9);
+    doc.setTextColor(110, 110, 110);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, margin, y);
+
+    y += 12;
+
+    sectionTitle("Report Details");
+
+    doc.setFontSize(10);
+    doc.setTextColor(50, 50, 50);
+
+    const detailLines = [
+      ["Name", reportName ? cleanText(reportName) : "Not provided"],
+      ["Address", reportAddress ? cleanText(reportAddress) : "Not provided"],
+      ["Country", cleanText(displayCountry)],
+      ["Rate Used", `${pdfCurrency}${activeRate || 0}/kWh`]
+    ];
+
+    detailLines.forEach(([label, value]) => {
+      checkPage(9);
+
+      doc.setFont("helvetica", "bold");
+      doc.text(`${label}:`, margin, y);
+
+      doc.setFont("helvetica", "normal");
+      y = writeWrappedText(value, margin + 32, y, contentWidth - 32, 5);
+
+      y += 2;
+    });
+
+    y += 4;
+
+    sectionTitle("Summary");
+
+    const summaryLines = [
+      ["Estimated Monthly Bill", money(total)],
+      ["Total Consumption", `${totalKwh.toFixed(2)} kWh`],
+      ["Estimated Daily Average", `${money(dailyAverage)} / day`],
+      ["Highest Usage Appliance", topAppliance?.name || "Not available"]
+    ];
+
+    if (Number(actualBill) > 0) {
+      summaryLines.push(["Current Monthly Bill Entered", money(Number(actualBill))]);
+      summaryLines.push(["Estimated Difference", money(Math.abs(difference))]);
+    }
+
+    summaryLines.forEach(([label, value]) => {
+      checkPage(8);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(50, 50, 50);
+      doc.text(`${label}:`, margin, y);
+
+      doc.setFont("helvetica", "normal");
+      y = writeWrappedText(value, margin + 62, y, contentWidth - 62, 5);
+
+      y += 2;
+    });
+
+    y += 4;
+
+    sectionTitle("Energy Insight");
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(60, 60, 60);
+    y = writeWrappedText(auditMessage, margin, y, contentWidth, 5);
+
+    y += 8;
+
+    sectionTitle("Appliance Breakdown");
+
+    const validRows = breakdown.filter(
+      (item) => item.name || item.kwh > 0 || item.cost > 0
+    );
+
+    const tableX = margin;
+    const col = {
+      appliance: tableX,
+      qty: tableX + 48,
+      watts: tableX + 63,
+      hours: tableX + 83,
+      days: tableX + 103,
+      kwh: tableX + 123,
+      cost: tableX + 143
+    };
+
+    const tableHeader = () => {
+      checkPage(12);
+
+      doc.setFillColor(245, 247, 250);
+      doc.rect(tableX, y - 5, contentWidth, 9, "F");
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(40, 40, 40);
+
+      doc.text("Appliance", col.appliance + 1, y);
+      doc.text("Qty", col.qty, y);
+      doc.text("Watts", col.watts, y);
+      doc.text("Hours", col.hours, y);
+      doc.text("Days", col.days, y);
+      doc.text("kWh", col.kwh, y);
+      doc.text("Cost", col.cost, y);
+
+      y += 8;
+    };
+
+    tableHeader();
+
+    if (validRows.length === 0) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text("No appliance data entered.", tableX + 1, y);
+      y += 8;
+    } else {
+      validRows.forEach((item) => {
+        checkPage(12);
+
+        doc.setDrawColor(235, 235, 235);
+        doc.line(tableX, y + 2, pageWidth - margin, y + 2);
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
-        doc.setTextColor(120, 120, 120);
-
-        doc.text(
-          "Estimates only. This report does not replace your official utility bill.",
-          margin,
-          pageHeight - margin + 11
-        );
-
-        doc.text(`Page ${pageNumber}`, pageWidth - margin, pageHeight - margin + 11, {
-          align: "right"
-        });
-      };
-
-      const checkPage = (needed = 20) => {
-        if (y + needed > pageHeight - margin - 8) {
-          footer();
-          doc.addPage();
-          pageNumber += 1;
-          y = margin;
-        }
-      };
-
-      const sectionTitle = (title, rightText = "") => {
-        checkPage(18);
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        doc.setTextColor(25, 25, 25);
-        doc.text(title, margin, y);
-
-        if (rightText) {
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(8.5);
-          doc.setTextColor(90, 90, 90);
-          doc.text(rightText, pageWidth - margin, y, { align: "right" });
-        }
-
-        y += 5.5;
-
-        doc.setDrawColor(5, 150, 105);
-        doc.setLineWidth(0.5);
-        doc.line(margin, y, pageWidth - margin, y);
-
-        y += 9;
-      };
-
-      const now = new Date();
-
-      const formattedDate = now.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric"
-      });
-
-      const formattedTime = now.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit"
-      });
-
-      const generatedLabel = `Generated on ${formattedDate} at ${formattedTime}`;
-
-      const headerTop = y;
-      const logoBoxSize = 13;
-      const headerTextX = logoImage?.dataUrl ? margin + 16 : margin;
-
-      if (logoImage?.dataUrl) {
-        const logoRatio = logoImage.width / logoImage.height;
-        const logoWidth = logoRatio >= 1 ? logoBoxSize : logoBoxSize * logoRatio;
-        const logoHeight = logoRatio >= 1 ? logoBoxSize / logoRatio : logoBoxSize;
-        const logoX = margin + (logoBoxSize - logoWidth) / 2;
-        const logoY = headerTop + 1.5;
-
-        doc.addImage(logoImage.dataUrl, "PNG", logoX, logoY, logoWidth, logoHeight);
-      }
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(18);
-      doc.setTextColor(30, 30, 30);
-      doc.text("Watts My Bill?", headerTextX, headerTop + 7.2);
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9.5);
-      doc.setTextColor(90, 90, 90);
-      doc.text("Energy Audit Report", headerTextX, headerTop + 11.8);
-
-      y += 26;
-
-      sectionTitle("Report Details", generatedLabel);
-
-      const detailLines = [
-        ...(reportName ? [["Name", cleanText(reportName)]] : []),
-        ...(reportAddress ? [["Address", cleanText(reportAddress)]] : []),
-        ["Country", cleanText(displayCountry)],
-        [
-          "Rate Used",
-          `${pdfCurrency}${Number(activeRate || 0).toLocaleString(undefined, {
-            maximumFractionDigits: 4
-          })}/kWh`
-        ]
-      ];
-
-      doc.setFontSize(10);
-      doc.setTextColor(50, 50, 50);
-
-      detailLines.forEach(([label, value]) => {
-        checkPage(10);
-
-        doc.setFont("helvetica", "bold");
-        doc.text(`${label}:`, margin, y);
-
-        doc.setFont("helvetica", "normal");
-        y = writeWrappedText(value, margin + 48, y, contentWidth - 48, 5);
-
-        y += 1.8;
-      });
-
-      y += 8;
-
-      sectionTitle("Summary");
-
-      const summaryLines = [
-        ["Estimated Monthly Bill", money(total)],
-        ["Total Consumption", `${totalKwh.toFixed(2)} kWh`],
-        ["Estimated Daily Average", `${money(dailyAverage)} / day`],
-        ["Highest Usage Appliance", topAppliance?.name || "Not available"]
-      ];
-
-      if (Number(actualBill) > 0) {
-        summaryLines.push(["Current Monthly Bill Entered", money(Number(actualBill))]);
-        summaryLines.push(["Estimated Difference", money(Math.abs(difference))]);
-      }
-
-      summaryLines.forEach(([label, value]) => {
-        checkPage(9);
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
         doc.setTextColor(50, 50, 50);
-        doc.text(`${label}:`, margin, y);
 
-        doc.setFont("helvetica", "normal");
-        y = writeWrappedText(value, margin + 74, y, contentWidth - 74, 5);
+        const applianceName = cleanText(item.name || "Unnamed");
+        const applianceLines = doc.splitTextToSize(applianceName, 43);
+        const rowHeight = Math.max(8, applianceLines.length * 4.5);
 
-        y += 1.8;
+        doc.text(applianceLines, col.appliance + 1, y);
+        doc.text(String(item.quantity || 1), col.qty, y);
+        doc.text(String(item.watts || 0), col.watts, y);
+        doc.text(String(item.hours || 0), col.hours, y);
+        doc.text(String(item.days || 0), col.days, y);
+        doc.text(item.kwh.toFixed(2), col.kwh, y);
+        doc.text(money(item.cost), col.cost, y);
+
+        y += rowHeight;
       });
-
-      y += 10;
-
-      sectionTitle("Energy Insight");
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9.5);
-      doc.setTextColor(70, 70, 70);
-      y = writeJustifiedText(auditMessage, margin, y, contentWidth, 5.2);
-
-      y += 9;
-
-      sectionTitle("Appliance Breakdown");
-
-      const validRows = breakdown.filter(
-        (item) => item.name || item.kwh > 0 || item.cost > 0
-      );
-
-      const tableX = margin;
-      const col = {
-        appliance: tableX,
-        qty: tableX + 48,
-        watts: tableX + 63,
-        hours: tableX + 83,
-        days: tableX + 103,
-        kwh: tableX + 123,
-        cost: tableX + 143
-      };
-
-      const tableHeader = () => {
-        checkPage(14);
-
-        doc.setFillColor(245, 247, 250);
-        doc.rect(tableX, y - 5, contentWidth, 9, "F");
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(7.5);
-        doc.setTextColor(45, 45, 45);
-
-        doc.text("Appliance", col.appliance + 1, y);
-        doc.text("Qty", col.qty, y);
-        doc.text("Watts", col.watts, y);
-        doc.text("Hours", col.hours, y);
-        doc.text("Days", col.days, y);
-        doc.text("kWh", col.kwh, y);
-        doc.text("Cost", col.cost, y);
-
-        y += 8;
-      };
-
-      tableHeader();
-
-      if (validRows.length === 0) {
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(100, 100, 100);
-        doc.text("No appliance data entered.", tableX + 1, y);
-        y += 8;
-      } else {
-        validRows.forEach((item) => {
-          checkPage(12);
-
-          doc.setDrawColor(230, 230, 230);
-          doc.line(tableX, y + 2, pageWidth - margin, y + 2);
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(7.5);
-          doc.setTextColor(50, 50, 50);
-
-          const applianceName = cleanText(item.name || "Unnamed");
-          const applianceLines = doc.splitTextToSize(applianceName, 43);
-          const rowHeight = Math.max(8, applianceLines.length * 4.5);
-
-          doc.text(applianceLines, col.appliance + 1, y);
-          doc.text(String(item.quantity || 1), col.qty, y);
-          doc.text(String(item.watts || 0), col.watts, y);
-          doc.text(String(item.hours || 0), col.hours, y);
-          doc.text(String(item.days || 0), col.days, y);
-          doc.text(item.kwh.toFixed(2), col.kwh, y);
-          doc.text(money(item.cost), col.cost, y);
-
-          y += rowHeight;
-        });
-      }
-
-      y += 10;
-
-      sectionTitle("Important Note");
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(90, 90, 90);
-
-      writeWrappedText(
-        "This report is for estimation and educational purposes only. Actual electric bills may include taxes, generation charges, transmission, distribution, service fees, VAT, and provider-specific adjustments.",
-        margin,
-        y,
-        contentWidth,
-        5
-      );
-
-      footer();
-
-      doc.save("watts-my-bill-energy-audit-report.pdf");
-    } catch (error) {
-      console.error("PDF generation failed:", error);
-      alert("Sorry, the report could not be downloaded. Please refresh the page and try again.");
     }
+
+    y += 8;
+
+    sectionTitle("Important Note");
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(90, 90, 90);
+
+    writeWrappedText(
+      "This report is for estimation and educational purposes only. Actual electric bills may include taxes, generation charges, transmission, distribution, service fees, VAT, and provider-specific adjustments.",
+      margin,
+      y,
+      contentWidth,
+      5
+    );
+
+    footer();
+
+    doc.save("watts-my-bill-energy-audit-report.pdf");
   };
 
   const theme = darkMode
@@ -923,7 +815,7 @@ export default function Page() {
   return (
     <div className={`min-h-screen p-4 md:p-6 transition ${theme}`}>
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-start gap-4 mb-4">
+        <div className="flex justify-between items-start gap-4 mb-6">
           <Logo />
 
           <div className="flex flex-col sm:flex-row gap-2">
@@ -943,20 +835,17 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="mb-6 p-5 md:p-6 rounded-3xl bg-gradient-to-r from-[#059669] via-[#10B981] to-[#2DD4BF] text-white shadow-2xl">
+        <div className="mb-6 p-6 rounded-3xl bg-gradient-to-r from-[#059669] via-[#10B981] to-[#2DD4BF] text-white shadow-2xl">
           <h2 className="text-3xl font-black">
             {displayCurrency}
-            {Number(total).toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            })}
+            {total.toFixed(2)}
           </h2>
 
           <p className="mt-2 opacity-90">
             Estimated monthly electricity bill
           </p>
 
-          <div className="mt-4 grid md:grid-cols-4 gap-3">
+          <div className="mt-5 grid md:grid-cols-4 gap-3">
             <div className="bg-white/20 px-4 py-3 rounded-2xl backdrop-blur-sm">
               <p className="text-xs opacity-80">Total Usage</p>
               <p className="font-bold">⚡ {totalKwh.toFixed(2)} kWh</p>
@@ -981,10 +870,7 @@ export default function Page() {
               <p className="text-xs opacity-80">Daily Average</p>
               <p className="font-bold">
                 {displayCurrency}
-                {Number(dailyAverage).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}/day
+                {dailyAverage.toFixed(2)}/day
               </p>
             </div>
           </div>
@@ -995,7 +881,7 @@ export default function Page() {
             </div>
           )}
 
-          <div className="mt-4">
+          <div className="mt-5">
             <button
               onClick={() => setShowEstimateHelp(!showEstimateHelp)}
               className="text-xs underline underline-offset-4 opacity-90 hover:opacity-100"
@@ -1015,7 +901,7 @@ export default function Page() {
 
         <div className="grid md:grid-cols-3 gap-4 mb-6">
           <select
-            className="p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+            className="p-4 rounded-2xl border bg-white text-black shadow"
             value={country.name}
             onChange={(e) => {
               setCountry(
@@ -1036,7 +922,7 @@ export default function Page() {
 
           <input
             type="number"
-            className="p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+            className="p-4 rounded-2xl border bg-white text-black shadow"
             placeholder="Enter your current monthly bill"
             value={actualBill}
             onChange={(e) => setActualBill(e.target.value)}
@@ -1045,7 +931,7 @@ export default function Page() {
           <div>
             <input
               type="number"
-              className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              className="w-full p-4 rounded-2xl border bg-white text-black shadow"
               placeholder={`Electricity provider rate per kWh (${displayCurrency || "currency"})`}
               value={customRate}
               onChange={(e) => setCustomRate(e.target.value)}
@@ -1062,7 +948,7 @@ export default function Page() {
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <input
               type="text"
-              className="p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              className="p-4 rounded-2xl border bg-white text-black shadow"
               placeholder="Your country name"
               value={customCountryName}
               onChange={(e) => setCustomCountryName(e.target.value)}
@@ -1070,7 +956,7 @@ export default function Page() {
 
             <input
               type="text"
-              className="p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              className="p-4 rounded-2xl border bg-white text-black shadow"
               placeholder="Currency symbol, e.g. ₱, $, €, RM"
               value={customCurrency}
               onChange={(e) => setCustomCurrency(e.target.value)}
@@ -1089,10 +975,7 @@ export default function Page() {
                 }`}
               >
                 {displayCurrency}
-                {Number(Math.abs(difference)).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}
+                {Math.abs(difference).toFixed(2)}
               </span>
             </div>
 
@@ -1127,14 +1010,14 @@ export default function Page() {
             <div className="flex flex-col md:flex-row gap-2">
               <input
                 type="text"
-                className="p-3 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                className="p-3 rounded-2xl border bg-white text-black shadow-sm"
                 placeholder="Search appliance..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
 
               <select
-                className="p-3 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                className="p-3 rounded-2xl border bg-white text-black shadow-sm"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -1150,7 +1033,7 @@ export default function Page() {
               <button
                 key={`${p.category}-${p.name}`}
                 onClick={() => addPreset(p)}
-                className="px-4 py-1.5 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-black text-sm transition shadow-sm"
+                className="px-4 py-2 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-black text-sm transition shadow-sm"
                 title={`${p.category} • ${p.watts}W • ${p.hours}h/day • ${p.days} days`}
               >
                 + {p.name}
@@ -1296,10 +1179,7 @@ export default function Page() {
 
                   <h3 className="font-black text-2xl text-emerald-600">
                     {displayCurrency}
-                    {Number(item.cost).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    })}
+                    {item.cost.toFixed(2)}
                   </h3>
                 </div>
               </div>
@@ -1331,10 +1211,7 @@ export default function Page() {
               <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
                 <p className="text-xs opacity-60">Potential Monthly Saving</p>
                 <p className="font-black text-lg text-emerald-700">
-                  {displayCurrency}{Number(possibleSavings).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })}
+                  {displayCurrency}{possibleSavings.toFixed(2)}
                 </p>
                 <p className="text-xs opacity-60 mt-1">If reduced by 1 hour/day</p>
               </div>
@@ -1357,7 +1234,7 @@ export default function Page() {
           <div className="grid md:grid-cols-2 gap-4">
             <input
               type="text"
-              className="p-4 rounded-2xl border border-gray-200 bg-white text-black focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              className="p-4 rounded-2xl border bg-white text-black"
               placeholder="Name for report"
               value={reportName}
               onChange={(e) => setReportName(e.target.value)}
@@ -1365,7 +1242,7 @@ export default function Page() {
 
             <input
               type="text"
-              className="p-4 rounded-2xl border border-gray-200 bg-white text-black focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              className="p-4 rounded-2xl border bg-white text-black"
               placeholder="Address for report"
               value={reportAddress}
               onChange={(e) => setReportAddress(e.target.value)}
