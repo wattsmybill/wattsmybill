@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,18 +40,11 @@ export const metadata = {
 
   openGraph: {
     title: "Watts My Bill? | Real-world electricity usage calculator",
-
-    description:
-      "Your friendly tool for understanding electricity bills.",
-
+    description: "Your friendly tool for understanding electricity bills.",
     url: "https://wattsmybill.app",
-
     siteName: "Watts My Bill?",
-
     type: "website",
-
     locale: "en_US",
-
     images: [
       {
         url: "/og-image.jpg",
@@ -63,12 +57,8 @@ export const metadata = {
 
   twitter: {
     card: "summary_large_image",
-
     title: "Watts My Bill? | Real-world electricity usage calculator",
-
-    description:
-      "Your friendly tool for understanding electricity bills.",
-
+    description: "Your friendly tool for understanding electricity bills.",
     images: ["/og-image.jpg"],
   },
 
@@ -86,6 +76,21 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-BVVJPKW2ZT"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-BVVJPKW2ZT');
+          `}
+        </Script>
+
         {children}
       </body>
     </html>
