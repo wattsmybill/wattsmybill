@@ -262,7 +262,7 @@ function Logo() {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="w-[64px] h-[64px] flex items-center justify-center overflow-hidden shrink-0">
+      <div className="w-[48px] h-[48px] md:w-[56px] md:h-[56px] flex items-center justify-center overflow-hidden shrink-0">
         {logoFailed ? (
           <span aria-hidden="true" className="text-3xl">💡</span>
         ) : (
@@ -276,11 +276,11 @@ function Logo() {
       </div>
 
       <div>
-        <div className="font-black text-[2.6rem] tracking-tight leading-none">
+        <div className="font-black text-[2rem] md:text-[2.3rem] tracking-tight leading-none">
           Watts My Bill?
         </div>
 
-        <div className="text-sm text-gray-600 mt-1">
+        <div className="text-xs md:text-sm text-gray-600 mt-1">
           Electricity usage calculator
         </div>
       </div>
@@ -923,20 +923,20 @@ export default function Page() {
   return (
     <div className={`min-h-screen p-4 md:p-6 transition ${theme}`}>
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-start gap-4 mb-4">
+        <div className="flex justify-between items-start gap-3 md:gap-4 mb-4">
           <Logo />
 
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 shrink-0">
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition whitespace-nowrap"
+              className="px-3 py-2 md:px-4 rounded-xl bg-emerald-600 text-white text-sm md:text-base hover:bg-emerald-700 transition whitespace-nowrap"
             >
               {darkMode ? "Light Mode" : "Dark Mode"}
             </button>
 
             <button
               onClick={clearAll}
-              className="px-4 py-2 rounded-xl bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 transition shadow-sm whitespace-nowrap"
+              className="px-3 py-2 md:px-4 rounded-xl bg-white text-gray-700 text-sm md:text-base hover:bg-gray-100 border border-gray-200 transition shadow-sm whitespace-nowrap"
             >
               Start Over
             </button>
@@ -1124,7 +1124,7 @@ export default function Page() {
               )}
             </div>
 
-            <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex flex-col md:flex-row md:items-center gap-2">
               <input
                 type="text"
                 className="p-3 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
@@ -1209,7 +1209,7 @@ export default function Page() {
 
               <div className="grid md:grid-cols-5 gap-3 pr-10">
                 <input
-                  className="p-3 border rounded-xl"
+                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                   placeholder="Appliance"
                   value={item.name}
                   onChange={(e) =>
@@ -1218,7 +1218,7 @@ export default function Page() {
                 />
 
                 <input
-                  className="p-3 border rounded-xl"
+                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                   type="number"
                   min="1"
                   placeholder="Qty"
@@ -1229,7 +1229,7 @@ export default function Page() {
                 />
 
                 <input
-                  className="p-3 border rounded-xl"
+                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                   type="number"
                   placeholder="W"
                   value={item.watts}
@@ -1239,7 +1239,7 @@ export default function Page() {
                 />
 
                 <input
-                  className="p-3 border rounded-xl"
+                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                   type="number"
                   placeholder="Hours"
                   value={item.hours}
@@ -1249,7 +1249,7 @@ export default function Page() {
                 />
 
                 <input
-                  className="p-3 border rounded-xl"
+                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                   type="number"
                   placeholder="Days"
                   value={item.days}
