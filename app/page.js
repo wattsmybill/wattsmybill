@@ -22,7 +22,7 @@ const COUNTRIES = [
   { name: "Italy", rate: 0.29, currency: "€", flag: "🇮🇹" },
   { name: "Japan", rate: 0.3, currency: "¥", flag: "🇯🇵" },
   { name: "New Zealand", rate: 0.33, currency: "NZ$", flag: "🇳🇿" },
-  { name: "Philippines", rate: 15.44, currency: "₱", flag: "🇵🇭" },
+  { name: "Philippines", rate: 13.44, currency: "₱", flag: "🇵🇭" },
   { name: "Singapore", rate: 0.25, currency: "S$", flag: "🇸🇬" },
   { name: "South Korea", rate: 0.22, currency: "₩", flag: "🇰🇷" },
   { name: "Spain", rate: 0.27, currency: "€", flag: "🇪🇸" },
