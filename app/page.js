@@ -193,7 +193,7 @@ const INFO_SECTIONS = [
     id: "about",
     title: "About Watts My Bill?",
     description:
-      "Watts My Bill? is a free electricity usage calculator that helps users estimate monthly electricity costs based on appliance wattage, quantity, usage hours, days used, and electricity rate. It is built to help everyday users better understand how appliances may contribute to their bill."
+      "Watts My Bill? is a free electricity usage calculator that helps users estimate monthly electricity costs based on appliance wattage, quantity, usage hours, days per month, and electricity rate. It is built to help everyday users better understand how appliances may contribute to their bill."
   },
   {
     id: "privacy",
@@ -904,7 +904,7 @@ export default function Page() {
         doc.text("Qty", col.qty, y);
         doc.text("Watts", col.watts, y);
         doc.text("Hours", col.hours, y);
-        doc.text("Days", col.days, y);
+        doc.text("Days/Mo", col.days, y);
         doc.text("kWh", col.kwh, y);
         doc.text("Cost", col.cost, y);
 
@@ -1212,7 +1212,7 @@ export default function Page() {
                 key={`${p.category}-${p.name}`}
                 onClick={() => addPreset(p)}
                 className="px-4 py-1.5 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-black text-sm transition shadow-sm"
-                title={`${p.category} • ${p.watts}W • ${p.hours}h/day • ${p.days} days`}
+                title={`${p.category} • ${p.watts}W • ${p.hours}h/day • ${p.days} days/month`}
               >
                 + {p.name}
               </button>
@@ -1242,7 +1242,7 @@ export default function Page() {
           <div className="text-sm font-semibold opacity-70">Quantity</div>
           <div className="text-sm font-semibold opacity-70">Wattage (W)</div>
           <div className="text-sm font-semibold opacity-70">Hours / Day</div>
-          <div className="text-sm font-semibold opacity-70">Days of Use</div>
+          <div className="text-sm font-semibold opacity-70">Days / Month</div>
         </div>
 
         <div ref={applianceSectionRef} className="space-y-4 scroll-mt-24">
@@ -1312,7 +1312,7 @@ export default function Page() {
                 <input
                   className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                   type="number"
-                  placeholder="Days"
+                  placeholder="Days / Month"
                   value={item.days}
                   onChange={(e) =>
                     updateAppliance(i, "days", e.target.value)
@@ -1512,7 +1512,7 @@ export default function Page() {
           </button>
         </div>
 
-        <div className="mb-10 p-5 md:p-6 rounded-3xl bg-white text-black shadow-lg">
+        <div className="mb-8 p-5 rounded-3xl bg-white text-black shadow-lg">
           <h2 className="font-black text-xl mb-2">
             Support Watts My Bill?
           </h2>
@@ -1574,7 +1574,7 @@ export default function Page() {
 
 
 
-        <section className="mb-5 rounded-3xl bg-white p-5 md:p-6 text-black shadow-sm">
+        <section className="mb-4 rounded-3xl bg-white p-5 text-black shadow-sm">
           <h2 className="text-xl font-black leading-tight">
             Electricity Bill Usage Calculator
           </h2>
@@ -1582,7 +1582,7 @@ export default function Page() {
           <p className="mt-2 text-sm leading-relaxed text-gray-600">
             Watts My Bill? is an electricity usage calculator that helps estimate
             monthly electricity costs based on appliance wattage, quantity, usage
-            hours, days used, and electricity provider rates.
+            hours, days per month, and electricity provider rates.
           </p>
 
           <p className="mt-2 text-sm leading-relaxed text-gray-600">

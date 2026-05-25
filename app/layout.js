@@ -39,6 +39,15 @@ export const metadata = {
   creator: "Watts My Bill?",
   publisher: "Watts My Bill?",
 
+  alternates: {
+    canonical: "https://wattsmybill.app",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
   openGraph: {
     title: "Watts My Bill? | Electricity Usage Calculator",
     description:
@@ -66,9 +75,12 @@ export const metadata = {
   },
 
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.ico?v=2" },
+      { url: "/favicon.ico?v=2", sizes: "32x32", type: "image/x-icon" }
+    ],
+    shortcut: "/favicon.ico?v=2",
+    apple: "/apple-touch-icon.png?v=2",
   },
 };
 
