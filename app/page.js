@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
+import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3 } from "lucide-react";
 
 const DEFAULT_APPLIANCE = {
   name: "",
@@ -276,7 +277,7 @@ function Logo() {
       </div>
 
       <div className="min-w-0">
-        <div className="font-black text-[1.6rem] min-[390px]:text-[1.7rem] sm:text-[2rem] md:text-[2.3rem] tracking-tight leading-none">
+        <div className="font-extrabold text-[1.6rem] min-[390px]:text-[1.7rem] sm:text-[2rem] md:text-[2.25rem] tracking-tight leading-none text-gray-950 drop-shadow-none">
           Watts My Bill?
         </div>
 
@@ -306,6 +307,7 @@ export default function Page() {
   const [activeInfoPage, setActiveInfoPage] = useState(null);
   const [addedToast, setAddedToast] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(null);
+  const [shareCopied, setShareCopied] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
 
   const applianceSectionRef = useRef(null);
@@ -541,6 +543,11 @@ export default function Page() {
     .filter((item) => item.kwh > 0)
     .sort((a, b) => b.kwh - a.kwh)[0];
 
+  const topAppliances = [...breakdown]
+    .filter((item) => item.kwh > 0)
+    .sort((a, b) => b.kwh - a.kwh)
+    .slice(0, 5);
+
   const dailyAverage = total / 30;
 
   const possibleSavings = topAppliance
@@ -578,6 +585,54 @@ export default function Page() {
         2
       )} per month. ${applianceInsight}`
     : "Add appliance details to generate an energy audit insight.";
+
+  const buildShareText = () => {
+    const estimatedBill = `${displayCurrency}${Number(total).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
+
+    const topUsage = topAppliance?.name
+      ? ` Highest usage: ${topAppliance.name}.`
+      : "";
+
+    return `I estimated my monthly electricity bill using Watts My Bill?: ${estimatedBill}. Total usage: ${totalKwh.toFixed(
+      2
+    )} kWh.${topUsage}`;
+  };
+
+  const copyEstimateLink = async () => {
+    const link = typeof window !== "undefined" ? window.location.href : "https://wattsmybill.app";
+    const textToCopy = `${buildShareText()}\n${link}`;
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 1800);
+    } catch {
+      setShareCopied(false);
+      alert("Could not copy the estimate. Please copy the website link manually.");
+    }
+  };
+
+  const shareEstimate = async () => {
+    const link = typeof window !== "undefined" ? window.location.href : "https://wattsmybill.app";
+    const shareData = {
+      title: "Watts My Bill?",
+      text: buildShareText(),
+      url: link
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch {
+        return;
+      }
+    } else {
+      await copyEstimateLink();
+    }
+  };
 
   const activeInfoSection = INFO_SECTIONS.find(
     (section) => section.id === activeInfoPage
@@ -929,22 +984,29 @@ export default function Page() {
           <div className="flex flex-col sm:flex-row gap-2 shrink-0">
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="px-3 py-2 md:px-4 rounded-xl bg-emerald-600 text-white text-sm md:text-base hover:bg-emerald-700 transition whitespace-nowrap"
+              title={darkMode ? "Light Mode" : "Dark Mode"}
+              className="w-10 h-10 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition flex items-center justify-center shrink-0 shadow-sm"
             >
-              {darkMode ? "Light Mode" : "Dark Mode"}
+              {darkMode ? (
+                <Sun size={18} strokeWidth={2.3} />
+              ) : (
+                <Moon size={18} strokeWidth={2.3} />
+              )}
             </button>
 
             <button
               onClick={clearAll}
-              className="px-3 py-2 md:px-4 rounded-xl bg-white text-gray-700 text-sm md:text-base hover:bg-gray-100 border border-gray-200 transition shadow-sm whitespace-nowrap"
+              title="Reset"
+              className="px-3 py-2 md:px-4 rounded-xl bg-white text-gray-700 text-sm md:text-base hover:bg-gray-100 border border-gray-200 transition shadow-sm whitespace-nowrap flex items-center gap-2"
             >
-              Start Over
+              <RotateCcw size={16} strokeWidth={2.2} />
+              <span>Reset</span>
             </button>
           </div>
         </div>
 
-        <div className="mb-6 p-5 md:p-6 rounded-3xl bg-gradient-to-r from-[#059669] via-[#10B981] to-[#2DD4BF] text-white shadow-2xl">
-          <h2 className="text-3xl font-black">
+        <div className="mb-6 p-5 rounded-3xl bg-gradient-to-r from-[#059669] via-[#10B981] to-[#2DD4BF] text-white shadow-xl">
+          <h2 className="text-3xl font-black leading-tight">
             {displayCurrency}
             {Number(total).toLocaleString(undefined, {
               minimumFractionDigits: 2,
@@ -952,24 +1014,24 @@ export default function Page() {
             })}
           </h2>
 
-          <p className="mt-2 opacity-90">
+          <p className="mt-1 opacity-90">
             Estimated monthly electricity bill
           </p>
 
           <div className="mt-4 grid md:grid-cols-4 gap-3">
-            <div className="bg-white/20 px-4 py-3 rounded-2xl backdrop-blur-sm">
+            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm">
               <p className="text-xs opacity-80">Total Usage</p>
               <p className="font-bold">⚡ {totalKwh.toFixed(2)} kWh</p>
             </div>
 
-            <div className="bg-white/20 px-4 py-3 rounded-2xl backdrop-blur-sm">
+            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm">
               <p className="text-xs opacity-80">Country</p>
               <p className="font-bold">
                 {country.flag} {displayCountry}
               </p>
             </div>
 
-            <div className="bg-white/20 px-4 py-3 rounded-2xl backdrop-blur-sm">
+            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm">
               <p className="text-xs opacity-80">Rate Used</p>
               <p className="font-bold">
                 {displayCurrency}
@@ -977,7 +1039,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="bg-white/20 px-4 py-3 rounded-2xl backdrop-blur-sm">
+            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm">
               <p className="text-xs opacity-80">Daily Average</p>
               <p className="font-bold">
                 {displayCurrency}
@@ -990,12 +1052,12 @@ export default function Page() {
           </div>
 
           {topAppliance?.name && (
-            <div className="mt-4 bg-white/20 px-4 py-3 rounded-2xl backdrop-blur-sm inline-block">
+            <div className="mt-3 bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm inline-block">
               🔥 Highest usage: {topAppliance.name}
             </div>
           )}
 
-          <div className="mt-4">
+          <div className="mt-3">
             <button
               onClick={() => setShowEstimateHelp(!showEstimateHelp)}
               className="text-xs underline underline-offset-4 opacity-90 hover:opacity-100"
@@ -1347,6 +1409,77 @@ export default function Page() {
           )}
         </div>
 
+
+        {topAppliances.length > 0 && (
+          <div className="mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
+            <div className="mb-4 flex items-center gap-2">
+              <BarChart3 size={20} className="text-emerald-600" />
+              <h2 className="font-black text-xl">Appliance Comparison</h2>
+            </div>
+
+            <p className="mb-4 text-sm text-gray-600">
+              See which appliances contribute the most to your estimated energy usage.
+            </p>
+
+            <div className="space-y-4">
+              {topAppliances.map((item, index) => {
+                const percentage =
+                  totalKwh > 0 ? Math.max(4, (item.kwh / totalKwh) * 100) : 0;
+
+                return (
+                  <div key={`${item.name}-${item.kwh}-${index}`}>
+                    <div className="mb-1 flex items-center justify-between gap-3 text-sm">
+                      <span className="font-semibold text-gray-800">
+                        {item.name || "Unnamed appliance"}
+                      </span>
+
+                      <span className="text-gray-500">
+                        {item.kwh.toFixed(2)} kWh
+                      </span>
+                    </div>
+
+                    <div className="h-3 overflow-hidden rounded-full bg-gray-100">
+                      <div
+                        className="h-full rounded-full bg-emerald-500"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="font-black text-xl">Share Your Estimate</h2>
+              <p className="mt-1 text-sm text-gray-600">
+                Send your estimated bill, usage, and highest-usage appliance to someone else.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={shareEstimate}
+                className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+              >
+                <Share2 size={16} strokeWidth={2.2} />
+                Share estimate
+              </button>
+
+              <button
+                onClick={copyEstimateLink}
+                className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+              >
+                <Copy size={16} strokeWidth={2.2} />
+                {shareCopied ? "Copied!" : "Copy link"}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
           <h2 className="font-black text-xl mb-2">Energy Audit Report</h2>
 
@@ -1428,6 +1561,8 @@ export default function Page() {
 
                 <p className="text-xs opacity-50 mt-3">
                   Scan the QR code or use the PayPal link.
+
+                  
                 </p>
               </div>
             </div>
@@ -1438,6 +1573,25 @@ export default function Page() {
           </p>
         </div>
 
+
+
+        <section className="mb-6 rounded-3xl bg-white p-5 text-black shadow-sm">
+          <h2 className="text-xl font-black">
+            Electricity Bill Usage Calculator
+          </h2>
+
+          <p className="mt-2 text-sm leading-relaxed text-gray-600">
+            Watts My Bill? is an electricity usage calculator that helps estimate
+            monthly electricity costs based on appliance wattage, quantity, usage
+            hours, days used, and electricity provider rates.
+          </p>
+
+          <p className="mt-2 text-sm leading-relaxed text-gray-600">
+            Use it to understand how appliances such as air-conditioning units,
+            refrigerators, lighting, computers, heaters, and kitchen appliances
+            may contribute to your electricity bill.
+          </p>
+        </section>
 
         <footer className="mb-28 rounded-3xl border border-gray-200 bg-white p-5 text-black shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">

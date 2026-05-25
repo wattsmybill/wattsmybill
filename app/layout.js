@@ -1,5 +1,4 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,22 +15,23 @@ export const metadata = {
   metadataBase: new URL("https://wattsmybill.app"),
 
   title: {
-    default: "Watts My Bill? | Real-world electricity usage calculator",
+    default: "Watts My Bill? | Electricity Usage Calculator",
     template: "%s | Watts My Bill?",
   },
 
   description:
-    "Your friendly tool for understanding electricity bills. Estimate electricity costs based on appliance wattage, usage hours, quantity, and provider rates.",
+    "Watts My Bill? is an electricity usage calculator that helps estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity rates.",
 
   keywords: [
     "Watts My Bill",
+    "electricity usage calculator",
     "electricity bill calculator",
+    "electricity bill usage calculator",
     "electric bill estimator",
     "appliance wattage calculator",
     "kWh calculator",
     "energy usage calculator",
     "power consumption calculator",
-    "electricity usage calculator",
   ],
 
   authors: [{ name: "Watts My Bill?" }],
@@ -39,8 +39,9 @@ export const metadata = {
   publisher: "Watts My Bill?",
 
   openGraph: {
-    title: "Watts My Bill? | Real-world electricity usage calculator",
-    description: "Your friendly tool for understanding electricity bills.",
+    title: "Watts My Bill? | Electricity Usage Calculator",
+    description:
+      "Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity rates.",
     url: "https://wattsmybill.app",
     siteName: "Watts My Bill?",
     type: "website",
@@ -57,8 +58,9 @@ export const metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Watts My Bill? | Real-world electricity usage calculator",
-    description: "Your friendly tool for understanding electricity bills.",
+    title: "Watts My Bill? | Electricity Usage Calculator",
+    description:
+      "Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity rates.",
     images: ["/og-image.jpg"],
   },
 
@@ -75,24 +77,7 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-BVVJPKW2ZT"
-          strategy="afterInteractive"
-        />
-
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-BVVJPKW2ZT');
-          `}
-        </Script>
-
-        {children}
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
