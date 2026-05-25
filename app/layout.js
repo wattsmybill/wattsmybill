@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,7 +21,7 @@ export const metadata = {
   },
 
   description:
-    "Watts My Bill? is an electricity usage calculator that helps estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity rates.",
+    "Watts My Bill? is an electricity usage calculator that helps you estimate monthly energy costs, understand appliance consumption, and make smarter electricity decisions.",
 
   keywords: [
     "Watts My Bill",
@@ -41,14 +42,14 @@ export const metadata = {
   openGraph: {
     title: "Watts My Bill? | Electricity Usage Calculator",
     description:
-      "Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity rates.",
+      "Estimate monthly energy costs, understand appliance consumption, and make smarter electricity decisions.",
     url: "https://wattsmybill.app",
     siteName: "Watts My Bill?",
     type: "website",
     locale: "en_US",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og-image-2.jpg",
         width: 1200,
         height: 630,
         alt: "Watts My Bill? electricity usage calculator",
@@ -60,8 +61,8 @@ export const metadata = {
     card: "summary_large_image",
     title: "Watts My Bill? | Electricity Usage Calculator",
     description:
-      "Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity rates.",
-    images: ["/og-image.jpg"],
+      "Estimate monthly energy costs, understand appliance consumption, and make smarter electricity decisions.",
+    images: ["/og-image-2.jpg"],
   },
 
   icons: {
@@ -77,7 +78,24 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-BVVJPKW2ZT"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-BVVJPKW2ZT');
+          `}
+        </Script>
+
+        {children}
+      </body>
     </html>
   );
 }
