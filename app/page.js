@@ -1242,7 +1242,7 @@ export default function Page() {
           <div className="text-sm font-semibold opacity-70">Quantity</div>
           <div className="text-sm font-semibold opacity-70">Wattage (W)</div>
           <div className="text-sm font-semibold opacity-70">Hours / Day</div>
-          <div className="text-sm font-semibold opacity-70">Days of Use / Month</div>
+          <div className="text-sm font-semibold opacity-70">Days of Use</div>
         </div>
 
         <div ref={applianceSectionRef} className="space-y-4 scroll-mt-24">
@@ -1512,25 +1512,25 @@ export default function Page() {
           </button>
         </div>
 
-        <div className="mb-24 p-5 rounded-3xl bg-white text-black shadow-lg">
+        <div className="mb-10 p-5 md:p-6 rounded-3xl bg-white text-black shadow-lg">
           <h2 className="font-black text-xl mb-2">
             Support Watts My Bill?
           </h2>
 
-          <p className="text-sm opacity-70 mb-5">
+          <p className="text-sm opacity-70 mb-4">
             This tool is free to use. If it helped you understand your
             electricity bill, you may support the project.
           </p>
 
           <button
             onClick={() => setShowDonate(!showDonate)}
-            className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow transition"
+            className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow transition"
           >
             {showDonate ? "Hide" : "Support"}
           </button>
 
           {showDonate && (
-            <div className="grid md:grid-cols-2 gap-6 mt-6">
+            <div className="grid md:grid-cols-2 gap-4 mt-5">
               <div className="border rounded-3xl p-5 bg-gray-50">
                 <img
                   src="/Gcash-qr.jpg"
@@ -1567,15 +1567,15 @@ export default function Page() {
             </div>
           )}
 
-          <p className="text-xs opacity-50 mt-5">
+          <p className="text-xs opacity-50 mt-4">
             Your support helps keep Watts My Bill? free and improving.
           </p>
         </div>
 
 
 
-        <section className="mb-6 rounded-3xl bg-white p-5 text-black shadow-sm">
-          <h2 className="text-xl font-black">
+        <section className="mb-5 rounded-3xl bg-white p-5 md:p-6 text-black shadow-sm">
+          <h2 className="text-xl font-black leading-tight">
             Electricity Bill Usage Calculator
           </h2>
 
@@ -1592,11 +1592,11 @@ export default function Page() {
           </p>
         </section>
 
-        <footer className="mb-28 rounded-3xl border border-gray-200 bg-white p-5 text-black shadow-sm">
+        <footer className="mb-24 rounded-3xl border border-gray-200 bg-white p-5 md:p-6 text-black shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
               <p className="font-bold">© 2026 Watts My Bill? All rights reserved.</p>
-              <p className="mt-1 max-w-2xl text-xs text-gray-600">
+              <p className="mt-1 max-w-2xl text-xs leading-relaxed text-gray-600">
                 Estimates only. Watts My Bill? is not affiliated with any electricity
                 provider. Use this tool as a guide, not as an official bill.
               </p>
@@ -1611,7 +1611,7 @@ export default function Page() {
                       activeInfoPage === section.id ? null : section.id
                     )
                   }
-                  className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                     activeInfoPage === section.id
                       ? "border-emerald-600 bg-emerald-600 text-white"
                       : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
@@ -1663,4 +1663,5 @@ export default function Page() {
       </div>
     </div>
   );
+  
 }
