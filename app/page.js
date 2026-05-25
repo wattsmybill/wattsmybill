@@ -258,7 +258,7 @@ function loadImageAsDataUrl(src) {
 }
 
 
-function Logo() {
+function Logo({ darkMode = false }) {
   const [logoFailed, setLogoFailed] = useState(false);
 
   return (
@@ -277,11 +277,11 @@ function Logo() {
       </div>
 
       <div className="min-w-0">
-        <div className="font-extrabold text-[1.6rem] min-[390px]:text-[1.7rem] sm:text-[2rem] md:text-[2.25rem] tracking-tight leading-none text-gray-950 drop-shadow-none">
+        <div className={`font-extrabold text-[1.6rem] min-[390px]:text-[1.7rem] sm:text-[2rem] md:text-[2.25rem] tracking-tight leading-none drop-shadow-none ${darkMode ? "text-white" : "text-gray-950"}`}>
           Watts My Bill?
         </div>
 
-        <div className="text-xs md:text-sm text-gray-600 mt-1">
+        <div className={`text-xs md:text-sm mt-1 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
           Electricity usage calculator
         </div>
       </div>
@@ -979,7 +979,7 @@ export default function Page() {
     <div className={`min-h-screen p-4 md:p-6 transition ${theme}`}>
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-start gap-3 md:gap-4 mb-4">
-          <Logo />
+          <Logo darkMode={darkMode} />
 
           <div className="flex flex-col sm:flex-row gap-2 shrink-0">
             <button
@@ -996,11 +996,10 @@ export default function Page() {
 
             <button
               onClick={clearAll}
-              title="Reset"
-              className="px-3 py-2 md:px-4 rounded-xl bg-white text-gray-700 text-sm md:text-base hover:bg-gray-100 border border-gray-200 transition shadow-sm whitespace-nowrap flex items-center gap-2"
+              title="Reset calculator"
+              className="w-10 h-10 rounded-xl bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 transition shadow-sm flex items-center justify-center shrink-0"
             >
-              <RotateCcw size={16} strokeWidth={2.2} />
-              <span>Reset</span>
+              <RotateCcw size={18} strokeWidth={2.2} />
             </button>
           </div>
         </div>
