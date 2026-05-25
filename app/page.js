@@ -981,7 +981,7 @@ export default function Page() {
         <div className="flex justify-between items-start gap-3 md:gap-4 mb-4">
           <Logo darkMode={darkMode} />
 
-          <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+          <div className="flex flex-row items-center gap-2 shrink-0">
             <button
               onClick={() => setDarkMode(!darkMode)}
               title={darkMode ? "Light Mode" : "Dark Mode"}
