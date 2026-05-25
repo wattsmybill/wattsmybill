@@ -1242,7 +1242,7 @@ export default function Page() {
           <div className="text-sm font-semibold opacity-70">Quantity</div>
           <div className="text-sm font-semibold opacity-70">Wattage (W)</div>
           <div className="text-sm font-semibold opacity-70">Hours / Day</div>
-          <div className="text-sm font-semibold opacity-70">Days of Use</div>
+          <div className="text-sm font-semibold opacity-70">Days of Use / Month</div>
         </div>
 
         <div ref={applianceSectionRef} className="space-y-4 scroll-mt-24">
