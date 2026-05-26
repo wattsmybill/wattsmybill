@@ -1580,9 +1580,9 @@ export default function Page() {
           </h2>
 
           <p className="mt-2 text-sm leading-relaxed text-gray-600">
-            Watts My Bill? is an electricity usage calculator that helps estimate
-            monthly electricity costs based on appliance wattage, quantity, usage
-            hours, days per month, and electricity provider rates.
+            Watts My Bill? is your friendly tool that helps estimate monthly
+            electricity costs based on appliance wattage, quantity, usage, hours, 
+            days per month, and electricity provider rates.
           </p>
 
           <p className="mt-2 text-sm leading-relaxed text-gray-600">

@@ -3,7 +3,7 @@ export default function sitemap() {
     {
       url: "https://wattsmybill.app",
       lastModified: new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: "daily",
       priority: 1,
     },
   ];
