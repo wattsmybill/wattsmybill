@@ -442,7 +442,7 @@ function Logo({ darkMode = false }) {
         </div>
 
         <div className={`text-xs md:text-sm mt-1 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-          Electricity usage calculator
+          Your Friendly Electricity Usage Tool
         </div>
       </div>
     </div>
