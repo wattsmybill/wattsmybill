@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
-import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Home } from "lucide-react";
+import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Home, CheckCircle2, Coffee } from "lucide-react";
 
 const DEFAULT_APPLIANCE = {
   name: "",
@@ -235,6 +235,35 @@ const HOUSEHOLD_PRESETS = [
 ];
 
 
+function calculatePresetKwh(preset) {
+  return preset.appliances.reduce((sum, item) => {
+    const watts = Number(item.watts || 0);
+    const quantity = Number(item.quantity || 1);
+    const hours = Number(item.hours || 0);
+    const days = Number(item.days || 0);
+
+    return sum + (watts * quantity * hours * days) / 1000;
+  }, 0);
+}
+
+function summarizePresetAppliances(preset) {
+  return preset.appliances
+    .slice(0, 6)
+    .map((item) => `${item.quantity || 1} ${item.name}`)
+    .join(" • ");
+}
+
+function getPresetTypeLabel(preset) {
+  const name = preset.name.toLowerCase();
+
+  if (name.includes("studio")) return "Starter home";
+  if (name.includes("condo")) return "Condo setup";
+  if (name.includes("house")) return "Family home";
+
+  return "Home preset";
+}
+
+
 function getWattageGuide(applianceName = "", category = "") {
   const name = applianceName.toLowerCase();
   const type = category.toLowerCase();
@@ -434,6 +463,8 @@ export default function Page() {
   const [showDonate, setShowDonate] = useState(false);
   const [showAllPresets, setShowAllPresets] = useState(false);
   const [showAllHouseholdPresets, setShowAllHouseholdPresets] = useState(false);
+  const [selectedHouseholdPreset, setSelectedHouseholdPreset] = useState(null);
+  const [pendingHouseholdPreset, setPendingHouseholdPreset] = useState(null);
   const [showWattageHelp, setShowWattageHelp] = useState(false);
   const [showEstimateHelp, setShowEstimateHelp] = useState(false);
   const [activeInfoPage, setActiveInfoPage] = useState(null);
@@ -475,6 +506,7 @@ export default function Page() {
         setSelectedCategory(parsed.selectedCategory || "All");
         setShowAllPresets(parsed.showAllPresets || false);
         setShowAllHouseholdPresets(parsed.showAllHouseholdPresets || false);
+        setSelectedHouseholdPreset(parsed.selectedHouseholdPreset || null);
         setShowWattageHelp(parsed.showWattageHelp || false);
         setShowEstimateHelp(parsed.showEstimateHelp || false);
 
@@ -514,6 +546,7 @@ export default function Page() {
         selectedCategory,
         showAllPresets,
         showAllHouseholdPresets,
+        selectedHouseholdPreset,
         showWattageHelp,
         showEstimateHelp
       })
@@ -533,6 +566,7 @@ export default function Page() {
     selectedCategory,
     showAllPresets,
     showAllHouseholdPresets,
+    selectedHouseholdPreset,
     showWattageHelp,
     showEstimateHelp
   ]);
@@ -557,6 +591,10 @@ export default function Page() {
   const visibleHouseholdPresets = showAllHouseholdPresets
     ? HOUSEHOLD_PRESETS
     : HOUSEHOLD_PRESETS.slice(0, 4);
+
+  const activeHouseholdPreset = HOUSEHOLD_PRESETS.find(
+    (preset) => preset.name === selectedHouseholdPreset
+  );
 
   const isOtherCountry = country.name === "Other Country";
   const activeRate = customRate ? Number(customRate) : country.rate;
@@ -585,7 +623,7 @@ export default function Page() {
       clearTimeout(highlightTimerRef.current);
     }
 
-    setAddedToast(`✅ ${name || "Appliance"} added`);
+    setAddedToast("");
     setHighlightedIndex(index);
 
     feedbackTimerRef.current = setTimeout(() => {
@@ -617,6 +655,8 @@ export default function Page() {
     setShowDonate(false);
     setShowAllPresets(false);
     setShowAllHouseholdPresets(false);
+    setSelectedHouseholdPreset(null);
+    setPendingHouseholdPreset(null);
     setShowWattageHelp(false);
     setShowEstimateHelp(false);
     setActiveInfoPage(null);
@@ -669,20 +709,22 @@ export default function Page() {
     }, 120);
   };
 
-  const addHouseholdPreset = (preset) => {
-    const presetAppliances = preset.appliances.map((item) => ({
+  const buildHouseholdPresetAppliances = (preset) =>
+    preset.appliances.map((item) => ({
       ...DEFAULT_APPLIANCE,
       ...item,
       wattageGuide: getWattageGuide(item.name, item.category)
     }));
 
-    const shouldReplaceBlankRows = appliances.every(isBlankAppliance);
-    const newAppliances = shouldReplaceBlankRows
-      ? presetAppliances
-      : [...presetAppliances, ...appliances];
+  const applyHouseholdPreset = (preset, mode = "replace") => {
+    const presetAppliances = buildHouseholdPresetAppliances(preset);
+    const newAppliances =
+      mode === "add" ? [...presetAppliances, ...appliances] : presetAppliances;
 
+    setSelectedHouseholdPreset(preset.name);
+    setPendingHouseholdPreset(null);
     setAppliances(newAppliances);
-    setAddedToast(`✅ ${preset.name} added`);
+    setAddedToast("");
     setHighlightedIndex(0);
 
     if (feedbackTimerRef.current) {
@@ -693,8 +735,7 @@ export default function Page() {
       clearTimeout(highlightTimerRef.current);
     }
 
-    feedbackTimerRef.current = setTimeout(() => setAddedToast(""), 2400);
-    highlightTimerRef.current = setTimeout(() => setHighlightedIndex(null), 1800);
+    highlightTimerRef.current = setTimeout(() => setHighlightedIndex(null), 1200);
 
     setTimeout(() => {
       applianceSectionRef.current?.scrollIntoView({
@@ -702,6 +743,17 @@ export default function Page() {
         block: "start"
       });
     }, 120);
+  };
+
+  const addHouseholdPreset = (preset) => {
+    setSelectedHouseholdPreset(preset.name);
+
+    if (appliances.every(isBlankAppliance)) {
+      applyHouseholdPreset(preset, "replace");
+      return;
+    }
+
+    setPendingHouseholdPreset(preset);
   };
 
   const updateAppliance = (i, field, value) => {
@@ -1052,29 +1104,30 @@ ${topUsage.trim()}` : ""}`;
 
       y += 8;
 
-      sectionTitle("Summary");
+      sectionTitle("Executive Summary");
 
       checkPage(42);
 
+      doc.setFillColor(235, 252, 245);
+      doc.setDrawColor(180, 235, 215);
+      doc.roundedRect(marginX, y - 5, contentWidth, 28, 4, 4, "FD");
+
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8.5);
-      doc.setTextColor(95, 95, 95);
-      doc.text("Estimated Monthly Bill", marginX, y);
-
-      y += 10;
+      doc.setTextColor(85, 105, 100);
+      doc.text("Estimated Monthly Bill", marginX + 6, y + 1);
 
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(20);
+      doc.setFontSize(22);
       doc.setTextColor(5, 150, 105);
-      doc.text(cleanText(money(total)), marginX, y);
+      doc.text(cleanText(money(total)), marginX + 6, y + 13);
 
-      y += 8;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(85, 105, 100);
+      doc.text(`${totalKwh.toFixed(2)} kWh estimated monthly usage`, pageWidth - marginX - 6, y + 13, { align: "right" });
 
-      doc.setDrawColor(225, 225, 225);
-      doc.setLineWidth(0.25);
-      doc.line(marginX, y, pageWidth - marginX, y);
-
-      y += 8;
+      y += 34;
 
       const summaryLines = [
         ["Total Usage", `${totalKwh.toFixed(2)} kWh`],
@@ -1289,33 +1342,31 @@ ${topUsage.trim()}` : ""}`;
   };
 
   const theme = darkMode
-    ? "bg-[#101826] text-white"
-    : "bg-gray-50 text-gray-900";
+    ? "bg-[#06142b] text-white"
+    : "bg-[#eef3f1] text-gray-900";
 
   return (
-    <div className={`min-h-screen p-4 md:p-6 transition ${theme}`}>
-      <div className="max-w-6xl mx-auto">
+    <div className={`min-h-screen p-4 md:p-6 transition-colors duration-300 ${theme}`}>
+      <div className="mx-auto w-full max-w-[1400px]">
         <div className="flex justify-between items-start gap-3 md:gap-4 mb-4">
           <Logo darkMode={darkMode} />
-
-          <div className="flex flex-row items-center gap-2 shrink-0">
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-              className="w-11 h-11 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700 transition flex items-center justify-center shrink-0 shadow-md shadow-emerald-900/10 ring-1 ring-white/20"
-            >
-              {darkMode ? (
-                <Sun size={18} strokeWidth={2.3} />
-              ) : (
-                <Moon size={18} strokeWidth={2.3} />
-              )}
-            </button>
-
-          </div>
         </div>
 
-        <div className="mb-6 p-5 rounded-3xl bg-gradient-to-r from-[#059669] via-[#10B981] to-[#2DD4BF] text-white shadow-xl">
-          <h2 className="text-3xl font-black leading-tight">
+        <div className="relative mb-5 md:mb-6 p-5 md:p-6 rounded-3xl bg-gradient-to-r from-[#047857] via-[#059669] to-[#14b8a6] text-white shadow-xl shadow-emerald-950/20 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-950/25">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-2xl border border-white/15 bg-white/14 text-white/80 backdrop-blur-md shadow-md shadow-emerald-950/20 ring-1 ring-white/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20 hover:text-white hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] active:scale-95"
+            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {darkMode ? (
+              <Sun size={18} strokeWidth={2.3} />
+            ) : (
+              <Moon size={18} strokeWidth={2.3} />
+            )}
+          </button>
+
+          <h2 className="pr-12 text-3xl font-black leading-tight">
             {displayCurrency}
             {Number(total).toLocaleString(undefined, {
               minimumFractionDigits: 2,
@@ -1328,19 +1379,19 @@ ${topUsage.trim()}` : ""}`;
           </p>
 
           <div className="mt-4 grid md:grid-cols-4 gap-3">
-            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm">
+            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5">
               <p className="text-xs opacity-80">Total Usage</p>
               <p className="font-bold">⚡ {totalKwh.toFixed(2)} kWh</p>
             </div>
 
-            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm">
+            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5">
               <p className="text-xs opacity-80">Country</p>
               <p className="font-bold">
                 {country.flag} {displayCountry}
               </p>
             </div>
 
-            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm">
+            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5">
               <p className="text-xs opacity-80">Rate Used</p>
               <p className="font-bold">
                 {displayCurrency}
@@ -1348,7 +1399,7 @@ ${topUsage.trim()}` : ""}`;
               </p>
             </div>
 
-            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm">
+            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5">
               <p className="text-xs opacity-80">Daily Average</p>
               <p className="font-bold">
                 {displayCurrency}
@@ -1361,7 +1412,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
 
           {topAppliance?.name && (
-            <div className="mt-3 bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm inline-block">
+            <div className="mt-3 bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5 inline-block">
               🔥 Highest usage: {topAppliance.name}
             </div>
           )}
@@ -1391,7 +1442,7 @@ ${topUsage.trim()}` : ""}`;
             </span>
 
             <select
-              className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              className="w-full p-4 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
               value={country.name}
               onChange={(e) => {
                 setCountry(
@@ -1418,7 +1469,7 @@ ${topUsage.trim()}` : ""}`;
 
             <input
               type="number"
-              className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              className="w-full p-4 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
               placeholder="Enter amount"
               value={actualBill}
               onChange={(e) => setActualBill(e.target.value)}
@@ -1433,7 +1484,7 @@ ${topUsage.trim()}` : ""}`;
 
               <input
                 type="number"
-                className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                className="w-full p-4 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                 placeholder={`${displayCurrency || "Currency"} per kWh`}
                 value={customRate}
                 onChange={(e) => setCustomRate(e.target.value)}
@@ -1451,7 +1502,7 @@ ${topUsage.trim()}` : ""}`;
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <input
               type="text"
-              className="p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              className="p-4 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
               placeholder="Your country name"
               value={customCountryName}
               onChange={(e) => setCustomCountryName(e.target.value)}
@@ -1459,7 +1510,7 @@ ${topUsage.trim()}` : ""}`;
 
             <input
               type="text"
-              className="p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              className="p-4 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
               placeholder="Currency symbol, e.g. ₱, $, €, RM"
               value={customCurrency}
               onChange={(e) => setCustomCurrency(e.target.value)}
@@ -1468,7 +1519,7 @@ ${topUsage.trim()}` : ""}`;
         )}
 
         {Number(actualBill) > 0 && (
-          <div className="mb-6 p-4 rounded-2xl bg-white text-black shadow">
+          <div className="mb-5 md:mb-6 p-4 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div className="flex justify-between items-center">
               <span className="font-medium">Bill Difference</span>
 
@@ -1492,43 +1543,106 @@ ${topUsage.trim()}` : ""}`;
           </div>
         )}
 
-        <div className="mb-6 rounded-3xl bg-white/80 p-5 text-black shadow-sm">
-          <div className="mb-3">
-            <h2 className="flex items-center gap-2 font-bold text-lg">
-              <Home size={18} className="text-emerald-600" />
+        <div className="mb-5 md:mb-6 rounded-3xl bg-[#f7f8f8] p-5 md:p-5 text-black shadow-sm ring-1 ring-black/5 transition-all duration-200 hover:shadow-md">
+          <div className="mb-4">
+            <h2 className="flex items-center gap-2 font-black text-xl tracking-tight">
+              <Home size={19} className="text-emerald-600" />
               Household Presets
             </h2>
-            <p className="mt-1 text-xs text-gray-500">
-              Optional shortcuts. You can still add, edit, or remove appliances one by one.
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-gray-600">
+              Tap a preset to quickly pre-fill common home appliances. Details appear only after selecting one.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {visibleHouseholdPresets.map((preset) => (
-              <button
-                key={preset.name}
-                onClick={() => addHouseholdPreset(preset)}
-                className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-2 text-left text-sm text-gray-900 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-100"
-                title={`${preset.name} ${preset.size}`}
-              >
-                <span className="block font-semibold">
-                  {preset.icon} {preset.name}
-                </span>
-                <span className="text-xs text-gray-500">{preset.size}</span>
-              </button>
-            ))}
+          <div className="grid grid-cols-2 gap-2 md:gap-2.5 lg:grid-cols-4">
+            {visibleHouseholdPresets.map((preset) => {
+              const presetKwh = calculatePresetKwh(preset);
+              const isSelected = selectedHouseholdPreset === preset.name;
+
+              return (
+                <button
+                  key={preset.name}
+                  onClick={() => addHouseholdPreset(preset)}
+                  className={`group min-h-[92px] md:min-h-[96px] rounded-2xl border p-2.5 md:p-3 text-left text-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] ${
+                    isSelected
+                      ? "border-emerald-400 bg-emerald-100 ring-2 ring-emerald-300 shadow-emerald-900/10"
+                      : "border-emerald-100 bg-emerald-50/80 hover:border-emerald-300 hover:bg-emerald-50"
+                  }`}
+                  title={`${preset.name} ${preset.size}`}
+                >
+                  <span className="mb-1.5 flex items-start justify-between gap-2">
+                    <span className="grid h-7 w-7 place-items-center rounded-xl bg-white text-sm shadow-sm ring-1 ring-emerald-100">
+                      {preset.icon}
+                    </span>
+
+                    {isSelected ? (
+                      <CheckCircle2 size={17} className="text-emerald-700" />
+                    ) : (
+                      <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-100">
+                        Add
+                      </span>
+                    )}
+                  </span>
+
+                  <span className="block font-black leading-tight text-gray-950">
+                    {preset.name}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-gray-500">{preset.size}</span>
+                  <span className="mt-1 block text-xs font-semibold text-emerald-800">
+                    ⚡ ~{presetKwh.toFixed(0)} kWh/month
+                  </span>
+                </button>
+              );
+            })}
           </div>
+
+          {activeHouseholdPreset && (
+            <div className="mt-4 rounded-3xl border border-emerald-100 bg-white/85 p-4 shadow-sm">
+              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+                    What’s included • {getPresetTypeLabel(activeHouseholdPreset)}
+                  </p>
+                  <h3 className="mt-1 font-black text-gray-950">
+                    {activeHouseholdPreset.icon} {activeHouseholdPreset.name}
+                  </h3>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Estimated preset usage: ~{calculatePresetKwh(activeHouseholdPreset).toFixed(0)} kWh/month before edits.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setSelectedHouseholdPreset(null)}
+                  className="self-start rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-md"
+                >
+                  Hide details
+                </button>
+              </div>
+
+              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {activeHouseholdPreset.appliances.map((item) => (
+                  <div
+                    key={`${activeHouseholdPreset.name}-${item.category}-${item.name}`}
+                    className="rounded-2xl border border-gray-100 bg-[#f7f8f8] px-3 py-2 text-xs text-gray-700"
+                  >
+                    <span className="font-bold text-gray-950">{item.quantity || 1}× {item.name}</span>
+                    <span className="block text-gray-500">{item.watts}W • {item.hours}h/day • {item.days} days/mo</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <button
             onClick={() => setShowAllHouseholdPresets(!showAllHouseholdPresets)}
-            className="mt-4 rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+            className="mt-4 rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md"
           >
-            {showAllHouseholdPresets ? "Show Less" : "More"}
+            {showAllHouseholdPresets ? "Show Less" : "More Presets"}
           </button>
         </div>
 
-        <div className="mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+        <div className="mb-5 md:mb-6 rounded-3xl bg-[#f7f8f8] p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
             <div>
               <h2 className="font-bold text-lg">Quick Add Appliances</h2>
 
@@ -1551,14 +1665,14 @@ ${topUsage.trim()}` : ""}`;
             <div className="flex flex-col md:flex-row md:items-center gap-2">
               <input
                 type="text"
-                className="p-3 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                className="p-3 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                 placeholder="Search appliance..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
 
               <select
-                className="p-3 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                className="p-3 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -1569,24 +1683,32 @@ ${topUsage.trim()}` : ""}`;
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {visiblePresets.map((p) => (
-              <button
-                key={`${p.category}-${p.name}`}
-                onClick={() => addPreset(p)}
-                className="px-4 py-1.5 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-black text-sm transition shadow-sm"
-                title={`${p.category} • ${p.watts}W • ${p.hours}h/day • ${p.days} days/month`}
-              >
-                + {p.name}
-              </button>
-            ))}
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+            Popular appliances
+          </p>
+
+          <div className="flex flex-wrap gap-1.5 md:gap-2">
+            {visiblePresets.map((p, index) => {
+              const hideOnMobile = !showAllPresets && index >= 6;
+
+              return (
+                <button
+                  key={`${p.category}-${p.name}`}
+                  onClick={() => addPreset(p)}
+                  className={`${hideOnMobile ? "hidden md:inline-flex" : "inline-flex"} items-center px-3 py-1.5 md:px-3.5 md:py-2 rounded-full bg-emerald-100 hover:bg-emerald-200 text-black text-sm font-semibold transition-all duration-200 shadow-sm hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]`}
+                  title={`${p.category} • ${p.watts}W • ${p.hours}h/day • ${p.days} days/month`}
+                >
+                  + {p.name}
+                </button>
+              );
+            })}
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {filteredPresets.length > 10 && (
               <button
                 onClick={() => setShowAllPresets(!showAllPresets)}
-                className="rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+                className="rounded-2xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-md"
               >
                 {showAllPresets ? "Show Less" : "Show More"}
               </button>
@@ -1594,7 +1716,7 @@ ${topUsage.trim()}` : ""}`;
 
             <button
               onClick={addAppliance}
-              className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-100"
+              className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md"
             >
               + Add Appliance
             </button>
@@ -1602,7 +1724,7 @@ ${topUsage.trim()}` : ""}`;
             <button
               onClick={clearAll}
               title="Reset calculator"
-              className="inline-flex items-center gap-1.5 rounded-2xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 shadow-sm transition hover:bg-red-50"
+              className="inline-flex items-center gap-1.5 rounded-2xl border border-red-200 bg-red-50/70 px-3.5 py-2 text-sm font-semibold text-red-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-50 hover:shadow-md"
             >
               <RotateCcw size={15} strokeWidth={2.2} />
               Reset
@@ -1628,7 +1750,7 @@ ${topUsage.trim()}` : ""}`;
                 className={`p-5 rounded-3xl text-black shadow-lg relative transition-all duration-500 ${
                   highlightedIndex === i
                     ? "bg-emerald-50 ring-2 ring-emerald-400 shadow-2xl"
-                    : "bg-white"
+                    : "bg-[#f7f8f8] ring-1 ring-black/5 hover:shadow-xl hover:-translate-y-0.5"
                 }`}
               >
               <button
@@ -1643,7 +1765,7 @@ ${topUsage.trim()}` : ""}`;
                 <label className="block">
                   <span className="mb-1.5 block text-xs font-semibold text-gray-500">Appliance</span>
                   <input
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     placeholder="Appliance name"
                     value={item.name}
                     onChange={(e) => updateAppliance(i, "name", e.target.value)}
@@ -1653,7 +1775,7 @@ ${topUsage.trim()}` : ""}`;
                 <label className="block">
                   <span className="mb-1.5 block text-xs font-semibold text-gray-500">Quantity</span>
                   <input
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
                     min="1"
                     placeholder="Qty"
@@ -1665,7 +1787,7 @@ ${topUsage.trim()}` : ""}`;
                 <label className="block">
                   <span className="mb-1.5 block text-xs font-semibold text-gray-500">Wattage (W)</span>
                   <input
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
                     placeholder="W"
                     value={item.watts}
@@ -1676,7 +1798,7 @@ ${topUsage.trim()}` : ""}`;
                 <label className="block">
                   <span className="mb-1.5 block text-xs font-semibold text-gray-500">Hours / Day</span>
                   <input
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
                     placeholder="Hours"
                     value={item.hours}
@@ -1687,7 +1809,7 @@ ${topUsage.trim()}` : ""}`;
                 <label className="block">
                   <span className="mb-1.5 block text-xs font-semibold text-gray-500">Days / Month</span>
                   <input
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
                     placeholder="Days"
                     value={item.days}
@@ -1745,7 +1867,7 @@ ${topUsage.trim()}` : ""}`;
           })}
         </div>
 
-        <div className="mt-8 mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
+        <div className="mt-8 mb-6 p-5 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5">
           <p className="text-sm opacity-60 mb-1">Energy Audit Insight</p>
 
           <h2 className="font-black text-xl mb-2">
@@ -1786,7 +1908,7 @@ ${topUsage.trim()}` : ""}`;
 
 
         {topAppliances.length > 0 && (
-          <div className="mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
+          <div className="mb-6 p-5 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5">
             <div className="mb-4 flex items-center gap-2">
               <BarChart3 size={20} className="text-emerald-600" />
               <h2 className="font-black text-xl">Appliance Comparison</h2>
@@ -1826,7 +1948,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
         )}
 
-        <div className="mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
+        <div className="mb-6 p-5 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="font-black text-xl">Share Your Estimate</h2>
@@ -1838,7 +1960,7 @@ ${topUsage.trim()}` : ""}`;
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={shareEstimate}
-                className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+                className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-md"
               >
                 <Share2 size={16} strokeWidth={2.2} />
                 Share estimate
@@ -1846,7 +1968,7 @@ ${topUsage.trim()}` : ""}`;
 
               <button
                 onClick={copyEstimateLink}
-                className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+                className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-md"
               >
                 <Copy size={16} strokeWidth={2.2} />
                 {shareCopied ? "Copied!" : "Copy link"}
@@ -1855,7 +1977,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
         </div>
 
-        <div className="mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
+        <div className="mb-6 p-5 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5">
           <h2 className="font-black text-xl mb-2">Energy Audit Report</h2>
 
           <p className="text-sm opacity-70 mb-2">
@@ -1899,32 +2021,37 @@ ${topUsage.trim()}` : ""}`;
 
           <button
             onClick={downloadPDF}
-            className="mt-4 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow"
+            className="mt-4 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
           >
             Download Energy Audit Report
           </button>
         </div>
 
-        <div className="mb-8 p-5 rounded-3xl bg-white text-black shadow-lg">
-          <h2 className="font-black text-xl mb-2">
-            Support Watts My Bill?
-          </h2>
+        <div className="mb-8 rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-[#f7f8f8] to-teal-50 p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5 transition-all duration-200 hover:shadow-md">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="flex items-center gap-2 font-black text-xl mb-2">
+                <Coffee size={19} className="text-emerald-700" />
+                Support Watts My Bill?
+              </h2>
 
-          <p className="text-sm opacity-70 mb-4">
-            This tool is free to use. If it helped you understand your
-            electricity bill, you may support the project.
-          </p>
+              <p className="text-sm opacity-70">
+                This tool is free to use. If it helped you understand your
+                electricity bill, you may support the project.
+              </p>
+            </div>
 
-          <button
-            onClick={() => setShowDonate(!showDonate)}
-            className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow transition"
-          >
-            {showDonate ? "Hide" : "Support"}
-          </button>
+            <button
+              onClick={() => setShowDonate(!showDonate)}
+              className="self-start px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+            >
+              {showDonate ? "Hide" : "Support"}
+            </button>
+          </div>
 
           {showDonate && (
             <div className="grid md:grid-cols-2 gap-4 mt-5">
-              <div className="border rounded-3xl p-5 bg-gray-50">
+              <div className="border border-emerald-100 rounded-3xl p-5 bg-white/85 shadow-sm">
                 <img
                   src="/Gcash-qr.jpg"
                   alt="Gcash QR"
@@ -1932,15 +2059,15 @@ ${topUsage.trim()}` : ""}`;
                 />
 
                 <h3 className="font-bold text-lg mt-4">
-                  Gcash
+                  GCash
                 </h3>
 
                 <p className="text-xs opacity-50 mt-3">
-                  Scan using Gcash or InstaPay-supported banking apps.
+                  Scan using GCash or InstaPay-supported banking apps.
                 </p>
               </div>
 
-              <div className="border rounded-3xl p-5 bg-gray-50">
+              <div className="border border-emerald-100 rounded-3xl p-5 bg-white/85 shadow-sm">
                 <img
                   src="/paypal-qr.jpg"
                   alt="PayPal QR"
@@ -1974,7 +2101,7 @@ ${topUsage.trim()}` : ""}`;
 
 
 
-        <section className="mb-4 rounded-3xl bg-white p-5 text-black shadow-sm">
+        <section className="mb-4 rounded-3xl bg-[#f7f8f8] p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5">
           <h2 className="text-xl font-black leading-tight">
             Electricity Bill Usage Calculator
           </h2>
@@ -1992,7 +2119,7 @@ ${topUsage.trim()}` : ""}`;
           </p>
         </section>
 
-        <footer className="mb-24 rounded-3xl border border-gray-200 bg-white p-5 md:p-6 text-black shadow-sm">
+        <footer className="mb-24 rounded-3xl border border-gray-200 bg-[#f7f8f8] p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
               <p className="font-bold">© 2026 Watts My Bill? All rights reserved.</p>
@@ -2011,7 +2138,7 @@ ${topUsage.trim()}` : ""}`;
                       activeInfoPage === section.id ? null : section.id
                     )
                   }
-                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                  className={`rounded-full border px-4 py-2 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 ${
                     activeInfoPage === section.id
                       ? "border-emerald-600 bg-emerald-600 text-white"
                       : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
@@ -2023,7 +2150,57 @@ ${topUsage.trim()}` : ""}`;
             </div>
           </div>
 
-          {activeInfoSection && (
+          {pendingHouseholdPreset && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-md rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-2xl ring-1 ring-white/20">
+              <div className="mb-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+                  Household preset action
+                </p>
+                <h3 className="mt-1 text-xl font-black tracking-tight text-gray-950">
+                  You already have appliances listed.
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                  Do you want to replace your current appliance list with the {pendingHouseholdPreset.name} preset, or add this preset to your existing list?
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3 text-sm text-gray-700">
+                <span className="font-bold text-gray-950">
+                  {pendingHouseholdPreset.icon} {pendingHouseholdPreset.name}
+                </span>
+                <span className="mt-1 block text-xs text-gray-600">
+                  ⚡ ~{calculatePresetKwh(pendingHouseholdPreset).toFixed(0)} kWh/month • {pendingHouseholdPreset.appliances.length} appliances
+                </span>
+              </div>
+
+              <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                <button
+                  onClick={() => applyHouseholdPreset(pendingHouseholdPreset, "replace")}
+                  className="rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-md active:scale-[0.98]"
+                >
+                  Replace list
+                </button>
+
+                <button
+                  onClick={() => applyHouseholdPreset(pendingHouseholdPreset, "add")}
+                  className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md active:scale-[0.98]"
+                >
+                  Add to list
+                </button>
+
+                <button
+                  onClick={() => setPendingHouseholdPreset(null)}
+                  className="sm:col-span-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-600 shadow-sm transition-all duration-200 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeInfoSection && (
             <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -2046,13 +2223,6 @@ ${topUsage.trim()}` : ""}`;
             </div>
           )}
         </footer>
-
-
-        {addedToast && (
-          <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-2xl">
-            {addedToast}
-          </div>
-        )}
 
       </div>
     </div>
