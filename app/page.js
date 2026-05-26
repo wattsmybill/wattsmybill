@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
-import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3 } from "lucide-react";
+import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Home } from "lucide-react";
 
 const DEFAULT_APPLIANCE = {
   name: "",
@@ -16,22 +16,34 @@ const LOGO_PATH = "/logo.png";
 
 const COUNTRIES = [
   { name: "Select your country", rate: 0, currency: "", flag: "🌍", isPlaceholder: true },
-  { name: "Australia", rate: 0.32, currency: "A$", flag: "🇦🇺" },
+  { name: "Australia", rate: 0.4, currency: "A$", flag: "🇦🇺" },
+  { name: "Brazil", rate: 0.88, currency: "R$", flag: "🇧🇷" },
   { name: "Canada", rate: 0.17, currency: "C$", flag: "🇨🇦" },
-  { name: "China", rate: 0.1, currency: "¥", flag: "🇨🇳" },
-  { name: "France", rate: 0.3, currency: "€", flag: "🇫🇷" },
-  { name: "Germany", rate: 0.35, currency: "€", flag: "🇩🇪" },
-  { name: "India", rate: 0.09, currency: "₹", flag: "🇮🇳" },
-  { name: "Italy", rate: 0.29, currency: "€", flag: "🇮🇹" },
-  { name: "Japan", rate: 0.3, currency: "¥", flag: "🇯🇵" },
-  { name: "New Zealand", rate: 0.33, currency: "NZ$", flag: "🇳🇿" },
-  { name: "Philippines", rate: 12.77, currency: "₱", flag: "🇵🇭" },
-  { name: "Singapore", rate: 0.25, currency: "S$", flag: "🇸🇬" },
-  { name: "South Korea", rate: 0.22, currency: "₩", flag: "🇰🇷" },
-  { name: "Spain", rate: 0.27, currency: "€", flag: "🇪🇸" },
-  { name: "UAE", rate: 0.2, currency: "د.إ", flag: "🇦🇪" },
-  { name: "United Kingdom", rate: 0.28, currency: "£", flag: "🇬🇧" },
-  { name: "United States", rate: 0.18, currency: "$", flag: "🇺🇸" },
+  { name: "China", rate: 0.532, currency: "¥", flag: "🇨🇳" },
+  { name: "Denmark", rate: 2.4, currency: "kr", flag: "🇩🇰" },
+  { name: "France", rate: 0.234, currency: "€", flag: "🇫🇷" },
+  { name: "Germany", rate: 0.371, currency: "€", flag: "🇩🇪" },
+  { name: "India", rate: 6.49, currency: "₹", flag: "🇮🇳" },
+  { name: "Indonesia", rate: 1450, currency: "Rp", flag: "🇮🇩" },
+  { name: "Italy", rate: 0.339, currency: "€", flag: "🇮🇹" },
+  { name: "Japan", rate: 35, currency: "¥", flag: "🇯🇵" },
+  { name: "Malaysia", rate: 0.22, currency: "RM", flag: "🇲🇾" },
+  { name: "Mexico", rate: 2.0, currency: "MX$", flag: "🇲🇽" },
+  { name: "Netherlands", rate: 0.245, currency: "€", flag: "🇳🇱" },
+  { name: "New Zealand", rate: 0.35, currency: "NZ$", flag: "🇳🇿" },
+  { name: "Norway", rate: 1.62, currency: "kr", flag: "🇳🇴" },
+  { name: "Philippines", rate: 12.383, currency: "₱", flag: "🇵🇭" },
+  { name: "Poland", rate: 0.87, currency: "zł", flag: "🇵🇱" },
+  { name: "Singapore", rate: 0.299, currency: "S$", flag: "🇸🇬" },
+  { name: "South Africa", rate: 3.67, currency: "R", flag: "🇿🇦" },
+  { name: "South Korea", rate: 171, currency: "₩", flag: "🇰🇷" },
+  { name: "Spain", rate: 0.235, currency: "€", flag: "🇪🇸" },
+  { name: "Sweden", rate: 2.27, currency: "kr", flag: "🇸🇪" },
+  { name: "Thailand", rate: 4.14, currency: "฿", flag: "🇹🇭" },
+  { name: "UAE", rate: 0.294, currency: "د.إ", flag: "🇦🇪" },
+  { name: "United Kingdom", rate: 0.3, currency: "£", flag: "🇬🇧" },
+  { name: "United States", rate: 0.186, currency: "$", flag: "🇺🇸" },
+  { name: "Vietnam", rate: 2050, currency: "₫", flag: "🇻🇳" },
   { name: "Other Country", rate: 0, currency: "", flag: "🌍" }
 ];
 
@@ -103,6 +115,125 @@ const PRESETS = [
   { category: "Other", name: "Aquarium Heater", watts: 100, hours: 8, days: 30 },
   { category: "Other", name: "Sewing Machine", watts: 100, hours: 2, days: 12 }
 ];
+
+const HOUSEHOLD_PRESETS = [
+  {
+    name: "Studio Condo",
+    icon: "🏢",
+    size: "~20–35 sqm",
+    appliances: [
+      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
+      { category: "Electronics", name: "Laptop", watts: 65, quantity: 1, hours: 6, days: 25 },
+      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 1, hours: 8, days: 30 },
+      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 4, hours: 6, days: 30 },
+      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 },
+      { category: "Electronics", name: "Phone Charger", watts: 10, quantity: 1, hours: 3, days: 30 }
+    ]
+  },
+  {
+    name: "1 Bedroom Condo",
+    icon: "🏢",
+    size: "~35–50 sqm",
+    appliances: [
+      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 1, hours: 8, days: 25 },
+      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
+      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 1, hours: 5, days: 30 },
+      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 },
+      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 6, hours: 6, days: 30 },
+      { category: "Kitchen", name: "Rice Cooker", watts: 700, quantity: 1, hours: 1, days: 25 }
+    ]
+  },
+  {
+    name: "2 Bedroom Condo",
+    icon: "🏢",
+    size: "~50–80 sqm",
+    appliances: [
+      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 2, hours: 8, days: 25 },
+      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
+      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 1, hours: 5, days: 30 },
+      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 12 },
+      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 },
+      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 8, hours: 6, days: 30 },
+      { category: "Kitchen", name: "Rice Cooker", watts: 700, quantity: 1, hours: 1, days: 25 }
+    ]
+  },
+  {
+    name: "3 Bedroom Condo",
+    icon: "🏢",
+    size: "~80–120 sqm",
+    appliances: [
+      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 3, hours: 8, days: 25 },
+      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
+      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 2, hours: 5, days: 30 },
+      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 12 },
+      { category: "Bathroom", name: "Water Heater", watts: 1500, quantity: 2, hours: 0.5, days: 20 },
+      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 },
+      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 12, hours: 6, days: 30 }
+    ]
+  },
+  {
+    name: "2 Bedroom House",
+    icon: "🏠",
+    size: "~60–90 sqm",
+    appliances: [
+      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 3, hours: 8, days: 30 },
+      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 1, hours: 8, days: 20 },
+      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
+      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 1, hours: 5, days: 30 },
+      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 12 },
+      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 10, hours: 6, days: 30 },
+      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 }
+    ]
+  },
+  {
+    name: "3 Bedroom House",
+    icon: "🏠",
+    size: "~90–140 sqm",
+    appliances: [
+      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 2, hours: 8, days: 22 },
+      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 3, hours: 8, days: 30 },
+      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
+      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 2, hours: 5, days: 30 },
+      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 14 },
+      { category: "Kitchen", name: "Rice Cooker", watts: 700, quantity: 1, hours: 1, days: 30 },
+      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 14, hours: 6, days: 30 },
+      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 }
+    ]
+  },
+  {
+    name: "4 Bedroom House",
+    icon: "🏠",
+    size: "~140–220 sqm",
+    appliances: [
+      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 3, hours: 8, days: 22 },
+      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 4, hours: 8, days: 30 },
+      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
+      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 2, hours: 5, days: 30 },
+      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 16 },
+      { category: "Laundry", name: "Dryer", watts: 3000, quantity: 1, hours: 1, days: 6 },
+      { category: "Other", name: "Water Pump", watts: 750, quantity: 1, hours: 1, days: 20 },
+      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 18, hours: 6, days: 30 },
+      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 }
+    ]
+  },
+  {
+    name: "5 Bedroom House",
+    icon: "🏠",
+    size: "~220–350 sqm",
+    appliances: [
+      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 4, hours: 8, days: 22 },
+      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 5, hours: 8, days: 30 },
+      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 2, hours: 24, days: 30 },
+      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 3, hours: 5, days: 30 },
+      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 18 },
+      { category: "Laundry", name: "Dryer", watts: 3000, quantity: 1, hours: 1, days: 8 },
+      { category: "Other", name: "Water Pump", watts: 750, quantity: 1, hours: 1, days: 25 },
+      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 24, hours: 6, days: 30 },
+      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 }
+    ]
+  }
+];
+
 
 function getWattageGuide(applianceName = "", category = "") {
   const name = applianceName.toLowerCase();
@@ -302,6 +433,7 @@ export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showDonate, setShowDonate] = useState(false);
   const [showAllPresets, setShowAllPresets] = useState(false);
+  const [showAllHouseholdPresets, setShowAllHouseholdPresets] = useState(false);
   const [showWattageHelp, setShowWattageHelp] = useState(false);
   const [showEstimateHelp, setShowEstimateHelp] = useState(false);
   const [activeInfoPage, setActiveInfoPage] = useState(null);
@@ -342,6 +474,7 @@ export default function Page() {
         setSearchTerm(parsed.searchTerm || "");
         setSelectedCategory(parsed.selectedCategory || "All");
         setShowAllPresets(parsed.showAllPresets || false);
+        setShowAllHouseholdPresets(parsed.showAllHouseholdPresets || false);
         setShowWattageHelp(parsed.showWattageHelp || false);
         setShowEstimateHelp(parsed.showEstimateHelp || false);
 
@@ -380,6 +513,7 @@ export default function Page() {
         searchTerm,
         selectedCategory,
         showAllPresets,
+        showAllHouseholdPresets,
         showWattageHelp,
         showEstimateHelp
       })
@@ -398,6 +532,7 @@ export default function Page() {
     searchTerm,
     selectedCategory,
     showAllPresets,
+    showAllHouseholdPresets,
     showWattageHelp,
     showEstimateHelp
   ]);
@@ -419,6 +554,10 @@ export default function Page() {
     ? filteredPresets
     : filteredPresets.slice(0, 10);
 
+  const visibleHouseholdPresets = showAllHouseholdPresets
+    ? HOUSEHOLD_PRESETS
+    : HOUSEHOLD_PRESETS.slice(0, 4);
+
   const isOtherCountry = country.name === "Other Country";
   const activeRate = customRate ? Number(customRate) : country.rate;
 
@@ -429,6 +568,13 @@ export default function Page() {
   const displayCurrency = isOtherCountry
     ? customCurrency || ""
     : country.currency;
+
+  const isBlankAppliance = (item) =>
+    !String(item.name || "").trim() &&
+    !String(item.watts || "").trim() &&
+    !String(item.hours || "").trim() &&
+    !String(item.days || "").trim() &&
+    Number(item.quantity || 1) === 1;
 
   const showAddedFeedback = (name, index) => {
     if (feedbackTimerRef.current) {
@@ -470,6 +616,7 @@ export default function Page() {
     setSelectedCategory("All");
     setShowDonate(false);
     setShowAllPresets(false);
+    setShowAllHouseholdPresets(false);
     setShowWattageHelp(false);
     setShowEstimateHelp(false);
     setActiveInfoPage(null);
@@ -480,30 +627,81 @@ export default function Page() {
 
   const addAppliance = () => {
     const newAppliances = [
-      ...appliances,
-      { ...DEFAULT_APPLIANCE }
+      { ...DEFAULT_APPLIANCE },
+      ...appliances
     ];
 
     setAppliances(newAppliances);
-    showAddedFeedback("Blank appliance", newAppliances.length - 1);
+    showAddedFeedback("Appliance", 0);
+
+    setTimeout(() => {
+      applianceSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 120);
   };
 
   const addPreset = (preset) => {
-    const newAppliances = [
-      ...appliances,
-      {
-        name: preset.name,
-        category: preset.category,
-        watts: preset.watts,
-        quantity: 1,
-        hours: preset.hours,
-        days: preset.days,
-        wattageGuide: preset.wattageGuide || getWattageGuide(preset.name, preset.category)
-      }
-    ];
+    const newAppliance = {
+      name: preset.name,
+      category: preset.category,
+      watts: preset.watts,
+      quantity: 1,
+      hours: preset.hours,
+      days: preset.days,
+      wattageGuide: preset.wattageGuide || getWattageGuide(preset.name, preset.category)
+    };
+
+    const shouldReplaceBlankRows = appliances.every(isBlankAppliance);
+    const newAppliances = shouldReplaceBlankRows
+      ? [newAppliance]
+      : [newAppliance, ...appliances];
 
     setAppliances(newAppliances);
-    showAddedFeedback(preset.name, newAppliances.length - 1);
+    showAddedFeedback(preset.name, 0);
+
+    setTimeout(() => {
+      applianceSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 120);
+  };
+
+  const addHouseholdPreset = (preset) => {
+    const presetAppliances = preset.appliances.map((item) => ({
+      ...DEFAULT_APPLIANCE,
+      ...item,
+      wattageGuide: getWattageGuide(item.name, item.category)
+    }));
+
+    const shouldReplaceBlankRows = appliances.every(isBlankAppliance);
+    const newAppliances = shouldReplaceBlankRows
+      ? presetAppliances
+      : [...presetAppliances, ...appliances];
+
+    setAppliances(newAppliances);
+    setAddedToast(`✅ ${preset.name} added`);
+    setHighlightedIndex(0);
+
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+    }
+
+    if (highlightTimerRef.current) {
+      clearTimeout(highlightTimerRef.current);
+    }
+
+    feedbackTimerRef.current = setTimeout(() => setAddedToast(""), 2400);
+    highlightTimerRef.current = setTimeout(() => setHighlightedIndex(null), 1800);
+
+    setTimeout(() => {
+      applianceSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 120);
   };
 
   const updateAppliance = (i, field, value) => {
@@ -566,6 +764,12 @@ export default function Page() {
     ? getApplianceInsight(topAppliance.name, topAppliance.category)
     : "";
 
+  const coolingKwh = breakdown
+    .filter((item) => item.category === "Cooling")
+    .reduce((sum, item) => sum + item.kwh, 0);
+
+  const coolingShare = totalKwh > 0 ? (coolingKwh / totalKwh) * 100 : 0;
+
   const billComparisonInsight = Number(actualBill) > 0
     ? difference > 0
       ? `Your entered bill is ${displayCurrency}${Math.abs(difference).toFixed(
@@ -583,7 +787,7 @@ export default function Page() {
         0
       )}% of your listed usage. Reducing its use by 1 hour per day may save around ${displayCurrency}${possibleSavings.toFixed(
         2
-      )} per month. ${applianceInsight}`
+      )} per month. ${coolingShare >= 40 ? `Cooling appliances make up about ${coolingShare.toFixed(0)}% of your listed usage. ` : ""}${applianceInsight}`
     : "Add appliance details to generate an energy audit insight.";
 
   const buildShareText = () => {
@@ -596,9 +800,11 @@ export default function Page() {
       ? ` Highest usage: ${topAppliance.name}.`
       : "";
 
-    return `I estimated my monthly electricity bill using Watts My Bill?: ${estimatedBill}. Total usage: ${totalKwh.toFixed(
+    return `I estimated my monthly electricity bill using Watts My Bill?: ${estimatedBill}.
+Total usage: ${totalKwh.toFixed(
       2
-    )} kWh.${topUsage}`;
+    )} kWh.${topUsage ? `
+${topUsage.trim()}` : ""}`;
   };
 
   const copyEstimateLink = async () => {
@@ -645,10 +851,12 @@ export default function Page() {
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
 
-      const margin = 25.4;
-      const contentWidth = pageWidth - margin * 2;
+      const marginX = 25.4; // 1 inch left/right
+      const marginTop = 19.05; // 0.75 inch top
+      const marginBottom = 25.4; // 1 inch bottom
+      const contentWidth = pageWidth - marginX * 2;
 
-      let y = margin;
+      let y = marginTop;
       let pageNumber = 1;
       const logoImage = await loadImageAsDataUrl(LOGO_PATH);
 
@@ -664,6 +872,15 @@ export default function Page() {
         "S$": "SGD ",
         "¥": "JPY ",
         "₩": "KRW ",
+        "₫": "VND ",
+        "zł": "PLN ",
+        "kr": "KR ",
+        "Rp": "IDR ",
+        "RM": "MYR ",
+        "MX$": "MXN ",
+        "R$": "BRL ",
+        "R": "ZAR ",
+        "฿": "THB ",
         "د.إ": "AED "
       };
 
@@ -674,6 +891,7 @@ export default function Page() {
           .replace(/₱/g, "PHP ")
           .replace(/₹/g, "INR ")
           .replace(/₩/g, "KRW ")
+          .replace(/₫/g, "VND ")
           .replace(/¥/g, "JPY ")
           .replace(/€/g, "EUR ")
           .replace(/£/g, "GBP ")
@@ -683,10 +901,10 @@ export default function Page() {
           .trim();
 
       const money = (value) =>
-        `${pdfCurrency}${Number(value || 0).toLocaleString(undefined, {
+        cleanText(`${pdfCurrency}${Number(value || 0).toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
-        })}`;
+        })}`);
 
       const writeWrappedText = (text, x, startY, maxWidth, lineHeight = 5.2) => {
         const lines = doc.splitTextToSize(cleanText(text), maxWidth);
@@ -708,10 +926,10 @@ export default function Page() {
         doc.setDrawColor(220, 220, 220);
         doc.setLineWidth(0.25);
         doc.line(
-          margin,
-          pageHeight - margin + 5,
-          pageWidth - margin,
-          pageHeight - margin + 5
+          marginX,
+          pageHeight - marginBottom + 5,
+          pageWidth - marginX,
+          pageHeight - marginBottom + 5
         );
 
         doc.setFont("helvetica", "normal");
@@ -720,21 +938,21 @@ export default function Page() {
 
         doc.text(
           "Estimates only. This report does not replace your official utility bill.",
-          margin,
-          pageHeight - margin + 11
+          marginX,
+          pageHeight - marginBottom + 11
         );
 
-        doc.text(`Page ${pageNumber}`, pageWidth - margin, pageHeight - margin + 11, {
+        doc.text(`Page ${pageNumber}`, pageWidth - marginX, pageHeight - marginBottom + 11, {
           align: "right"
         });
       };
 
       const checkPage = (needed = 20) => {
-        if (y + needed > pageHeight - margin - 8) {
+        if (y + needed > pageHeight - marginBottom - 8) {
           footer();
           doc.addPage();
           pageNumber += 1;
-          y = margin;
+          y = marginX;
         }
       };
 
@@ -744,20 +962,20 @@ export default function Page() {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor(25, 25, 25);
-        doc.text(title, margin, y);
+        doc.text(title, marginX, y);
 
         if (rightText) {
           doc.setFont("helvetica", "normal");
           doc.setFontSize(8.5);
           doc.setTextColor(90, 90, 90);
-          doc.text(rightText, pageWidth - margin, y, { align: "right" });
+          doc.text(rightText, pageWidth - marginX, y, { align: "right" });
         }
 
         y += 5.5;
 
         doc.setDrawColor(5, 150, 105);
         doc.setLineWidth(0.5);
-        doc.line(margin, y, pageWidth - margin, y);
+        doc.line(marginX, y, pageWidth - marginX, y);
 
         y += 9;
       };
@@ -779,13 +997,13 @@ export default function Page() {
 
       const headerTop = y;
       const logoBoxSize = 13;
-      const headerTextX = logoImage?.dataUrl ? margin + 16 : margin;
+      const headerTextX = logoImage?.dataUrl ? marginX + 16 : marginX;
 
       if (logoImage?.dataUrl) {
         const logoRatio = logoImage.width / logoImage.height;
         const logoWidth = logoRatio >= 1 ? logoBoxSize : logoBoxSize * logoRatio;
         const logoHeight = logoRatio >= 1 ? logoBoxSize / logoRatio : logoBoxSize;
-        const logoX = margin + (logoBoxSize - logoWidth) / 2;
+        const logoX = marginX + (logoBoxSize - logoWidth) / 2;
         const logoY = headerTop + 1.5;
 
         doc.addImage(logoImage.dataUrl, "PNG", logoX, logoY, logoWidth, logoHeight);
@@ -824,10 +1042,10 @@ export default function Page() {
         checkPage(10);
 
         doc.setFont("helvetica", "bold");
-        doc.text(`${label}:`, margin, y);
+        doc.text(`${label}:`, marginX, y);
 
         doc.setFont("helvetica", "normal");
-        y = writeWrappedText(value, margin + 48, y, contentWidth - 48, 5);
+        y = writeWrappedText(value, marginX + 48, y, contentWidth - 48, 5);
 
         y += 1.8;
       });
@@ -836,42 +1054,97 @@ export default function Page() {
 
       sectionTitle("Summary");
 
-      const summaryLines = [
-        ["Estimated Monthly Bill", money(total)],
-        ["Total Consumption", `${totalKwh.toFixed(2)} kWh`],
-        ["Estimated Daily Average", `${money(dailyAverage)} / day`],
-        ["Highest Usage Appliance", topAppliance?.name || "Not available"]
-      ];
+      checkPage(42);
 
-      if (Number(actualBill) > 0) {
-        summaryLines.push(["Current Monthly Bill Entered", money(Number(actualBill))]);
-        summaryLines.push(["Estimated Difference", money(Math.abs(difference))]);
-      }
-
-      summaryLines.forEach(([label, value]) => {
-        checkPage(9);
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
-        doc.setTextColor(50, 50, 50);
-        doc.text(`${label}:`, margin, y);
-
-        doc.setFont("helvetica", "normal");
-        y = writeWrappedText(value, margin + 74, y, contentWidth - 74, 5);
-
-        y += 1.8;
-      });
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(95, 95, 95);
+      doc.text("Estimated Monthly Bill", marginX, y);
 
       y += 10;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.setTextColor(5, 150, 105);
+      doc.text(cleanText(money(total)), marginX, y);
+
+      y += 8;
+
+      doc.setDrawColor(225, 225, 225);
+      doc.setLineWidth(0.25);
+      doc.line(marginX, y, pageWidth - marginX, y);
+
+      y += 8;
+
+      const summaryLines = [
+        ["Total Usage", `${totalKwh.toFixed(2)} kWh`],
+        ["Daily Average", `${money(dailyAverage)} / day`],
+        ["Highest Usage", topAppliance?.name || "Not available"],
+        ["Country", cleanText(displayCountry)]
+      ];
+
+      summaryLines.forEach(([label, value]) => {
+        checkPage(8);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(50, 50, 50);
+        doc.text(`${label}:`, marginX, y);
+
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(70, 70, 70);
+        y = writeWrappedText(value, marginX + 42, y, contentWidth - 42, 5);
+
+        y += 2;
+      });
+
+      if (Number(actualBill) > 0) {
+        y += 3;
+
+        doc.setDrawColor(230, 230, 230);
+        doc.line(marginX, y, pageWidth - marginX, y);
+
+        y += 7;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(50, 50, 50);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text("Bill Comparison", marginX, y);
+
+        y += 8;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.text("Current Bill", marginX, y);
+
+        doc.setFont("helvetica", "normal");
+        doc.text(money(Number(actualBill)), marginX + 40, y);
+
+        y += 8;
+
+        doc.setFont("helvetica", "bold");
+        doc.text("Estimated Difference", marginX, y);
+
+        doc.setFont("helvetica", "normal");
+        doc.text(money(Math.abs(difference)), marginX + 40, y);
+
+        y += 7;
+
+        
+      }
+
+      y += 12;
 
       sectionTitle("Energy Insight");
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9.5);
       doc.setTextColor(70, 70, 70);
-      y = writeJustifiedText(auditMessage, margin, y, contentWidth, 5.2);
+      y = writeJustifiedText(auditMessage, marginX, y, contentWidth, 5.2);
 
-      y += 9;
+      y += 10;
 
       sectionTitle("Appliance Breakdown");
 
@@ -879,25 +1152,23 @@ export default function Page() {
         (item) => item.name || item.kwh > 0 || item.cost > 0
       );
 
-      const tableX = margin;
+      const tableX = marginX;
       const col = {
-        appliance: tableX,
-        qty: tableX + 48,
-        watts: tableX + 63,
-        hours: tableX + 83,
-        days: tableX + 103,
-        kwh: tableX + 123,
-        cost: tableX + 143
+          appliance: tableX,
+          qty: tableX + 44,
+          watts: tableX + 58,
+          hours: tableX + 76,
+          days: tableX + 94,
+          kwh: tableX + 112,
+          cost: tableX + 132
       };
 
       const tableHeader = () => {
-        checkPage(14);
-
         doc.setFillColor(245, 247, 250);
         doc.rect(tableX, y - 5, contentWidth, 9, "F");
 
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(7.5);
+        doc.setFontSize(7.3);
         doc.setTextColor(45, 45, 45);
 
         doc.text("Appliance", col.appliance + 1, y);
@@ -911,28 +1182,42 @@ export default function Page() {
         y += 8;
       };
 
-      tableHeader();
+      const newPdfPageWithTableHeader = () => {
+        footer();
+        doc.addPage();
+        pageNumber += 1;
+        y = marginTop;
+        tableHeader();
+      };
 
       if (validRows.length === 0) {
+        checkPage(18);
+        tableHeader();
+
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
         doc.setTextColor(100, 100, 100);
         doc.text("No appliance data entered.", tableX + 1, y);
         y += 8;
       } else {
+        checkPage(26);
+        tableHeader();
+
         validRows.forEach((item) => {
-          checkPage(12);
+          const applianceName = cleanText(item.name || "Unnamed");
+          const applianceLines = doc.splitTextToSize(applianceName, 42);
+          const rowHeight = Math.max(8, applianceLines.length * 4.5);
+
+          if (y + rowHeight > pageHeight - marginBottom - 8) {
+            newPdfPageWithTableHeader();
+          }
 
           doc.setDrawColor(230, 230, 230);
-          doc.line(tableX, y + 2, pageWidth - margin, y + 2);
+          doc.line(tableX, y + 2, pageWidth - marginX, y + 2);
 
           doc.setFont("helvetica", "normal");
-          doc.setFontSize(7.5);
+          doc.setFontSize(7.3);
           doc.setTextColor(50, 50, 50);
-
-          const applianceName = cleanText(item.name || "Unnamed");
-          const applianceLines = doc.splitTextToSize(applianceName, 43);
-          const rowHeight = Math.max(8, applianceLines.length * 4.5);
 
           doc.text(applianceLines, col.appliance + 1, y);
           doc.text(String(item.quantity || 1), col.qty, y);
@@ -948,6 +1233,38 @@ export default function Page() {
 
       y += 10;
 
+      if (topAppliances.length > 0) {
+        sectionTitle("Top Appliance Highlights");
+
+        topAppliances.slice(0, 3).forEach((item) => {
+          checkPage(12);
+
+          const percent = totalKwh > 0 ? Math.min(100, (item.kwh / totalKwh) * 100) : 0;
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(9);
+          doc.setTextColor(45, 45, 45);
+          doc.text(cleanText(item.name || "Unnamed appliance"), marginX, y);
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8);
+          doc.setTextColor(90, 90, 90);
+          doc.text(`${item.kwh.toFixed(2)} kWh`, pageWidth - marginX, y, { align: "right" });
+
+          y += 3.5;
+
+          doc.setFillColor(235, 245, 240);
+          doc.roundedRect(marginX, y, contentWidth, 3, 1.5, 1.5, "F");
+
+          doc.setFillColor(5, 150, 105);
+          doc.roundedRect(marginX, y, Math.max(8, (contentWidth * percent) / 100), 3, 1.5, 1.5, "F");
+
+          y += 10;
+        });
+
+        y += 16;
+      }
+
       sectionTitle("Important Note");
 
       doc.setFont("helvetica", "normal");
@@ -956,7 +1273,7 @@ export default function Page() {
 
       writeWrappedText(
         "This report is for estimation and educational purposes only. Actual electric bills may include taxes, generation charges, transmission, distribution, service fees, VAT, and provider-specific adjustments.",
-        margin,
+        marginX,
         y,
         contentWidth,
         5
@@ -984,8 +1301,8 @@ export default function Page() {
           <div className="flex flex-row items-center gap-2 shrink-0">
             <button
               onClick={() => setDarkMode(!darkMode)}
-              title={darkMode ? "Light Mode" : "Dark Mode"}
-              className="w-10 h-10 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition flex items-center justify-center shrink-0 shadow-sm"
+              title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              className="w-11 h-11 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700 transition flex items-center justify-center shrink-0 shadow-md shadow-emerald-900/10 ring-1 ring-white/20"
             >
               {darkMode ? (
                 <Sun size={18} strokeWidth={2.3} />
@@ -994,13 +1311,6 @@ export default function Page() {
               )}
             </button>
 
-            <button
-              onClick={clearAll}
-              title="Reset calculator"
-              className="w-10 h-10 rounded-xl bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 transition shadow-sm flex items-center justify-center shrink-0"
-            >
-              <RotateCcw size={18} strokeWidth={2.2} />
-            </button>
           </div>
         </div>
 
@@ -1075,46 +1385,64 @@ export default function Page() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-4 mb-6">
-          <select
-            className="p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-            value={country.name}
-            onChange={(e) => {
-              setCountry(
-                COUNTRIES.find((c) => c.name === e.target.value) ||
-                  COUNTRIES[0]
-              );
-              setCustomRate("");
-              setCustomCountryName("");
-              setCustomCurrency("");
-            }}
-          >
-            {COUNTRIES.map((c) => (
-              <option key={c.name} value={c.name}>
-                {`${c.flag} ${c.name}`}
-              </option>
-            ))}
-          </select>
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide opacity-70">
+              Country
+            </span>
 
-          <input
-            type="number"
-            className="p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-            placeholder="Enter your current monthly bill"
-            value={actualBill}
-            onChange={(e) => setActualBill(e.target.value)}
-          />
+            <select
+              className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+              value={country.name}
+              onChange={(e) => {
+                setCountry(
+                  COUNTRIES.find((c) => c.name === e.target.value) ||
+                    COUNTRIES[0]
+                );
+                setCustomRate("");
+                setCustomCountryName("");
+                setCustomCurrency("");
+              }}
+            >
+              {COUNTRIES.map((c) => (
+                <option key={c.name} value={c.name}>
+                  {`${c.flag} ${c.name}`}
+                </option>
+              ))}
+            </select>
+          </label>
 
-          <div>
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide opacity-70">
+              Current Monthly Bill
+            </span>
+
             <input
               type="number"
               className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-              placeholder={`Electricity provider rate per kWh (${displayCurrency || "currency"})`}
-              value={customRate}
-              onChange={(e) => setCustomRate(e.target.value)}
+              placeholder="Enter amount"
+              value={actualBill}
+              onChange={(e) => setActualBill(e.target.value)}
             />
+          </label>
+
+          <div>
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide opacity-70">
+                Provider Rate / kWh
+              </span>
+
+              <input
+                type="number"
+                className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                placeholder={`${displayCurrency || "Currency"} per kWh`}
+                value={customRate}
+                onChange={(e) => setCustomRate(e.target.value)}
+              />
+            </label>
+
             <p className="text-xs opacity-60 mt-2 px-1">
-              Optional. Enter the rate from your electricity provider for a more
-              accurate estimate. If left blank, we’ll use the average rate for
-              your selected country.
+              Optional. Enter your provider rate for a more accurate estimate.
+              If left blank, we’ll use the average rate for your selected country.
             </p>
           </div>
         </div>
@@ -1163,6 +1491,41 @@ export default function Page() {
             </p>
           </div>
         )}
+
+        <div className="mb-6 rounded-3xl bg-white/80 p-5 text-black shadow-sm">
+          <div className="mb-3">
+            <h2 className="flex items-center gap-2 font-bold text-lg">
+              <Home size={18} className="text-emerald-600" />
+              Household Presets
+            </h2>
+            <p className="mt-1 text-xs text-gray-500">
+              Optional shortcuts. You can still add, edit, or remove appliances one by one.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {visibleHouseholdPresets.map((preset) => (
+              <button
+                key={preset.name}
+                onClick={() => addHouseholdPreset(preset)}
+                className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-2 text-left text-sm text-gray-900 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-100"
+                title={`${preset.name} ${preset.size}`}
+              >
+                <span className="block font-semibold">
+                  {preset.icon} {preset.name}
+                </span>
+                <span className="text-xs text-gray-500">{preset.size}</span>
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setShowAllHouseholdPresets(!showAllHouseholdPresets)}
+            className="mt-4 rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+          >
+            {showAllHouseholdPresets ? "Show Less" : "More"}
+          </button>
+        </div>
 
         <div className="mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
@@ -1219,30 +1582,38 @@ export default function Page() {
             ))}
           </div>
 
-          {filteredPresets.length > 10 && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {filteredPresets.length > 10 && (
+              <button
+                onClick={() => setShowAllPresets(!showAllPresets)}
+                className="rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+              >
+                {showAllPresets ? "Show Less" : "Show More"}
+              </button>
+            )}
+
             <button
-              onClick={() => setShowAllPresets(!showAllPresets)}
-              className="mt-4 px-4 py-2 rounded-2xl bg-gray-200 hover:bg-gray-300 text-sm font-medium transition"
+              onClick={addAppliance}
+              className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-100"
             >
-              {showAllPresets
-                ? "Show Less Appliances"
-                : `Show More Appliances (${filteredPresets.length - 10}+ more)`}
+              + Add Appliance
             </button>
-          )}
+
+            <button
+              onClick={clearAll}
+              title="Reset calculator"
+              className="inline-flex items-center gap-1.5 rounded-2xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 shadow-sm transition hover:bg-red-50"
+            >
+              <RotateCcw size={15} strokeWidth={2.2} />
+              Reset
+            </button>
+          </div>
 
           {filteredPresets.length === 0 && (
             <p className="text-sm opacity-60 mt-3">
               No appliance found. You can still add it manually below.
             </p>
           )}
-        </div>
-
-        <div className="hidden md:grid md:grid-cols-5 gap-3 px-2 mb-2">
-          <div className="text-sm font-semibold opacity-70">Appliance</div>
-          <div className="text-sm font-semibold opacity-70">Quantity</div>
-          <div className="text-sm font-semibold opacity-70">Wattage (W)</div>
-          <div className="text-sm font-semibold opacity-70">Hours / Day</div>
-          <div className="text-sm font-semibold opacity-70">Days / Month</div>
         </div>
 
         <div ref={applianceSectionRef} className="space-y-4 scroll-mt-24">
@@ -1269,55 +1640,60 @@ export default function Page() {
               </button>
 
               <div className="grid md:grid-cols-5 gap-3 pr-10">
-                <input
-                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                  placeholder="Appliance"
-                  value={item.name}
-                  onChange={(e) =>
-                    updateAppliance(i, "name", e.target.value)
-                  }
-                />
+                <label className="block">
+                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Appliance</span>
+                  <input
+                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    placeholder="Appliance name"
+                    value={item.name}
+                    onChange={(e) => updateAppliance(i, "name", e.target.value)}
+                  />
+                </label>
 
-                <input
-                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                  type="number"
-                  min="1"
-                  placeholder="Qty"
-                  value={item.quantity}
-                  onChange={(e) =>
-                    updateAppliance(i, "quantity", e.target.value)
-                  }
-                />
+                <label className="block">
+                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Quantity</span>
+                  <input
+                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    type="number"
+                    min="1"
+                    placeholder="Qty"
+                    value={item.quantity}
+                    onChange={(e) => updateAppliance(i, "quantity", e.target.value)}
+                  />
+                </label>
 
-                <input
-                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                  type="number"
-                  placeholder="W"
-                  value={item.watts}
-                  onChange={(e) =>
-                    updateAppliance(i, "watts", e.target.value)
-                  }
-                />
+                <label className="block">
+                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Wattage (W)</span>
+                  <input
+                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    type="number"
+                    placeholder="W"
+                    value={item.watts}
+                    onChange={(e) => updateAppliance(i, "watts", e.target.value)}
+                  />
+                </label>
 
-                <input
-                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                  type="number"
-                  placeholder="Hours"
-                  value={item.hours}
-                  onChange={(e) =>
-                    updateAppliance(i, "hours", e.target.value)
-                  }
-                />
+                <label className="block">
+                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Hours / Day</span>
+                  <input
+                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    type="number"
+                    placeholder="Hours"
+                    value={item.hours}
+                    onChange={(e) => updateAppliance(i, "hours", e.target.value)}
+                  />
+                </label>
 
-                <input
-                  className="p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                  type="number"
-                  placeholder="Days / Month"
-                  value={item.days}
-                  onChange={(e) =>
-                    updateAppliance(i, "days", e.target.value)
-                  }
-                />
+                <label className="block">
+                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Days / Month</span>
+                  <input
+                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                    type="number"
+                    placeholder="Days"
+                    value={item.days}
+                    onChange={(e) => updateAppliance(i, "days", e.target.value)}
+                  />
+                </label>
               </div>
 
               {item.name && (
@@ -1482,26 +1858,43 @@ export default function Page() {
         <div className="mb-6 p-5 rounded-3xl bg-white text-black shadow-lg">
           <h2 className="font-black text-xl mb-2">Energy Audit Report</h2>
 
-          <p className="text-sm opacity-70 mb-4">
+          <p className="text-sm opacity-70 mb-2">
             Optionally add your name and address before downloading your report.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              className="p-4 rounded-2xl border border-gray-200 bg-white text-black focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-              placeholder="Name for report"
-              value={reportName}
-              onChange={(e) => setReportName(e.target.value)}
-            />
+          <p className="mb-4 rounded-2xl bg-emerald-50 px-4 py-3 text-xs leading-relaxed text-emerald-800">
+            Your name and address are only used to generate the PDF on your device.
+            They are not sent to our server.
+          </p>
 
-            <input
-              type="text"
-              className="p-4 rounded-2xl border border-gray-200 bg-white text-black focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-              placeholder="Address for report"
-              value={reportAddress}
-              onChange={(e) => setReportAddress(e.target.value)}
-            />
+          <div className="grid md:grid-cols-2 gap-4">
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide opacity-70">
+                Name for Report
+              </span>
+
+              <input
+                type="text"
+                className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-black focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                placeholder="Enter your name"
+                value={reportName}
+                onChange={(e) => setReportName(e.target.value)}
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide opacity-70">
+                Address for Report
+              </span>
+
+              <input
+                type="text"
+                className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-black focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                placeholder="Enter your address"
+                value={reportAddress}
+                onChange={(e) => setReportAddress(e.target.value)}
+              />
+            </label>
           </div>
 
           <button
@@ -1560,9 +1953,16 @@ export default function Page() {
 
                 <p className="text-xs opacity-50 mt-3">
                   Scan the QR code or use the PayPal link.
-
-                  
                 </p>
+
+                <a
+                  href="https://paypal.me/wattsmybill"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-block text-sm font-semibold text-emerald-700 hover:underline"
+                >
+                  paypal.me/wattsmybill
+                </a>
               </div>
             </div>
           )}
@@ -1654,12 +2054,6 @@ export default function Page() {
           </div>
         )}
 
-        <button
-          onClick={addAppliance}
-          className="fixed bottom-5 right-5 bg-black text-white px-5 py-4 rounded-full shadow-2xl hover:scale-105 transition z-50"
-        >
-          + Add
-        </button>
       </div>
     </div>
   );
