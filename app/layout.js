@@ -21,7 +21,7 @@ export const metadata = {
   },
 
   description:
-    "Watts My Bill? is an electricity usage calculator that helps you estimate monthly energy costs, understand appliance consumption, and make smarter electricity decisions.",
+    "Your friendly tool for understanding electricity bills. Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity provider rates.",
 
   keywords: [
     "Watts My Bill",
@@ -33,6 +33,16 @@ export const metadata = {
     "kWh calculator",
     "energy usage calculator",
     "power consumption calculator",
+    "monthly electric bill estimate",
+    "whats my bill",
+    "electrical wattage",
+    "electrical consumption",
+    "how to know wattage consumption",
+    "energy bill",
+    "how to save energy",
+    "energy",
+    "watts",
+    "power",
   ],
 
   authors: [{ name: "Watts My Bill?" }],
@@ -46,12 +56,19 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 
   openGraph: {
     title: "Watts My Bill? | Electricity Usage Calculator",
     description:
-      "Estimate monthly energy costs, understand appliance consumption, and make smarter electricity decisions.",
+      "Your friendly tool for understanding electricity bills. Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity provider rates.",
     url: "https://wattsmybill.app",
     siteName: "Watts My Bill?",
     type: "website",
@@ -70,17 +87,25 @@ export const metadata = {
     card: "summary_large_image",
     title: "Watts My Bill? | Electricity Usage Calculator",
     description:
-      "Estimate monthly energy costs, understand appliance consumption, and make smarter electricity decisions.",
+      "Your friendly tool for understanding electricity bills. Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity provider rates.",
     images: ["/og-image-2.jpg"],
   },
 
   icons: {
     icon: [
-      { url: "/favicon.ico?v=2" },
-      { url: "/favicon.ico?v=2", sizes: "32x32", type: "image/x-icon" }
+      {
+        url: "/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
     ],
-    shortcut: "/favicon.ico?v=2",
-    apple: "/apple-touch-icon.png?v=2",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 };
 
