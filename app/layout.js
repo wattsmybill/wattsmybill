@@ -12,19 +12,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  metadataBase: new URL("https://www.wattsmybill.app"),
+const siteUrl = "https://www.wattsmybill.app";
+const siteName = "Watts My Bill?";
+const ogImage = `${siteUrl}/og-image-3.jpg`;
 
-  applicationName: "Watts My Bill?",
+export const metadata = {
+  metadataBase: new URL(siteUrl),
+
+  applicationName: siteName,
   category: "Utility",
 
   title: {
     default: "Watts My Bill? | Electricity Bill Estimator",
-    template: "%s | Watts My Bill?",
+    template: `%s | ${siteName}`,
   },
 
   description:
-    "Understand your electricity bill with a free appliance wattage calculator. Estimate monthly electricity costs, compare usage, and generate a simple energy audit report.",
+    "Understand your electricity bill with a free appliance wattage calculator. Estimate monthly electricity costs, compare usage, use household presets, and generate a simple energy audit report.",
 
   keywords: [
     "Watts My Bill",
@@ -46,12 +50,12 @@ export const metadata = {
     "how to save energy",
   ],
 
-  authors: [{ name: "Watts My Bill?" }],
-  creator: "Watts My Bill?",
-  publisher: "Watts My Bill?",
+  authors: [{ name: siteName }],
+  creator: siteName,
+  publisher: siteName,
 
   alternates: {
-    canonical: "https://www.wattsmybill.app",
+    canonical: siteUrl,
   },
 
   robots: {
@@ -69,14 +73,14 @@ export const metadata = {
   openGraph: {
     title: "Watts My Bill? | Electricity Bill Estimator",
     description:
-      "Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity rates.",
-    url: "https://www.wattsmybill.app",
-    siteName: "Watts My Bill?",
+      "Estimate appliance energy costs, compare usage, use household presets, and generate a simple energy audit report.",
+    url: siteUrl,
+    siteName,
     type: "website",
     locale: "en_US",
     images: [
       {
-        url: "https://www.wattsmybill.app/og-image-3.jpg",
+        url: ogImage,
         width: 1200,
         height: 630,
         alt: "Watts My Bill? electricity bill estimator and usage calculator",
@@ -88,8 +92,8 @@ export const metadata = {
     card: "summary_large_image",
     title: "Watts My Bill? | Electricity Bill Estimator",
     description:
-      "Understand your electricity bill with a free appliance wattage calculator and energy usage estimator.",
-    images: ["https://www.wattsmybill.app/og-image-3.jpg"],
+      "Understand your electricity bill with a free appliance wattage calculator, household presets, and an energy usage report.",
+    images: [ogImage],
   },
 
   icons: {
@@ -110,12 +114,36 @@ export const metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: siteName,
+  url: siteUrl,
+  applicationCategory: "UtilityApplication",
+  operatingSystem: "Any",
+  description:
+    "A free electricity bill estimator that helps users estimate appliance energy costs using wattage, hours, quantity, electricity rates, and household presets.",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+};
+
 export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          id="watts-my-bill-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+
       <body className="min-h-full flex flex-col">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-BVVJPKW2ZT"

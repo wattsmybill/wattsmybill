@@ -4,6 +4,10 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
 import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Home, CheckCircle2, Coffee } from "lucide-react";
 
+import { COUNTRIES } from "./data/countries";
+import { PRESETS } from "./data/appliances";
+import { HOUSEHOLD_PRESETS } from "./data/householdPresets";
+
 const DEFAULT_APPLIANCE = {
   name: "",
   watts: "",
@@ -14,226 +18,11 @@ const DEFAULT_APPLIANCE = {
 
 const LOGO_PATH = "/logo.png";
 
-const COUNTRIES = [
-  { name: "Select your country", rate: 0, currency: "", flag: "🌍", isPlaceholder: true },
-  { name: "Australia", rate: 0.4, currency: "A$", flag: "🇦🇺" },
-  { name: "Brazil", rate: 0.88, currency: "R$", flag: "🇧🇷" },
-  { name: "Canada", rate: 0.17, currency: "C$", flag: "🇨🇦" },
-  { name: "China", rate: 0.532, currency: "¥", flag: "🇨🇳" },
-  { name: "Denmark", rate: 2.4, currency: "kr", flag: "🇩🇰" },
-  { name: "France", rate: 0.234, currency: "€", flag: "🇫🇷" },
-  { name: "Germany", rate: 0.371, currency: "€", flag: "🇩🇪" },
-  { name: "India", rate: 6.49, currency: "₹", flag: "🇮🇳" },
-  { name: "Indonesia", rate: 1450, currency: "Rp", flag: "🇮🇩" },
-  { name: "Italy", rate: 0.339, currency: "€", flag: "🇮🇹" },
-  { name: "Japan", rate: 35, currency: "¥", flag: "🇯🇵" },
-  { name: "Malaysia", rate: 0.22, currency: "RM", flag: "🇲🇾" },
-  { name: "Mexico", rate: 2.0, currency: "MX$", flag: "🇲🇽" },
-  { name: "Netherlands", rate: 0.245, currency: "€", flag: "🇳🇱" },
-  { name: "New Zealand", rate: 0.35, currency: "NZ$", flag: "🇳🇿" },
-  { name: "Norway", rate: 1.62, currency: "kr", flag: "🇳🇴" },
-  { name: "Philippines", rate: 12.383, currency: "₱", flag: "🇵🇭" },
-  { name: "Poland", rate: 0.87, currency: "zł", flag: "🇵🇱" },
-  { name: "Singapore", rate: 0.299, currency: "S$", flag: "🇸🇬" },
-  { name: "South Africa", rate: 3.67, currency: "R", flag: "🇿🇦" },
-  { name: "South Korea", rate: 171, currency: "₩", flag: "🇰🇷" },
-  { name: "Spain", rate: 0.235, currency: "€", flag: "🇪🇸" },
-  { name: "Sweden", rate: 2.27, currency: "kr", flag: "🇸🇪" },
-  { name: "Thailand", rate: 4.14, currency: "฿", flag: "🇹🇭" },
-  { name: "UAE", rate: 0.294, currency: "د.إ", flag: "🇦🇪" },
-  { name: "United Kingdom", rate: 0.3, currency: "£", flag: "🇬🇧" },
-  { name: "United States", rate: 0.186, currency: "$", flag: "🇺🇸" },
-  { name: "Vietnam", rate: 2050, currency: "₫", flag: "🇻🇳" },
-  { name: "Other Country", rate: 0, currency: "", flag: "🌍" }
-];
 
-const PRESETS = [
-  { category: "Cooling", name: "Air-conditioning Unit", watts: 1200, hours: 8, days: 25 },
-  { category: "Cooling", name: "Window Type Aircon", watts: 900, hours: 8, days: 25 },
-  { category: "Cooling", name: "Split Type Aircon", watts: 1100, hours: 8, days: 25 },
-  { category: "Cooling", name: "Inverter Aircon", watts: 800, hours: 8, days: 25 },
-  { category: "Cooling", name: "Electric Fan", watts: 75, hours: 8, days: 30 },
-  { category: "Cooling", name: "Ceiling Fan", watts: 60, hours: 8, days: 30 },
-  { category: "Cooling", name: "Air Cooler", watts: 150, hours: 6, days: 25 },
 
-  { category: "Kitchen", name: "Refrigerator", watts: 150, hours: 24, days: 30 },
-  { category: "Kitchen", name: "Freezer", watts: 250, hours: 24, days: 30 },
-  { category: "Kitchen", name: "Microwave", watts: 1200, hours: 0.25, days: 15 },
-  { category: "Kitchen", name: "Oven", watts: 2000, hours: 1, days: 8 },
-  { category: "Kitchen", name: "Electric Stove", watts: 2000, hours: 1, days: 20 },
-  { category: "Kitchen", name: "Electric Range", watts: 2500, hours: 1, days: 20 },
-  { category: "Kitchen", name: "Induction Cooker", watts: 1800, hours: 1, days: 20 },
-  { category: "Kitchen", name: "Rice Cooker", watts: 700, hours: 1, days: 30 },
-  { category: "Kitchen", name: "Air Fryer", watts: 1400, hours: 0.5, days: 12 },
-  { category: "Kitchen", name: "Electric Kettle", watts: 1500, hours: 0.25, days: 30 },
-  { category: "Kitchen", name: "Coffee Maker", watts: 900, hours: 0.25, days: 25 },
-  { category: "Kitchen", name: "Blender", watts: 400, hours: 0.1, days: 12 },
-  { category: "Kitchen", name: "Toaster", watts: 800, hours: 0.1, days: 20 },
-  { category: "Kitchen", name: "Rangehood", watts: 200, hours: 1, days: 20 },
-  { category: "Kitchen", name: "Dishwasher", watts: 1500, hours: 1, days: 12 },
 
-  { category: "Laundry", name: "Washing Machine", watts: 500, hours: 1, days: 12 },
-  { category: "Laundry", name: "Dryer", watts: 3000, hours: 1, days: 8 },
-  { category: "Laundry", name: "Spin Dryer", watts: 300, hours: 0.5, days: 12 },
-  { category: "Laundry", name: "Flat Iron / Steam Iron", watts: 1000, hours: 1, days: 4 },
-  { category: "Laundry", name: "Steamer", watts: 800, hours: 0.5, days: 8 },
 
-  { category: "Electronics", name: "Television", watts: 100, hours: 5, days: 30 },
-  { category: "Electronics", name: "LED TV", watts: 80, hours: 5, days: 30 },
-  { category: "Electronics", name: "Smart TV", watts: 120, hours: 5, days: 30 },
-  { category: "Electronics", name: "Laptop", watts: 65, hours: 8, days: 25 },
-  { category: "Electronics", name: "Desktop Computer", watts: 300, hours: 8, days: 25 },
-  { category: "Electronics", name: "Gaming PC", watts: 500, hours: 5, days: 20 },
-  { category: "Electronics", name: "Monitor", watts: 40, hours: 8, days: 25 },
-  { category: "Electronics", name: "Printer", watts: 50, hours: 0.5, days: 10 },
-  { category: "Electronics", name: "Phone Charger", watts: 10, hours: 3, days: 30 },
-  { category: "Electronics", name: "Tablet Charger", watts: 15, hours: 3, days: 30 },
-  { category: "Electronics", name: "Game Console", watts: 150, hours: 3, days: 20 },
-  { category: "Electronics", name: "Speaker", watts: 50, hours: 3, days: 20 },
 
-  { category: "Internet", name: "Router", watts: 10, hours: 24, days: 30 },
-  { category: "Internet", name: "Modem", watts: 10, hours: 24, days: 30 },
-  { category: "Internet", name: "WiFi Mesh", watts: 15, hours: 24, days: 30 },
-  { category: "Internet", name: "CCTV Camera", watts: 10, hours: 24, days: 30 },
-
-  { category: "Lighting", name: "LED Bulb", watts: 10, hours: 6, days: 30 },
-  { category: "Lighting", name: "Lighting", watts: 60, hours: 6, days: 30 },
-  { category: "Lighting", name: "Fluorescent Light", watts: 40, hours: 6, days: 30 },
-  { category: "Lighting", name: "Outdoor Light", watts: 50, hours: 10, days: 30 },
-  { category: "Lighting", name: "Christmas Lights", watts: 80, hours: 6, days: 20 },
-
-  { category: "Bathroom", name: "Water Heater", watts: 1500, hours: 1, days: 20 },
-  { category: "Bathroom", name: "Hair Dryer / Blower", watts: 1000, hours: 0.25, days: 12 },
-  { category: "Bathroom", name: "Exhaust Fan", watts: 40, hours: 3, days: 30 },
-
-  { category: "Cleaning", name: "Vacuum Cleaner", watts: 1000, hours: 0.5, days: 8 },
-  { category: "Cleaning", name: "Pressure Washer", watts: 1500, hours: 1, days: 4 },
-  { category: "Cleaning", name: "Robot Vacuum", watts: 60, hours: 2, days: 20 },
-
-  { category: "Other", name: "Water Pump", watts: 750, hours: 1, days: 20 },
-  { category: "Other", name: "Aquarium Pump", watts: 20, hours: 24, days: 30 },
-  { category: "Other", name: "Aquarium Heater", watts: 100, hours: 8, days: 30 },
-  { category: "Other", name: "Sewing Machine", watts: 100, hours: 2, days: 12 }
-];
-
-const HOUSEHOLD_PRESETS = [
-  {
-    name: "Studio Condo",
-    icon: "🏢",
-    size: "~20–35 sqm",
-    appliances: [
-      { category: "Cooling", name: "Inverter Aircon", watts: 600, quantity: 1, hours: 6, days: 20 },
-      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
-      { category: "Electronics", name: "Laptop", watts: 65, quantity: 1, hours: 6, days: 25 },
-      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 1, hours: 8, days: 30 },
-      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 4, hours: 6, days: 30 },
-      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 },
-      { category: "Electronics", name: "Phone Charger", watts: 10, quantity: 1, hours: 3, days: 30 }
-    ]
-  },
-  {
-    name: "1 Bedroom Condo",
-    icon: "🏢",
-    size: "~35–50 sqm",
-    appliances: [
-      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 1, hours: 8, days: 25 },
-      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
-      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 1, hours: 5, days: 30 },
-      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 },
-      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 6, hours: 6, days: 30 },
-      { category: "Kitchen", name: "Rice Cooker", watts: 700, quantity: 1, hours: 1, days: 25 }
-    ]
-  },
-  {
-    name: "2 Bedroom Condo",
-    icon: "🏢",
-    size: "~50–80 sqm",
-    appliances: [
-      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 2, hours: 8, days: 25 },
-      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
-      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 1, hours: 5, days: 30 },
-      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 12 },
-      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 },
-      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 8, hours: 6, days: 30 },
-      { category: "Kitchen", name: "Rice Cooker", watts: 700, quantity: 1, hours: 1, days: 25 }
-    ]
-  },
-  {
-    name: "3 Bedroom Condo",
-    icon: "🏢",
-    size: "~80–120 sqm",
-    appliances: [
-      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 3, hours: 8, days: 25 },
-      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
-      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 2, hours: 5, days: 30 },
-      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 12 },
-      { category: "Bathroom", name: "Water Heater", watts: 1500, quantity: 2, hours: 0.5, days: 20 },
-      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 },
-      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 12, hours: 6, days: 30 }
-    ]
-  },
-  {
-    name: "2 Bedroom House",
-    icon: "🏠",
-    size: "~60–90 sqm",
-    appliances: [
-      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 3, hours: 8, days: 30 },
-      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 1, hours: 8, days: 20 },
-      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
-      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 1, hours: 5, days: 30 },
-      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 12 },
-      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 10, hours: 6, days: 30 },
-      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 }
-    ]
-  },
-  {
-    name: "3 Bedroom House",
-    icon: "🏠",
-    size: "~90–140 sqm",
-    appliances: [
-      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 2, hours: 8, days: 22 },
-      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 3, hours: 8, days: 30 },
-      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
-      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 2, hours: 5, days: 30 },
-      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 14 },
-      { category: "Kitchen", name: "Rice Cooker", watts: 700, quantity: 1, hours: 1, days: 30 },
-      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 14, hours: 6, days: 30 },
-      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 }
-    ]
-  },
-  {
-    name: "4 Bedroom House",
-    icon: "🏠",
-    size: "~140–220 sqm",
-    appliances: [
-      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 3, hours: 8, days: 22 },
-      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 4, hours: 8, days: 30 },
-      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
-      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 2, hours: 5, days: 30 },
-      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 16 },
-      { category: "Laundry", name: "Dryer", watts: 3000, quantity: 1, hours: 1, days: 6 },
-      { category: "Other", name: "Water Pump", watts: 750, quantity: 1, hours: 1, days: 20 },
-      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 18, hours: 6, days: 30 },
-      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 }
-    ]
-  },
-  {
-    name: "5 Bedroom House",
-    icon: "🏠",
-    size: "~220–350 sqm",
-    appliances: [
-      { category: "Cooling", name: "Inverter Aircon", watts: 800, quantity: 4, hours: 8, days: 22 },
-      { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 5, hours: 8, days: 30 },
-      { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 2, hours: 24, days: 30 },
-      { category: "Electronics", name: "Smart TV", watts: 120, quantity: 3, hours: 5, days: 30 },
-      { category: "Laundry", name: "Washing Machine", watts: 500, quantity: 1, hours: 1, days: 18 },
-      { category: "Laundry", name: "Dryer", watts: 3000, quantity: 1, hours: 1, days: 8 },
-      { category: "Other", name: "Water Pump", watts: 750, quantity: 1, hours: 1, days: 25 },
-      { category: "Lighting", name: "LED Bulb", watts: 10, quantity: 24, hours: 6, days: 30 },
-      { category: "Internet", name: "Router", watts: 10, quantity: 1, hours: 24, days: 30 }
-    ]
-  }
-];
 
 
 function calculatePresetKwh(preset) {
@@ -378,7 +167,7 @@ const INFO_SECTIONS = [
     id: "contact",
     title: "Contact",
     description:
-      "For questions, feedback, corrections, or suggestions, you can contact Watts My Bill? at hello@wattsmybill.app. Please do not send sensitive billing information unless you are comfortable sharing it."
+      "For questions, feedback, corrections, or suggestions, you can contact Watts My Bill? at hello@wattsmybill.app. Please avoid sending account numbers, billing references, exact addresses, or other sensitive personal billing information."
   }
 ];
 
@@ -448,6 +237,57 @@ function Logo({ darkMode = false }) {
       </div>
     </div>
   );
+}
+
+function useAnimatedNumber(value, duration = 520, largeJumpThreshold = 25000) {
+  const [displayValue, setDisplayValue] = useState(Number(value) || 0);
+  const previousValueRef = useRef(Number(value) || 0);
+
+  useEffect(() => {
+    const startValue = previousValueRef.current;
+    const endValue = Number(value) || 0;
+    const jumpSize = Math.abs(endValue - startValue);
+
+    if (jumpSize > largeJumpThreshold) {
+      setDisplayValue(endValue);
+      previousValueRef.current = endValue;
+      return;
+    }
+
+    if (jumpSize < 0.01) {
+      setDisplayValue(endValue);
+      previousValueRef.current = endValue;
+      return;
+    }
+
+    let animationFrame;
+    let startTime;
+
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const easedProgress = easeOutCubic(progress);
+      const nextValue = startValue + (endValue - startValue) * easedProgress;
+
+      setDisplayValue(nextValue);
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        previousValueRef.current = endValue;
+        setDisplayValue(endValue);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [value, duration, largeJumpThreshold]);
+
+  return displayValue;
 }
 
 export default function Page() {
@@ -607,6 +447,12 @@ export default function Page() {
   const displayCurrency = isOtherCountry
     ? customCurrency || ""
     : country.currency;
+
+  const formatCurrency = (value) =>
+    `${displayCurrency}${Number(value || 0).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
 
   const isBlankAppliance = (item) =>
     !String(item.name || "").trim() &&
@@ -801,6 +647,10 @@ export default function Page() {
 
   const dailyAverage = total / 30;
 
+  const animatedTotal = useAnimatedNumber(total);
+  const animatedTotalKwh = useAnimatedNumber(totalKwh);
+  const animatedDailyAverage = useAnimatedNumber(dailyAverage);
+
   const possibleSavings = topAppliance
     ? ((Number(topAppliance.watts || 0) *
         Number(topAppliance.quantity || 1) *
@@ -825,25 +675,23 @@ export default function Page() {
 
   const billComparisonInsight = Number(actualBill) > 0
     ? difference > 0
-      ? `Your entered bill is ${displayCurrency}${Math.abs(difference).toFixed(
-          2
-        )} higher than this estimate. That gap may come from taxes, provider charges, appliances not listed yet, or wattages that are lower than actual.`
-      : `Your estimate is ${displayCurrency}${Math.abs(difference).toFixed(
-          2
-        )} higher than your entered bill. Check if some wattages, hours, or days are too high.`
+      ? `Your entered bill is ${formatCurrency(Math.abs(difference))} higher than this estimate. The gap may come from taxes, provider fees, appliances not listed yet, or wattages that are lower than actual.`
+      : difference < 0
+        ? `Your estimate is ${formatCurrency(Math.abs(difference))} higher than your entered bill. Check if some wattages, hours, or days are too high.`
+        : "Your entered bill matches this estimate."
     : "Add your actual bill to compare it with this estimate.";
 
   const auditMessage = topAppliance
-    ? `${topAppliance.name} uses about ${topApplianceShare.toFixed(
-        0
-      )}% of your total estimated electricity usage (${topAppliance.kwh.toFixed(
+    ? `${topAppliance.name} is your top estimated energy user at ${topAppliance.kwh.toFixed(
         2
-      )} kWh). Reducing its use by 1 hour per day may save around ${displayCurrency}${possibleSavings.toFixed(
+      )} kWh, about ${topApplianceShare.toFixed(
+        0
+      )}% of your total estimated usage. Reducing its use by 1 hour per day may save around ${displayCurrency}${possibleSavings.toFixed(
         2
       )} per month. ${coolingShare >= 40 ? `Cooling appliances account for about ${coolingShare.toFixed(0)}% of your total estimated usage. ` : ""}${applianceInsight}`
     : "Add appliance details to generate an energy audit insight.";
 
-  const usageDriverLabel = "Biggest energy user";
+  const usageDriverLabel = "Top energy user";
 
   const savingsTip = topAppliance
     ? `Try reducing ${topAppliance.name} by 1 hour/day to test a possible monthly saving.`
@@ -860,7 +708,7 @@ export default function Page() {
     })}`;
 
     const topUsage = topAppliance?.name
-      ? ` Highest usage: ${topAppliance.name}.`
+      ? ` Top energy user: ${topAppliance.name}.`
       : "";
 
     return `I estimated my monthly electricity bill using Watts My Bill?: ${estimatedBill}.
@@ -1143,7 +991,7 @@ ${topUsage.trim()}` : ""}`;
       const summaryLines = [
         ["Total Usage", `${totalKwh.toFixed(2)} kWh`],
         ["Daily Average", `${money(dailyAverage)} / day`],
-        ["Highest Usage", topAppliance?.name || "Not available"],
+        ["Top Energy User", topAppliance?.name || "Not available"],
         ["Country", cleanText(displayCountry)]
       ];
 
@@ -1358,16 +1206,101 @@ ${topUsage.trim()}` : ""}`;
 
   return (
     <div className={`min-h-screen p-4 md:p-6 transition-colors duration-300 ${theme}`}>
+
+      <style jsx global>{`
+        @keyframes wmbHeroOrb {
+          0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.42; }
+          50% { transform: translate3d(-18px, 14px, 0) scale(1.08); opacity: 0.62; }
+        }
+
+        @keyframes wmbHeroOrbDelayed {
+          0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.28; }
+          50% { transform: translate3d(18px, -10px, 0) scale(1.06); opacity: 0.42; }
+        }
+
+        @keyframes wmbFadeUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes wmbEnergyPulse {
+          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255,255,255,0)); }
+          50% { transform: scale(1.08); filter: drop-shadow(0 0 7px rgba(255,255,255,0.28)); }
+        }
+
+        @keyframes wmbHeroGradientShift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+
+        @keyframes wmbSoftSheen {
+          0%, 100% { opacity: 0.18; transform: translateX(-6%) skewX(-8deg); }
+          50% { opacity: 0.32; transform: translateX(8%) skewX(-8deg); }
+        }
+
+        .wmb-hero-orb {
+          animation: wmbHeroOrb 9s ease-in-out infinite;
+        }
+
+        .wmb-hero-orb-delayed {
+          animation: wmbHeroOrbDelayed 11s ease-in-out infinite;
+        }
+
+        .wmb-fade-up {
+          animation: wmbFadeUp 520ms ease-out both;
+        }
+
+        .wmb-energy-pulse {
+          animation: wmbEnergyPulse 4.8s ease-in-out infinite;
+        }
+
+        .wmb-hero-gradient {
+          background-size: 160% 160%;
+          animation: wmbHeroGradientShift 14s ease-in-out infinite;
+        }
+
+        .wmb-soft-sheen {
+          animation: wmbSoftSheen 12s ease-in-out infinite;
+        }
+
+        .wmb-hero-noise {
+          background-image:
+            radial-gradient(circle at 20% 30%, rgba(255,255,255,0.18) 0 1px, transparent 1px),
+            radial-gradient(circle at 80% 10%, rgba(255,255,255,0.12) 0 1px, transparent 1px);
+          background-size: 46px 46px, 62px 62px;
+          mix-blend-mode: soft-light;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .wmb-hero-orb,
+          .wmb-hero-orb-delayed,
+          .wmb-fade-up,
+          .wmb-energy-pulse,
+          .wmb-hero-gradient,
+          .wmb-soft-sheen {
+            animation: none !important;
+          }
+        }
+      `}</style>
+
       <div className="mx-auto w-full max-w-[1360px]">
         <div className="flex justify-between items-start gap-3 md:gap-4 mb-4">
           <Logo darkMode={darkMode} />
         </div>
 
-        <div className="relative mb-3 md:mb-4 p-5 md:px-6 md:pt-6 md:pb-4 rounded-3xl bg-gradient-to-r from-[#065f46] via-[#047857] to-[#0f766e] text-white shadow-[0_18px_45px_rgba(4,120,87,0.18)] ring-1 ring-white/10 transition-all duration-300 hover:shadow-[0_22px_55px_rgba(4,120,87,0.22)]">
+        <div className="wmb-hero-gradient relative isolate mb-3 md:mb-4 p-5 md:px-6 md:pt-6 md:pb-4 rounded-3xl overflow-hidden bg-gradient-to-r from-[#064e3b] via-[#047857] to-[#0f766e] text-white shadow-[0_18px_45px_rgba(4,120,87,0.18)] ring-1 ring-white/10 transition-all duration-300 hover:shadow-[0_22px_55px_rgba(4,120,87,0.22)]">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-3xl">
+            <div className="wmb-hero-orb absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-200/25 blur-3xl" />
+            <div className="wmb-hero-orb-delayed absolute -left-20 bottom-0 h-44 w-44 rounded-full bg-emerald-200/20 blur-3xl" />
+            <div className="wmb-soft-sheen absolute -right-28 top-0 h-full w-1/2 bg-gradient-to-r from-transparent via-white/8 to-transparent blur-2xl" />
+            <div className="wmb-hero-noise absolute inset-0 opacity-[0.10]" />
+          </div>
+
           <button
-            onClick={() => setDarkMode(!darkMode)}
+            type="button"
+            onClick={() => setDarkMode((current) => !current)}
             title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-            className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/10 text-white/70 backdrop-blur-md shadow-sm shadow-emerald-950/5 ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/16 hover:text-white/85 hover:shadow-[0_0_12px_rgba(255,255,255,0.10)] active:scale-95"
+            className="pointer-events-auto absolute right-5 top-5 z-[60] grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/10 text-white/70 backdrop-blur-md shadow-sm shadow-emerald-950/5 ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/16 hover:text-white/85 hover:shadow-[0_0_12px_rgba(255,255,255,0.10)] active:scale-95"
             aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
             {darkMode ? (
@@ -1377,22 +1310,22 @@ ${topUsage.trim()}` : ""}`;
             )}
           </button>
 
-          <h2 className="pr-12 text-3xl font-black leading-tight">
+          <h2 className="relative z-20 pr-12 text-3xl font-black leading-tight">
             {displayCurrency}
-            {Number(total).toLocaleString(undefined, {
+            {Number(animatedTotal).toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
             })}
           </h2>
 
-          <p className="mt-1 opacity-90">
+          <p className="relative z-20 mt-1 opacity-90">
             Estimated monthly electricity bill
           </p>
 
-          <div className="mt-4 grid md:grid-cols-4 gap-3">
+          <div className="relative z-20 mt-4 grid md:grid-cols-4 gap-3">
             <div className="bg-white/18 px-4 py-2.5 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:bg-white/24 hover:-translate-y-0.5">
               <p className="text-xs opacity-80">Total Usage</p>
-              <p className="font-bold">⚡ {totalKwh.toFixed(2)} kWh</p>
+              <p className="font-bold"><span className="wmb-energy-pulse inline-block">⚡</span> {animatedTotalKwh.toFixed(2)} kWh</p>
             </div>
 
             <div className="bg-white/18 px-4 py-2.5 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:bg-white/24 hover:-translate-y-0.5">
@@ -1414,7 +1347,7 @@ ${topUsage.trim()}` : ""}`;
               <p className="text-xs opacity-80">Daily Average</p>
               <p className="font-bold">
                 {displayCurrency}
-                {Number(dailyAverage).toLocaleString(undefined, {
+                {Number(animatedDailyAverage).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 })}/day
@@ -1423,12 +1356,13 @@ ${topUsage.trim()}` : ""}`;
           </div>
 
           {topAppliance?.name && (
-            <div className="mt-3 bg-white/18 px-4 py-2.5 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:bg-white/24 hover:-translate-y-0.5 inline-block">
-              🔥 Highest usage: {topAppliance.name}
+            <div className="relative z-20 mt-3 inline-flex items-center gap-2 rounded-2xl bg-white/22 px-4 py-2.5 text-sm font-semibold backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/28 md:text-base">
+              <span aria-hidden="true">🔥</span>
+              <span>Top energy user: <span className="font-black">{topAppliance.name}</span></span>
             </div>
           )}
 
-          <div className="mt-3">
+          <div className="relative z-20 mt-3">
             <button
               onClick={() => setShowEstimateHelp(!showEstimateHelp)}
               className="text-xs underline underline-offset-4 opacity-90 hover:opacity-100"
@@ -1550,27 +1484,52 @@ ${topUsage.trim()}` : ""}`;
         )}
 
         {Number(actualBill) > 0 && (
-          <div className="mb-5 md:mb-6 p-4 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Bill Difference</span>
+          <div className="mb-5 md:mb-6 rounded-3xl border border-slate-200/70 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-black/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="grid h-8 w-8 shrink-0 place-items-center rounded-2xl border border-emerald-100 bg-emerald-50/80 text-emerald-700 sm:h-9 sm:w-9">
+                  <BarChart3 size={16} strokeWidth={2.2} />
+                </div>
 
-              <span
-                className={`font-bold text-lg ${
-                  difference > 0 ? "text-red-500" : "text-emerald-600"
+                <div>
+                  <p className="font-bold tracking-tight text-gray-950">
+                    Estimate comparison
+                  </p>
+                  <p className="mt-1 max-w-4xl text-xs leading-relaxed text-gray-600">
+                    {billComparisonInsight}
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className={`ml-11 mt-2 flex w-fit min-w-[168px] max-w-[calc(100%-2.75rem)] items-center justify-between gap-3 rounded-2xl border px-3 py-2 text-left shadow-sm backdrop-blur-sm sm:mt-0 sm:ml-0 sm:min-w-[178px] sm:self-center sm:px-4 sm:py-2 sm:text-right ${
+                  difference > 0
+                    ? "border-rose-100/80 bg-rose-50/45"
+                    : difference < 0
+                      ? "border-amber-100/80 bg-amber-50/45"
+                      : "border-emerald-100/80 bg-emerald-50/55"
                 }`}
               >
-                {displayCurrency}
-                {Number(Math.abs(difference)).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}
-              </span>
+                <p className={`text-[9px] font-extrabold uppercase tracking-[0.15em] sm:text-[10px] ${
+                  difference > 0
+                    ? "text-rose-400"
+                    : difference < 0
+                      ? "text-amber-500"
+                      : "text-emerald-500"
+                }`}>
+                  Difference
+                </p>
+                <p className={`text-[15px] font-black leading-none tracking-tight sm:text-base ${
+                  difference > 0
+                    ? "text-rose-600"
+                    : difference < 0
+                      ? "text-amber-600"
+                      : "text-emerald-600"
+                }`}>
+                  {formatCurrency(Math.abs(difference))}
+                </p>
+              </div>
             </div>
-
-            <p className="text-xs opacity-60 mt-2">
-              This is only a comparison between your entered bill and the
-              estimated calculation.
-            </p>
           </div>
         )}
 
@@ -1693,19 +1652,23 @@ ${topUsage.trim()}` : ""}`;
                   Manual builder
                 </span>
               </div>
-              <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                Build your estimate appliance by appliance, then fine-tune wattage, hours, and days below.
+              <div className="mt-1 text-sm leading-relaxed text-gray-600">
+                <p>
+                  Build your estimate appliance by appliance, then fine-tune wattage, hours, and days below.
+                </p>
+
                 <button
+                  type="button"
                   onClick={() => setShowWattageHelp(!showWattageHelp)}
-                  className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline"
+                  className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline"
                 >
                   <CheckCircle2 size={12} strokeWidth={2.4} />
                   {showWattageHelp ? "Hide wattage guide" : "Wattage guide"}
                 </button>
-              </p>
+              </div>
 
               {showWattageHelp && (
-                <p className="mt-2 max-w-xl rounded-2xl border border-emerald-100 bg-emerald-50/50 px-3 py-2 text-xs leading-relaxed text-gray-600">
+                <p className="mt-2 max-w-xl rounded-2xl border border-emerald-100 bg-emerald-50/50 px-3 py-2 text-xs leading-relaxed text-gray-600 transition-all duration-300 ease-out">
                   Check the appliance sticker, power adapter, user manual, or search the exact appliance model online. Actual wattage gives a better estimate than generic presets.
                 </p>
               )}
@@ -1944,7 +1907,7 @@ ${topUsage.trim()}` : ""}`;
           })}
         </div>
 
-        <div className="mt-6 mb-5 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-black/5">
+        <div className="wmb-fade-up mt-6 mb-5 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-black/5">
           <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">Smart usage insights</p>
 
           <h2 className="mt-1 text-xl font-black tracking-tight">
@@ -2239,7 +2202,7 @@ ${topUsage.trim()}` : ""}`;
               </div>
 
               <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Legal & Info</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Other Information</p>
                 <div className="mt-2 flex flex-wrap gap-2 md:justify-end">
                   {INFO_SECTIONS.map((section) => (
                     <button
