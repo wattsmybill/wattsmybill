@@ -1352,17 +1352,17 @@ ${topUsage.trim()}` : ""}`;
           <Logo darkMode={darkMode} />
         </div>
 
-        <div className="relative mb-5 md:mb-6 p-5 md:p-6 rounded-3xl bg-gradient-to-r from-[#047857] via-[#059669] to-[#14b8a6] text-white shadow-xl shadow-emerald-950/20 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-950/25">
+        <div className="relative mb-3 md:mb-4 p-5 md:px-6 md:pt-6 md:pb-4 rounded-3xl bg-gradient-to-r from-[#047857] via-[#059669] to-[#14b8a6] text-white shadow-md shadow-emerald-950/10 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-950/15">
           <button
             onClick={() => setDarkMode(!darkMode)}
             title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-            className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/12 text-white/75 backdrop-blur-md shadow-sm shadow-emerald-950/10 ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/18 hover:text-white/90 hover:shadow-[0_0_14px_rgba(255,255,255,0.14)] active:scale-95"
+            className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/10 text-white/70 backdrop-blur-md shadow-sm shadow-emerald-950/5 ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/16 hover:text-white/85 hover:shadow-[0_0_12px_rgba(255,255,255,0.10)] active:scale-95"
             aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
             {darkMode ? (
-              <Sun size={18} strokeWidth={2.3} />
+              <Sun size={17} strokeWidth={2.25} />
             ) : (
-              <Moon size={18} strokeWidth={2.3} />
+              <Moon size={17} strokeWidth={2.25} />
             )}
           </button>
 
@@ -1435,19 +1435,24 @@ ${topUsage.trim()}` : ""}`;
           </div>
         </div>
 
-        <div className="mb-5 md:mb-6 flex flex-wrap gap-2 text-black">
-          <div className="inline-flex w-full items-center gap-1.5 rounded-full border border-emerald-200/40 bg-white/45 px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-[0_6px_18px_rgba(15,23,42,0.04)] backdrop-blur-sm sm:w-auto">
-            <CheckCircle2 size={13} className="text-emerald-600" />
-            No signup required
-          </div>
-          <div className="inline-flex w-full items-center gap-1.5 rounded-full border border-emerald-200/40 bg-white/45 px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-[0_6px_18px_rgba(15,23,42,0.04)] backdrop-blur-sm sm:w-auto">
-            <CheckCircle2 size={13} className="text-emerald-600" />
-            Free to use
-          </div>
-          <div className="inline-flex w-full items-center gap-1.5 rounded-full border border-emerald-200/40 bg-white/45 px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-[0_6px_18px_rgba(15,23,42,0.04)] backdrop-blur-sm sm:w-auto">
-            <CheckCircle2 size={13} className="text-emerald-600" />
-            Wattage-based estimates
-          </div>
+        <div className="mb-7 flex flex-wrap gap-3 md:mb-8 md:gap-3.5">
+          {["No signup required", "Free to use", "Wattage-based estimates"].map((trustItem) => (
+            <div
+              key={trustItem}
+              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold backdrop-blur-md transition-colors duration-200 ${
+                darkMode
+                  ? "border-emerald-300/10 bg-slate-900/30 text-slate-200/80 shadow-none"
+                  : "border-emerald-200/30 bg-white/45 text-gray-700 shadow-[0_3px_10px_rgba(15,23,42,0.025)]"
+              }`}
+            >
+              <CheckCircle2
+                size={12}
+                strokeWidth={2.4}
+                className={darkMode ? "text-emerald-300/60" : "text-emerald-600/85"}
+              />
+              {trustItem}
+            </div>
+          ))}
         </div>
 
         <div className="grid md:grid-cols-3 gap-4 mb-6">
@@ -1580,8 +1585,8 @@ ${topUsage.trim()}` : ""}`;
                   onClick={() => addHouseholdPreset(preset)}
                   className={`group min-h-[92px] md:min-h-[96px] rounded-2xl border p-2.5 md:p-3 text-left text-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] ${
                     isSelected
-                      ? "border-emerald-400 bg-emerald-100 ring-2 ring-emerald-300 shadow-emerald-900/10"
-                      : "border-emerald-100 bg-emerald-50/80 hover:border-emerald-300 hover:bg-emerald-50"
+                      ? "border-emerald-400 bg-emerald-100/90 ring-2 ring-emerald-300 shadow-emerald-900/10"
+                      : "border-emerald-200/80 bg-[#e2f7ef] hover:border-emerald-300 hover:bg-[#d8f3e9]"
                   }`}
                   title={`${preset.name} ${preset.size}`}
                 >
@@ -1593,8 +1598,8 @@ ${topUsage.trim()}` : ""}`;
                     {isSelected ? (
                       <CheckCircle2 size={17} className="text-emerald-700" />
                     ) : (
-                      <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-100">
-                        Add
+                      <span className="rounded-full bg-white/75 px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-[0.08em] text-emerald-700 ring-1 ring-emerald-100/80">
+                        Use preset
                       </span>
                     )}
                   </span>
@@ -1604,7 +1609,7 @@ ${topUsage.trim()}` : ""}`;
                   </span>
                   <span className="mt-0.5 block text-xs text-gray-500">{preset.size}</span>
                   <span className="mt-1 block text-xs font-semibold text-emerald-800">
-                    ~{presetKwh.toFixed(0)} kWh/month
+                    Estimated: ~{presetKwh.toFixed(0)} kWh/month
                   </span>
                 </button>
               );
@@ -1659,12 +1664,12 @@ ${topUsage.trim()}` : ""}`;
         <div className="mb-5 md:mb-6 rounded-3xl bg-[#f7f8f8] p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5">
           <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-xl">
-              <div className="mb-2 inline-flex rounded-full border border-emerald-100 bg-emerald-50/70 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
-                Manual option
+              <div className="mb-2 inline-flex rounded-full border border-emerald-100/80 bg-emerald-50/55 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
+                Manual builder
               </div>
               <h2 className="text-xl font-black tracking-tight">Add Appliances Manually</h2>
               <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                Use search or quick chips when you want to build your estimate appliance by appliance.
+                Build your estimate appliance by appliance, then fine-tune wattage, hours, and days below.
               </p>
 
               <button
@@ -1721,7 +1726,7 @@ ${topUsage.trim()}` : ""}`;
                 <button
                   key={`${p.category}-${p.name}`}
                   onClick={() => addPreset(p)}
-                  className={`${hideOnMobile ? "hidden md:inline-flex" : "inline-flex"} items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-950 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-100 hover:shadow-md active:scale-[0.98] md:px-3.5 md:py-1.5`}
+                  className={`${hideOnMobile ? "hidden md:inline-flex" : "inline-flex"} items-center rounded-full border border-emerald-100/80 bg-emerald-50/75 px-3 py-1.5 text-sm font-semibold text-emerald-950 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-100/80 hover:shadow-md active:scale-[0.98] md:px-3.5 md:py-1.5`}
                   title={`${p.category} • ${p.watts}W • ${p.hours}h/day • ${p.days} days/month`}
                 >
                   + {p.name}

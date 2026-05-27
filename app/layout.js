@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://wattsmybill.app"),
+  metadataBase: new URL("https://www.wattsmybill.app"),
 
   applicationName: "Watts My Bill?",
   category: "Utility",
@@ -51,7 +51,7 @@ export const metadata = {
   publisher: "Watts My Bill?",
 
   alternates: {
-    canonical: "/",
+    canonical: "https://www.wattsmybill.app",
   },
 
   robots: {
@@ -70,13 +70,13 @@ export const metadata = {
     title: "Watts My Bill? | Electricity Bill Estimator",
     description:
       "Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity rates.",
-    url: "/",
+    url: "https://www.wattsmybill.app",
     siteName: "Watts My Bill?",
     type: "website",
     locale: "en_US",
     images: [
       {
-        url: "/og-image-3.jpg",
+        url: "https://www.wattsmybill.app/og-image-3.jpg",
         width: 1200,
         height: 630,
         alt: "Watts My Bill? electricity bill estimator and usage calculator",
@@ -89,7 +89,7 @@ export const metadata = {
     title: "Watts My Bill? | Electricity Bill Estimator",
     description:
       "Understand your electricity bill with a free appliance wattage calculator and energy usage estimator.",
-    images: ["/og-image-3.jpg"],
+    images: ["https://www.wattsmybill.app/og-image-3.jpg"],
   },
 
   icons: {
