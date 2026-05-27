@@ -122,6 +122,7 @@ const HOUSEHOLD_PRESETS = [
     icon: "🏢",
     size: "~20–35 sqm",
     appliances: [
+      { category: "Cooling", name: "Inverter Aircon", watts: 600, quantity: 1, hours: 6, days: 20 },
       { category: "Kitchen", name: "Refrigerator", watts: 150, quantity: 1, hours: 24, days: 30 },
       { category: "Electronics", name: "Laptop", watts: 65, quantity: 1, hours: 6, days: 25 },
       { category: "Cooling", name: "Electric Fan", watts: 75, quantity: 1, hours: 8, days: 30 },
@@ -833,14 +834,24 @@ export default function Page() {
     : "Add your actual bill to compare it with this estimate.";
 
   const auditMessage = topAppliance
-    ? `${topAppliance.name} is your top estimated energy user at ${topAppliance.kwh.toFixed(
-        2
-      )} kWh, about ${topApplianceShare.toFixed(
+    ? `${topAppliance.name} uses about ${topApplianceShare.toFixed(
         0
-      )}% of your listed usage. Reducing its use by 1 hour per day may save around ${displayCurrency}${possibleSavings.toFixed(
+      )}% of your total estimated electricity usage (${topAppliance.kwh.toFixed(
         2
-      )} per month. ${coolingShare >= 40 ? `Cooling appliances make up about ${coolingShare.toFixed(0)}% of your listed usage. ` : ""}${applianceInsight}`
+      )} kWh). Reducing its use by 1 hour per day may save around ${displayCurrency}${possibleSavings.toFixed(
+        2
+      )} per month. ${coolingShare >= 40 ? `Cooling appliances account for about ${coolingShare.toFixed(0)}% of your total estimated usage. ` : ""}${applianceInsight}`
     : "Add appliance details to generate an energy audit insight.";
+
+  const usageDriverLabel = "Biggest energy user";
+
+  const savingsTip = topAppliance
+    ? `Try reducing ${topAppliance.name} by 1 hour/day to test a possible monthly saving.`
+    : "Add appliances to unlock usage insights and saving suggestions.";
+
+  const coolingInsight = coolingShare >= 40
+    ? `Cooling appliances account for about ${coolingShare.toFixed(0)}% of your total estimated usage.`
+    : "Your cooling usage does not dominate the estimate yet.";
 
   const buildShareText = () => {
     const estimatedBill = `${displayCurrency}${Number(total).toLocaleString(undefined, {
@@ -1347,12 +1358,12 @@ ${topUsage.trim()}` : ""}`;
 
   return (
     <div className={`min-h-screen p-4 md:p-6 transition-colors duration-300 ${theme}`}>
-      <div className="mx-auto w-full max-w-[1400px]">
+      <div className="mx-auto w-full max-w-[1360px]">
         <div className="flex justify-between items-start gap-3 md:gap-4 mb-4">
           <Logo darkMode={darkMode} />
         </div>
 
-        <div className="relative mb-3 md:mb-4 p-5 md:px-6 md:pt-6 md:pb-4 rounded-3xl bg-gradient-to-r from-[#047857] via-[#059669] to-[#14b8a6] text-white shadow-md shadow-emerald-950/10 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-950/15">
+        <div className="relative mb-3 md:mb-4 p-5 md:px-6 md:pt-6 md:pb-4 rounded-3xl bg-gradient-to-r from-[#065f46] via-[#047857] to-[#0f766e] text-white shadow-[0_18px_45px_rgba(4,120,87,0.18)] ring-1 ring-white/10 transition-all duration-300 hover:shadow-[0_22px_55px_rgba(4,120,87,0.22)]">
           <button
             onClick={() => setDarkMode(!darkMode)}
             title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
@@ -1379,19 +1390,19 @@ ${topUsage.trim()}` : ""}`;
           </p>
 
           <div className="mt-4 grid md:grid-cols-4 gap-3">
-            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5">
+            <div className="bg-white/18 px-4 py-2.5 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:bg-white/24 hover:-translate-y-0.5">
               <p className="text-xs opacity-80">Total Usage</p>
               <p className="font-bold">⚡ {totalKwh.toFixed(2)} kWh</p>
             </div>
 
-            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5">
+            <div className="bg-white/18 px-4 py-2.5 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:bg-white/24 hover:-translate-y-0.5">
               <p className="text-xs opacity-80">Country</p>
               <p className="font-bold">
                 {country.flag} {displayCountry}
               </p>
             </div>
 
-            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5">
+            <div className="bg-white/18 px-4 py-2.5 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:bg-white/24 hover:-translate-y-0.5">
               <p className="text-xs opacity-80">Rate Used</p>
               <p className="font-bold">
                 {displayCurrency}
@@ -1399,7 +1410,7 @@ ${topUsage.trim()}` : ""}`;
               </p>
             </div>
 
-            <div className="bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5">
+            <div className="bg-white/18 px-4 py-2.5 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:bg-white/24 hover:-translate-y-0.5">
               <p className="text-xs opacity-80">Daily Average</p>
               <p className="font-bold">
                 {displayCurrency}
@@ -1412,7 +1423,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
 
           {topAppliance?.name && (
-            <div className="mt-3 bg-white/20 px-4 py-2.5 rounded-2xl backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5 inline-block">
+            <div className="mt-3 bg-white/18 px-4 py-2.5 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:bg-white/24 hover:-translate-y-0.5 inline-block">
               🔥 Highest usage: {topAppliance.name}
             </div>
           )}
@@ -1435,20 +1446,20 @@ ${topUsage.trim()}` : ""}`;
           </div>
         </div>
 
-        <div className="mb-7 flex flex-wrap gap-3 md:mb-8 md:gap-3.5">
-          {["No signup required", "Free to use", "Wattage-based estimates"].map((trustItem) => (
+        <div className="mb-6 flex flex-wrap gap-2.5 border-b border-white/5 pb-5 md:mb-7 md:gap-3.5 md:pb-6">
+          {["No signup required", "Free to use", "Based on appliance wattage"].map((trustItem) => (
             <div
               key={trustItem}
-              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold backdrop-blur-md transition-colors duration-200 ${
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold backdrop-blur-md transition-colors duration-200 ${
                 darkMode
-                  ? "border-emerald-300/10 bg-slate-900/30 text-slate-200/80 shadow-none"
-                  : "border-emerald-200/30 bg-white/45 text-gray-700 shadow-[0_3px_10px_rgba(15,23,42,0.025)]"
+                  ? "border-emerald-300/15 bg-slate-800/45 text-slate-100/85 shadow-none"
+                  : "border-emerald-200/40 bg-white/55 text-gray-700 shadow-[0_3px_10px_rgba(15,23,42,0.025)]"
               }`}
             >
               <CheckCircle2
                 size={12}
                 strokeWidth={2.4}
-                className={darkMode ? "text-emerald-300/60" : "text-emerald-600/85"}
+                className={darkMode ? "text-emerald-300/70" : "text-emerald-600/85"}
               />
               {trustItem}
             </div>
@@ -1563,7 +1574,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
         )}
 
-        <div className="mb-5 md:mb-6 rounded-3xl bg-[#f7f8f8] p-5 md:p-5 text-black shadow-sm ring-1 ring-black/5 transition-all duration-200 hover:shadow-md">
+        <div className="mb-4 rounded-3xl bg-[#f7f8f8] p-5 md:p-5 text-black shadow-sm ring-1 ring-black/5 transition-all duration-200 hover:shadow-md">
           <div className="mb-4">
             <h2 className="flex items-center gap-2 font-black text-xl tracking-tight">
               <Home size={19} className="text-emerald-600" />
@@ -1572,6 +1583,11 @@ ${topUsage.trim()}` : ""}`;
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-gray-600">
               Start with a typical home setup. You can still edit every appliance afterward.
             </p>
+
+            <div className="mt-3 max-w-3xl rounded-2xl border border-emerald-200/45 bg-emerald-50/45 px-3 py-2 text-[11px] leading-relaxed text-emerald-950/75">
+              <span className="font-bold text-emerald-800">Preset note:</span>{" "}
+              These are starting estimates only. For better accuracy, review the appliances, wattage, hours, and days after applying a preset.
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2 md:gap-2.5 lg:grid-cols-4">
@@ -1583,10 +1599,10 @@ ${topUsage.trim()}` : ""}`;
                 <button
                   key={preset.name}
                   onClick={() => addHouseholdPreset(preset)}
-                  className={`group min-h-[92px] md:min-h-[96px] rounded-2xl border p-2.5 md:p-3 text-left text-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98] ${
+                  className={`group min-h-[86px] md:min-h-[88px] rounded-2xl border p-2.5 text-left text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_3px_10px_rgba(16,185,129,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_8px_22px_rgba(16,185,129,0.14)] active:scale-[0.98] ${
                     isSelected
                       ? "border-emerald-400 bg-emerald-100/90 ring-2 ring-emerald-300 shadow-emerald-900/10"
-                      : "border-emerald-200/80 bg-[#e2f7ef] hover:border-emerald-300 hover:bg-[#d8f3e9]"
+                      : "border-emerald-200/75 bg-[#e4f7ef] hover:border-emerald-300 hover:bg-[#dcf4ea] hover:ring-1 hover:ring-emerald-200/70"
                   }`}
                   title={`${preset.name} ${preset.size}`}
                 >
@@ -1598,7 +1614,7 @@ ${topUsage.trim()}` : ""}`;
                     {isSelected ? (
                       <CheckCircle2 size={17} className="text-emerald-700" />
                     ) : (
-                      <span className="rounded-full bg-white/75 px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-[0.08em] text-emerald-700 ring-1 ring-emerald-100/80">
+                      <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-800 ring-1 ring-emerald-100/80">
                         Use preset
                       </span>
                     )}
@@ -1650,6 +1666,13 @@ ${topUsage.trim()}` : ""}`;
                   </div>
                 ))}
               </div>
+
+              <button
+                onClick={() => setSelectedHouseholdPreset(null)}
+                className="mt-4 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 shadow-sm transition-all duration-200 hover:bg-gray-50 sm:hidden"
+              >
+                Hide details
+              </button>
             </div>
           )}
 
@@ -1661,23 +1684,25 @@ ${topUsage.trim()}` : ""}`;
           </button>
         </div>
 
-        <div className="mb-5 md:mb-6 rounded-3xl bg-[#f7f8f8] p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5">
+        <div className="mb-4 rounded-3xl bg-[#f7f8f8] p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5">
           <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-xl">
-              <div className="mb-2 inline-flex rounded-full border border-emerald-100/80 bg-emerald-50/55 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
-                Manual builder
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-xl font-black tracking-tight">Quick Add Appliances</h2>
+                <span className="rounded-full border border-emerald-100/80 bg-emerald-50/55 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
+                  Manual builder
+                </span>
               </div>
-              <h2 className="text-xl font-black tracking-tight">Add Appliances Manually</h2>
               <p className="mt-1 text-sm leading-relaxed text-gray-600">
                 Build your estimate appliance by appliance, then fine-tune wattage, hours, and days below.
+                <button
+                  onClick={() => setShowWattageHelp(!showWattageHelp)}
+                  className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline"
+                >
+                  <CheckCircle2 size={12} strokeWidth={2.4} />
+                  {showWattageHelp ? "Hide wattage guide" : "Wattage guide"}
+                </button>
               </p>
-
-              <button
-                onClick={() => setShowWattageHelp(!showWattageHelp)}
-                className="mt-2 inline-flex text-xs font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline"
-              >
-                {showWattageHelp ? "Hide wattage guide" : "Wattage guide"}
-              </button>
 
               {showWattageHelp && (
                 <p className="mt-2 max-w-xl rounded-2xl border border-emerald-100 bg-emerald-50/50 px-3 py-2 text-xs leading-relaxed text-gray-600">
@@ -1735,30 +1760,32 @@ ${topUsage.trim()}` : ""}`;
             })}
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            {filteredPresets.length > 10 && (
-              <button
-                onClick={() => setShowAllPresets(!showAllPresets)}
-                className="rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
-              >
-                {showAllPresets ? "Show Less" : "Show More"}
-              </button>
-            )}
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-2">
+              {filteredPresets.length > 10 && (
+                <button
+                  onClick={() => setShowAllPresets(!showAllPresets)}
+                  className="rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                >
+                  {showAllPresets ? "Show Less" : "Show More"}
+                </button>
+              )}
 
-            <button
-              onClick={addAppliance}
-              className="rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md"
-            >
-              + Add Appliance
-            </button>
+              <button
+                onClick={addAppliance}
+                className="rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md"
+              >
+                + Add Appliance
+              </button>
+            </div>
 
             <button
               onClick={clearAll}
-              title="Reset calculator"
-              className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50/60 px-3.5 py-1.5 text-sm font-semibold text-red-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-50 hover:shadow-md"
+              title="Reset all calculator inputs"
+              className="inline-flex w-fit items-center gap-1.5 rounded-full border border-red-200/70 bg-red-50/35 px-3 py-1.5 text-xs font-semibold text-red-500/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
             >
-              <RotateCcw size={15} strokeWidth={2.2} />
-              Reset
+              <RotateCcw size={13} strokeWidth={2.1} />
+              Reset all
             </button>
           </div>
 
@@ -1769,7 +1796,7 @@ ${topUsage.trim()}` : ""}`;
           )}
         </div>
 
-        <section className="mb-5 md:mb-6 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-black/5">
+        <section className="mb-5 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-black/5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
@@ -1917,45 +1944,63 @@ ${topUsage.trim()}` : ""}`;
           })}
         </div>
 
-        <div className="mt-8 mb-6 p-5 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5">
-          <p className="text-sm opacity-60 mb-1">Energy Audit Insight</p>
+        <div className="mt-6 mb-5 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-black/5">
+          <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">Smart usage insights</p>
 
-          <h2 className="font-black text-xl mb-2">
+          <h2 className="mt-1 text-xl font-black tracking-tight">
             {topAppliance?.name
               ? "Here’s what is driving your estimate."
               : "Your audit is waiting for appliance data."}
           </h2>
 
-          <p className="text-sm opacity-75">{auditMessage}</p>
+          <p className="mt-2 max-w-4xl text-sm leading-relaxed text-gray-600">{auditMessage}</p>
 
-          {topAppliance?.name && (
-            <div className="grid md:grid-cols-3 gap-3 mt-4">
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
-                <p className="text-xs opacity-60">Top Appliance Share</p>
-                <p className="font-black text-lg text-emerald-700">
-                  {topApplianceShare.toFixed(0)}%
+          {topAppliance?.name ? (
+            <div className="mt-4 grid gap-3 md:grid-cols-4">
+              <div className="rounded-2xl border border-emerald-100/80 bg-emerald-50/75 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+                <p className="text-xs font-semibold text-gray-500">{usageDriverLabel}</p>
+                <p className="mt-1 text-base font-black leading-snug text-emerald-700 break-words">
+                  {topAppliance.name}
+                </p>
+                <p className="mt-1 text-xs font-semibold text-gray-600">
+                  {topApplianceShare.toFixed(0)}% of total estimated usage
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
-                <p className="text-xs opacity-60">Potential Monthly Saving</p>
-                <p className="font-black text-lg text-emerald-700">
+              <div className="rounded-2xl border border-emerald-100/80 bg-emerald-50/75 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+                <p className="text-xs font-semibold text-gray-500">Potential monthly saving</p>
+                <p className="mt-1 text-lg font-black text-emerald-700">
                   {displayCurrency}{Number(possibleSavings).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                   })}
                 </p>
-                <p className="text-xs opacity-60 mt-1">If reduced by 1 hour/day</p>
+                <p className="mt-1 text-xs text-gray-500">if reduced by 1 hour/day</p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-gray-50 border">
-                <p className="text-xs opacity-60">Bill Check</p>
-                <p className="text-sm opacity-75 mt-1">{billComparisonInsight}</p>
+              <div className="rounded-2xl border border-gray-100 bg-white/85 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+                <p className="text-xs font-semibold text-gray-500">Usage pattern</p>
+                <p className="mt-1 text-sm font-semibold text-gray-800">{coolingInsight}</p>
               </div>
+
+              <div className="rounded-2xl border border-gray-100 bg-white/85 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+                <p className="text-xs font-semibold text-gray-500">Quick action</p>
+                <p className="mt-1 text-sm font-semibold text-gray-800">{savingsTip}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 text-sm text-gray-600">
+              Add at least one appliance with wattage, hours, and days to unlock top-usage insights, possible savings, and appliance comparisons.
+            </div>
+          )}
+
+          {Number(actualBill) > 0 && topAppliance?.name && (
+            <div className="mt-3 rounded-2xl border border-gray-200 bg-white/80 p-4">
+              <p className="text-xs font-semibold text-gray-500">Bill check</p>
+              <p className="mt-1 text-sm leading-relaxed text-gray-700">{billComparisonInsight}</p>
             </div>
           )}
         </div>
-
 
         {topAppliances.length > 0 && (
           <div className="mb-6 p-5 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5">
@@ -2169,46 +2214,57 @@ ${topUsage.trim()}` : ""}`;
           </p>
         </section>
 
-        <footer className="mb-24 rounded-3xl border border-gray-200 bg-[#f7f8f8] p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5">
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div className="max-w-2xl">
+        <footer className="mb-24 rounded-3xl border border-gray-200 bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-black/5 md:p-6">
+          <div className="grid gap-6 md:grid-cols-[1.4fr_0.8fr] md:items-start">
+            <div>
               <p className="text-lg font-black tracking-tight">Watts My Bill?</p>
               <p className="mt-1 text-sm font-semibold text-emerald-700">
                 Understand Your Electricity Bill
               </p>
-              <p className="mt-2 text-xs leading-relaxed text-gray-600">
-                Free electricity usage calculator for estimating appliance energy costs. Estimates only; Watts My Bill? is not affiliated with any electricity provider.
-              </p>
-              <a
-                href="mailto:hello@wattsmybill.app"
-                className="mt-3 inline-block text-xs font-bold text-emerald-700 hover:underline"
-              >
-                hello@wattsmybill.app
-              </a>
-              <p className="mt-3 text-xs font-semibold text-gray-500">
-                © 2026 Watts My Bill? All rights reserved.
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-600">
+                Estimate appliance energy costs and understand your electricity bill.
+                For guidance only; not affiliated with any utility provider.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2 md:justify-end">
-              {INFO_SECTIONS.map((section) => (
-                <button
-                  key={section.id}
-                  onClick={() =>
-                    setActiveInfoPage(
-                      activeInfoPage === section.id ? null : section.id
-                    )
-                  }
-                  className={`rounded-full border px-4 py-2 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 ${
-                    activeInfoPage === section.id
-                      ? "border-emerald-600 bg-emerald-600 text-white"
-                      : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
-                  }`}
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1 md:text-right">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Contact</p>
+                <a
+                  href="mailto:hello@wattsmybill.app"
+                  className="mt-1 inline-block text-sm font-bold text-emerald-700 hover:underline"
                 >
-                  {section.title.replace("Watts My Bill?", "").trim()}
-                </button>
-              ))}
+                  hello@wattsmybill.app
+                </a>
+              </div>
+
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Legal & Info</p>
+                <div className="mt-2 flex flex-wrap gap-2 md:justify-end">
+                  {INFO_SECTIONS.map((section) => (
+                    <button
+                      key={section.id}
+                      onClick={() =>
+                        setActiveInfoPage(
+                          activeInfoPage === section.id ? null : section.id
+                        )
+                      }
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 ${
+                        activeInfoPage === section.id
+                          ? "border-emerald-600 bg-emerald-600 text-white"
+                          : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+                      }`}
+                    >
+                      {section.title.replace("Watts My Bill?", "").trim()}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div className="mt-6 border-t border-gray-200 pt-4 text-xs font-semibold text-gray-500">
+            © 2026 Watts My Bill? All rights reserved.
           </div>
 
           {pendingHouseholdPreset && (
