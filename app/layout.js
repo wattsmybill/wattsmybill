@@ -15,34 +15,35 @@ const geistMono = Geist_Mono({
 export const metadata = {
   metadataBase: new URL("https://wattsmybill.app"),
 
+  applicationName: "Watts My Bill?",
+  category: "Utility",
+
   title: {
-    default: "Watts My Bill? | Electricity Usage Calculator",
+    default: "Watts My Bill? | Electricity Bill Estimator",
     template: "%s | Watts My Bill?",
   },
 
   description:
-    "Your friendly tool for understanding electricity bills. Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity provider rates.",
+    "Understand your electricity bill with a free appliance wattage calculator. Estimate monthly electricity costs, compare usage, and generate a simple energy audit report.",
 
   keywords: [
     "Watts My Bill",
+    "electricity bill estimator",
     "electricity usage calculator",
     "electricity bill calculator",
-    "electricity bill usage calculator",
-    "electric bill estimator",
     "appliance wattage calculator",
     "kWh calculator",
     "energy usage calculator",
     "power consumption calculator",
+    "home energy audit report",
+    "household electricity estimator",
     "monthly electric bill estimate",
-    "whats my bill",
-    "electrical wattage",
-    "electrical consumption",
-    "how to know wattage consumption",
-    "energy bill",
+    "appliance energy cost calculator",
+    "watts calculator",
+    "electricity cost calculator",
+    "energy bill calculator",
+    "how to calculate electricity bill",
     "how to save energy",
-    "energy",
-    "watts",
-    "power",
   ],
 
   authors: [{ name: "Watts My Bill?" }],
@@ -50,7 +51,7 @@ export const metadata = {
   publisher: "Watts My Bill?",
 
   alternates: {
-    canonical: "https://wattsmybill.app",
+    canonical: "/",
   },
 
   robots: {
@@ -66,29 +67,29 @@ export const metadata = {
   },
 
   openGraph: {
-    title: "Watts My Bill? | Electricity Usage Calculator",
+    title: "Watts My Bill? | Electricity Bill Estimator",
     description:
-      "Your friendly tool for understanding electricity bills. Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity provider rates.",
-    url: "https://wattsmybill.app",
+      "Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity rates.",
+    url: "/",
     siteName: "Watts My Bill?",
     type: "website",
     locale: "en_US",
     images: [
       {
-        url: "/og-image-2.jpg",
+        url: "/og-image-3.jpg",
         width: 1200,
         height: 630,
-        alt: "Watts My Bill? electricity usage calculator",
+        alt: "Watts My Bill? electricity bill estimator and usage calculator",
       },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Watts My Bill? | Electricity Usage Calculator",
+    title: "Watts My Bill? | Electricity Bill Estimator",
     description:
-      "Your friendly tool for understanding electricity bills. Estimate monthly electricity costs based on appliance wattage, usage hours, quantity, and electricity provider rates.",
-    images: ["/og-image-2.jpg"],
+      "Understand your electricity bill with a free appliance wattage calculator and energy usage estimator.",
+    images: ["/og-image-3.jpg"],
   },
 
   icons: {

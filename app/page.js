@@ -377,7 +377,7 @@ const INFO_SECTIONS = [
     id: "contact",
     title: "Contact",
     description:
-      "For questions, feedback, corrections, or suggestions, you can contact the creator of Watts My Bill? through the official contact details or social links that will be added to this project. Please do not send sensitive billing information unless you are comfortable sharing it."
+      "For questions, feedback, corrections, or suggestions, you can contact Watts My Bill? at hello@wattsmybill.app. Please do not send sensitive billing information unless you are comfortable sharing it."
   }
 ];
 
@@ -442,7 +442,7 @@ function Logo({ darkMode = false }) {
         </div>
 
         <div className={`text-xs md:text-sm mt-1 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-          Your Friendly Electricity Usage Tool
+          Understand Your Electricity Bill
         </div>
       </div>
     </div>
@@ -1356,7 +1356,7 @@ ${topUsage.trim()}` : ""}`;
           <button
             onClick={() => setDarkMode(!darkMode)}
             title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-            className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-2xl border border-white/15 bg-white/14 text-white/80 backdrop-blur-md shadow-md shadow-emerald-950/20 ring-1 ring-white/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20 hover:text-white hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] active:scale-95"
+            className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/12 text-white/75 backdrop-blur-md shadow-sm shadow-emerald-950/10 ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/18 hover:text-white/90 hover:shadow-[0_0_14px_rgba(255,255,255,0.14)] active:scale-95"
             aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
             {darkMode ? (
@@ -1435,6 +1435,21 @@ ${topUsage.trim()}` : ""}`;
           </div>
         </div>
 
+        <div className="mb-5 md:mb-6 flex flex-wrap gap-2 text-black">
+          <div className="inline-flex w-full items-center gap-1.5 rounded-full border border-emerald-200/40 bg-white/45 px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-[0_6px_18px_rgba(15,23,42,0.04)] backdrop-blur-sm sm:w-auto">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            No signup required
+          </div>
+          <div className="inline-flex w-full items-center gap-1.5 rounded-full border border-emerald-200/40 bg-white/45 px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-[0_6px_18px_rgba(15,23,42,0.04)] backdrop-blur-sm sm:w-auto">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            Free to use
+          </div>
+          <div className="inline-flex w-full items-center gap-1.5 rounded-full border border-emerald-200/40 bg-white/45 px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-[0_6px_18px_rgba(15,23,42,0.04)] backdrop-blur-sm sm:w-auto">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            Wattage-based estimates
+          </div>
+        </div>
+
         <div className="grid md:grid-cols-3 gap-4 mb-6">
           <label className="block">
             <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide opacity-70">
@@ -1492,8 +1507,8 @@ ${topUsage.trim()}` : ""}`;
             </label>
 
             <p className="text-xs opacity-60 mt-2 px-1">
-              Optional. Enter your provider rate for a more accurate estimate.
-              If left blank, we’ll use the average rate for your selected country.
+              Optional. Add your provider’s rate for a more accurate estimate. 
+              Otherwise, we’ll use your country’s average rate.
             </p>
           </div>
         </div>
@@ -1550,7 +1565,7 @@ ${topUsage.trim()}` : ""}`;
               Household Presets
             </h2>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-gray-600">
-              Tap a preset to quickly pre-fill common home appliances. Details appear only after selecting one.
+              Start with a typical home setup. You can still edit every appliance afterward.
             </p>
           </div>
 
@@ -1589,7 +1604,7 @@ ${topUsage.trim()}` : ""}`;
                   </span>
                   <span className="mt-0.5 block text-xs text-gray-500">{preset.size}</span>
                   <span className="mt-1 block text-xs font-semibold text-emerald-800">
-                    ⚡ ~{presetKwh.toFixed(0)} kWh/month
+                    ~{presetKwh.toFixed(0)} kWh/month
                   </span>
                 </button>
               );
@@ -1642,37 +1657,41 @@ ${topUsage.trim()}` : ""}`;
         </div>
 
         <div className="mb-5 md:mb-6 rounded-3xl bg-[#f7f8f8] p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-            <div>
-              <h2 className="font-bold text-lg">Quick Add Appliances</h2>
+          <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className="max-w-xl">
+              <div className="mb-2 inline-flex rounded-full border border-emerald-100 bg-emerald-50/70 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
+                Manual option
+              </div>
+              <h2 className="text-xl font-black tracking-tight">Add Appliances Manually</h2>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">
+                Use search or quick chips when you want to build your estimate appliance by appliance.
+              </p>
 
               <button
                 onClick={() => setShowWattageHelp(!showWattageHelp)}
-                className="text-xs text-emerald-700 font-semibold mt-2 hover:underline"
+                className="mt-2 inline-flex text-xs font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline"
               >
-                {showWattageHelp ? "Hide wattage help" : "Need help finding wattage?"}
+                {showWattageHelp ? "Hide wattage guide" : "Wattage guide"}
               </button>
 
               {showWattageHelp && (
-                <p className="text-xs opacity-60 mt-2 max-w-xl">
-                  Check the appliance sticker, power adapter, user manual, or
-                  search the exact appliance model online. Using the actual
-                  wattage gives a better estimate than using generic presets.
+                <p className="mt-2 max-w-xl rounded-2xl border border-emerald-100 bg-emerald-50/50 px-3 py-2 text-xs leading-relaxed text-gray-600">
+                  Check the appliance sticker, power adapter, user manual, or search the exact appliance model online. Actual wattage gives a better estimate than generic presets.
                 </p>
               )}
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <div className="flex w-full flex-col gap-2 md:w-auto md:min-w-[380px] md:flex-row md:items-center">
               <input
                 type="text"
-                className="p-3 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                className="w-full rounded-2xl border border-gray-200 bg-white/70 p-3 text-black shadow-sm ring-1 ring-black/5 transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 md:min-w-[240px]"
                 placeholder="Search appliance..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
 
               <select
-                className="p-3 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                className="w-full rounded-2xl border border-gray-200 bg-white/70 p-3 text-black shadow-sm ring-1 ring-black/5 transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 md:w-[130px]"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -1683,9 +1702,16 @@ ${topUsage.trim()}` : ""}`;
             </div>
           </div>
 
-          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-gray-500">
-            Popular appliances
-          </p>
+          <div className="mb-2 flex items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-gray-500">
+                Popular appliances
+              </p>
+              <p className="mt-0.5 text-xs text-gray-500">
+                Start with common appliances, then fine-tune the details below.
+              </p>
+            </div>
+          </div>
 
           <div className="flex flex-wrap gap-1.5 md:gap-2">
             {visiblePresets.map((p, index) => {
@@ -1695,7 +1721,7 @@ ${topUsage.trim()}` : ""}`;
                 <button
                   key={`${p.category}-${p.name}`}
                   onClick={() => addPreset(p)}
-                  className={`${hideOnMobile ? "hidden md:inline-flex" : "inline-flex"} items-center px-3 py-1.5 md:px-3.5 md:py-2 rounded-full bg-emerald-100 hover:bg-emerald-200 text-black text-sm font-semibold transition-all duration-200 shadow-sm hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]`}
+                  className={`${hideOnMobile ? "hidden md:inline-flex" : "inline-flex"} items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-950 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-100 hover:shadow-md active:scale-[0.98] md:px-3.5 md:py-1.5`}
                   title={`${p.category} • ${p.watts}W • ${p.hours}h/day • ${p.days} days/month`}
                 >
                   + {p.name}
@@ -1708,7 +1734,7 @@ ${topUsage.trim()}` : ""}`;
             {filteredPresets.length > 10 && (
               <button
                 onClick={() => setShowAllPresets(!showAllPresets)}
-                className="rounded-2xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-md"
+                className="rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
               >
                 {showAllPresets ? "Show Less" : "Show More"}
               </button>
@@ -1716,7 +1742,7 @@ ${topUsage.trim()}` : ""}`;
 
             <button
               onClick={addAppliance}
-              className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md"
+              className="rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md"
             >
               + Add Appliance
             </button>
@@ -1724,7 +1750,7 @@ ${topUsage.trim()}` : ""}`;
             <button
               onClick={clearAll}
               title="Reset calculator"
-              className="inline-flex items-center gap-1.5 rounded-2xl border border-red-200 bg-red-50/70 px-3.5 py-2 text-sm font-semibold text-red-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-50 hover:shadow-md"
+              className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50/60 px-3.5 py-1.5 text-sm font-semibold text-red-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-50 hover:shadow-md"
             >
               <RotateCcw size={15} strokeWidth={2.2} />
               Reset
@@ -1737,6 +1763,25 @@ ${topUsage.trim()}` : ""}`;
             </p>
           )}
         </div>
+
+        <section className="mb-5 md:mb-6 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-black/5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+                How estimates work
+              </p>
+              <h2 className="mt-1 text-xl font-black tracking-tight">
+                Transparent, simple calculation.
+              </h2>
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-gray-600">
+                Energy usage is estimated using appliance watts, quantity, hours used, and days used per month. Your estimated cost uses your selected country’s average electricity rate or your custom provider rate.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 px-4 py-3 text-sm font-semibold text-emerald-900">
+              Watts × Qty × Hours × Days ÷ 1000 = kWh
+            </div>
+          </div>
+        </section>
 
         <div ref={applianceSectionRef} className="space-y-4 scroll-mt-24">
           {breakdown.map((item, i) => {
@@ -2121,15 +2166,26 @@ ${topUsage.trim()}` : ""}`;
 
         <footer className="mb-24 rounded-3xl border border-gray-200 bg-[#f7f8f8] p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div>
-              <p className="font-bold">© 2026 Watts My Bill? All rights reserved.</p>
-              <p className="mt-1 max-w-2xl text-xs leading-relaxed text-gray-600">
-                Estimates only. Watts My Bill? is not affiliated with any electricity
-                provider. Use this tool as a guide, not as an official bill.
+            <div className="max-w-2xl">
+              <p className="text-lg font-black tracking-tight">Watts My Bill?</p>
+              <p className="mt-1 text-sm font-semibold text-emerald-700">
+                Understand Your Electricity Bill
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-gray-600">
+                Free electricity usage calculator for estimating appliance energy costs. Estimates only; Watts My Bill? is not affiliated with any electricity provider.
+              </p>
+              <a
+                href="mailto:hello@wattsmybill.app"
+                className="mt-3 inline-block text-xs font-bold text-emerald-700 hover:underline"
+              >
+                hello@wattsmybill.app
+              </a>
+              <p className="mt-3 text-xs font-semibold text-gray-500">
+                © 2026 Watts My Bill? All rights reserved.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 md:justify-end">
               {INFO_SECTIONS.map((section) => (
                 <button
                   key={section.id}
@@ -2170,7 +2226,7 @@ ${topUsage.trim()}` : ""}`;
                   {pendingHouseholdPreset.icon} {pendingHouseholdPreset.name}
                 </span>
                 <span className="mt-1 block text-xs text-gray-600">
-                  ⚡ ~{calculatePresetKwh(pendingHouseholdPreset).toFixed(0)} kWh/month • {pendingHouseholdPreset.appliances.length} appliances
+                  ~{calculatePresetKwh(pendingHouseholdPreset).toFixed(0)} kWh/month • {pendingHouseholdPreset.appliances.length} appliances
                 </span>
               </div>
 
