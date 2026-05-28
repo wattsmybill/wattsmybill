@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
-import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Home, CheckCircle2, Coffee } from "lucide-react";
+import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Home, CheckCircle2, Coffee, ArrowUp } from "lucide-react";
 
 import { COUNTRIES } from "./data/countries";
 import { PRESETS } from "./data/appliances";
@@ -18,19 +18,47 @@ const DEFAULT_APPLIANCE = {
 
 const LOGO_PATH = "/logo.png";
 
+function safeNumber(value, fallback = 0) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? number : fallback;
+}
 
+function safePositiveNumber(value, fallback = 1) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : fallback;
+}
 
+function cleanNonNegativeInput(value, { allowZero = true } = {}) {
+  if (value === "") return "";
 
+  const number = Number(value);
 
+  if (!Number.isFinite(number)) return "";
+  if (number < 0) return allowZero ? "0" : "1";
+  if (!allowZero && number === 0) return "1";
 
+  return value;
+}
 
+const DID_YOU_KNOW_INSIGHTS = [
+  "Cooling appliances usually become the biggest part of a household electricity bill.",
+  "Small wattage changes can create noticeable monthly differences over time.",
+  "Air-conditioners, refrigerators, and water heaters often drive the highest usage.",
+  "Reducing your top appliance by even 1 hour/day can lower your estimate noticeably.",
+  "Provider rates can change over time, so updating your bill improves estimate accuracy.",
+  "High-watt appliances are not always expensive if they are only used briefly.",
+  "Low-watt appliances can still add up when running continuously throughout the day.",
+  "Electricity costs are usually driven more by usage habits than appliance quantity.",
+  "Cooling settings and room insulation can greatly affect aircon electricity usage.",
+  "Your estimate becomes more accurate when appliance wattage labels are used directly."
+];
 
 function calculatePresetKwh(preset) {
   return preset.appliances.reduce((sum, item) => {
-    const watts = Number(item.watts || 0);
-    const quantity = Number(item.quantity || 1);
-    const hours = Number(item.hours || 0);
-    const days = Number(item.days || 0);
+    const watts = safeNumber(item.watts);
+    const quantity = safePositiveNumber(item.quantity);
+    const hours = safeNumber(item.hours);
+    const days = safeNumber(item.days);
 
     return sum + (watts * quantity * hours * days) / 1000;
   }, 0);
@@ -240,12 +268,12 @@ function Logo({ darkMode = false }) {
 }
 
 function useAnimatedNumber(value, duration = 520, largeJumpThreshold = 25000) {
-  const [displayValue, setDisplayValue] = useState(Number(value) || 0);
-  const previousValueRef = useRef(Number(value) || 0);
+  const [displayValue, setDisplayValue] = useState(safeNumber(value));
+  const previousValueRef = useRef(safeNumber(value));
 
   useEffect(() => {
     const startValue = previousValueRef.current;
-    const endValue = Number(value) || 0;
+    const endValue = safeNumber(value);
     const jumpSize = Math.abs(endValue - startValue);
 
     if (jumpSize > largeJumpThreshold) {
@@ -313,12 +341,25 @@ export default function Page() {
   const [highlightedIndex, setHighlightedIndex] = useState(null);
   const [shareCopied, setShareCopied] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [showBackToEstimate, setShowBackToEstimate] = useState(false);
+  const [activeQuestion, setActiveQuestion] = useState(null);
+  const [didYouKnowIndex, setDidYouKnowIndex] = useState(0);
 
+  const heroSectionRef = useRef(null);
+  const inputSectionRef = useRef(null);
+  const insightsSectionRef = useRef(null);
   const applianceSectionRef = useRef(null);
   const feedbackTimerRef = useRef(null);
   const highlightTimerRef = useRef(null);
 
   const [appliances, setAppliances] = useState([DEFAULT_APPLIANCE]);
+
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+      if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -331,7 +372,7 @@ export default function Page() {
           ? parsed.appliances.map((item) => ({
               ...DEFAULT_APPLIANCE,
               ...item,
-              quantity: item.quantity || 1
+              quantity: safePositiveNumber(item.quantity)
             }))
           : [DEFAULT_APPLIANCE];
 
@@ -412,6 +453,25 @@ export default function Page() {
     showEstimateHelp
   ]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToEstimate(window.scrollY > 760);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const didYouKnowTimer = window.setInterval(() => {
+      setDidYouKnowIndex((current) => (current + 1) % DID_YOU_KNOW_INSIGHTS.length);
+    }, 9000);
+
+    return () => window.clearInterval(didYouKnowTimer);
+  }, [DID_YOU_KNOW_INSIGHTS.length]);
+
   const categories = ["All", ...new Set(PRESETS.map((item) => item.category))];
 
   const filteredPresets = PRESETS.filter((item) => {
@@ -438,7 +498,8 @@ export default function Page() {
   );
 
   const isOtherCountry = country.name === "Other Country";
-  const activeRate = customRate ? Number(customRate) : country.rate;
+  const hasCustomRate = String(customRate || "").trim() !== "";
+  const activeRate = hasCustomRate ? safeNumber(customRate) : safeNumber(country.rate);
 
   const displayCountry = isOtherCountry
     ? customCountryName || "Other Country"
@@ -449,17 +510,43 @@ export default function Page() {
     : country.currency;
 
   const formatCurrency = (value) =>
-    `${displayCurrency}${Number(value || 0).toLocaleString(undefined, {
+    `${displayCurrency}${safeNumber(value).toLocaleString(undefined, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     })}`;
+
+  const rateWarning =
+    hasCustomRate && safeNumber(customRate) > Math.max(safeNumber(country.rate) * 8, 1000);
+
+  const popularQuestions = [
+    {
+      question: "How much does my aircon cost?",
+      answer:
+        "Aircon cost depends on its wattage, hours used, days per month, and your electricity rate. Add your aircon below for a more accurate estimate."
+    },
+    {
+      question: "Why is my bill so high?",
+      answer:
+        "High bills often come from cooling, long daily use, appliances running all day, provider fees, or rates that changed."
+    },
+    {
+      question: "Is this appliance expensive to run?",
+      answer:
+        "Check watts, hours, and days. A high-watt appliance can be fine if used briefly, while a low-watt appliance can add up if used all day."
+    },
+    {
+      question: "What uses the most electricity?",
+      answer:
+        "Usually air-conditioning, heaters, dryers, cooking appliances, refrigerators, and appliances used for many hours."
+    }
+  ];
 
   const isBlankAppliance = (item) =>
     !String(item.name || "").trim() &&
     !String(item.watts || "").trim() &&
     !String(item.hours || "").trim() &&
     !String(item.days || "").trim() &&
-    Number(item.quantity || 1) === 1;
+    safePositiveNumber(item.quantity) === 1;
 
   const showAddedFeedback = (name, index) => {
     if (feedbackTimerRef.current) {
@@ -507,6 +594,7 @@ export default function Page() {
     setShowWattageHelp(false);
     setShowEstimateHelp(false);
     setActiveInfoPage(null);
+    setActiveQuestion(null);
     setAddedToast("");
     setHighlightedIndex(null);
     setAppliances([{ ...DEFAULT_APPLIANCE }]);
@@ -620,10 +708,10 @@ export default function Page() {
 
   const breakdown = useMemo(() => {
     return appliances.map((a) => {
-      const watts = Number(a.watts || 0);
-      const quantity = Number(a.quantity || 1);
-      const hours = Number(a.hours || 0);
-      const days = Number(a.days || 0);
+      const watts = safeNumber(a.watts);
+      const quantity = safePositiveNumber(a.quantity);
+      const hours = safeNumber(a.hours);
+      const days = safeNumber(a.days);
 
       const kwh = (watts * quantity * hours * days) / 1000;
       const cost = kwh * activeRate;
@@ -634,7 +722,8 @@ export default function Page() {
 
   const totalKwh = breakdown.reduce((s, i) => s + i.kwh, 0);
   const total = breakdown.reduce((s, i) => s + i.cost, 0);
-  const difference = actualBill ? Number(actualBill) - total : 0;
+  const difference = actualBill ? safeNumber(actualBill) - total : 0;
+  const currentMicroInsight = DID_YOU_KNOW_INSIGHTS[didYouKnowIndex % DID_YOU_KNOW_INSIGHTS.length];
 
   const topAppliance = [...breakdown]
     .filter((item) => item.kwh > 0)
@@ -652,10 +741,10 @@ export default function Page() {
   const animatedDailyAverage = useAnimatedNumber(dailyAverage);
 
   const possibleSavings = topAppliance
-    ? ((Number(topAppliance.watts || 0) *
-        Number(topAppliance.quantity || 1) *
+    ? ((safeNumber(topAppliance.watts) *
+        safePositiveNumber(topAppliance.quantity) *
         1 *
-        Number(topAppliance.days || 0)) /
+        safeNumber(topAppliance.days)) /
         1000) *
       activeRate
     : 0;
@@ -673,7 +762,7 @@ export default function Page() {
 
   const coolingShare = totalKwh > 0 ? (coolingKwh / totalKwh) * 100 : 0;
 
-  const billComparisonInsight = Number(actualBill) > 0
+  const billComparisonInsight = safeNumber(actualBill) > 0
     ? difference > 0
       ? `Your entered bill is ${formatCurrency(Math.abs(difference))} higher than this estimate. The gap may come from taxes, provider fees, appliances not listed yet, or wattages that are lower than actual.`
       : difference < 0
@@ -702,7 +791,7 @@ export default function Page() {
     : "Your cooling usage does not dominate the estimate yet.";
 
   const buildShareText = () => {
-    const estimatedBill = `${displayCurrency}${Number(total).toLocaleString(undefined, {
+    const estimatedBill = `${displayCurrency}${safeNumber(total).toLocaleString(undefined, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     })}`;
@@ -812,7 +901,7 @@ ${topUsage.trim()}` : ""}`;
           .trim();
 
       const money = (value) =>
-        cleanText(`${pdfCurrency}${Number(value || 0).toLocaleString(undefined, {
+        cleanText(`${pdfCurrency}${safeNumber(value).toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         })}`);
@@ -863,7 +952,7 @@ ${topUsage.trim()}` : ""}`;
           footer();
           doc.addPage();
           pageNumber += 1;
-          y = marginX;
+          y = marginTop;
         }
       };
 
@@ -940,7 +1029,7 @@ ${topUsage.trim()}` : ""}`;
         ["Country", cleanText(displayCountry)],
         [
           "Rate Used",
-          `${pdfCurrency}${Number(activeRate || 0).toLocaleString(undefined, {
+          `${pdfCurrency}${safeNumber(activeRate).toLocaleString(undefined, {
             maximumFractionDigits: 4
           })}/kWh`
         ]
@@ -1010,7 +1099,7 @@ ${topUsage.trim()}` : ""}`;
         y += 2;
       });
 
-      if (Number(actualBill) > 0) {
+      if (safeNumber(actualBill) > 0) {
         y += 3;
 
         doc.setDrawColor(230, 230, 230);
@@ -1032,7 +1121,7 @@ ${topUsage.trim()}` : ""}`;
         doc.text("Current Bill", marginX, y);
 
         doc.setFont("helvetica", "normal");
-        doc.text(money(Number(actualBill)), marginX + 40, y);
+        doc.text(money(safeNumber(actualBill)), marginX + 40, y);
 
         y += 8;
 
@@ -1132,10 +1221,10 @@ ${topUsage.trim()}` : ""}`;
           doc.setTextColor(50, 50, 50);
 
           doc.text(applianceLines, col.appliance + 1, y);
-          doc.text(String(item.quantity || 1), col.qty, y);
-          doc.text(String(item.watts || 0), col.watts, y);
-          doc.text(String(item.hours || 0), col.hours, y);
-          doc.text(String(item.days || 0), col.days, y);
+          doc.text(String(safePositiveNumber(item.quantity)), col.qty, y);
+          doc.text(String(safeNumber(item.watts)), col.watts, y);
+          doc.text(String(safeNumber(item.hours)), col.hours, y);
+          doc.text(String(safeNumber(item.days)), col.days, y);
           doc.text(item.kwh.toFixed(2), col.kwh, y);
           doc.text(money(item.cost), col.cost, y);
 
@@ -1209,13 +1298,25 @@ ${topUsage.trim()}` : ""}`;
 
       <style jsx global>{`
         @keyframes wmbHeroOrb {
-          0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.42; }
-          50% { transform: translate3d(-18px, 14px, 0) scale(1.08); opacity: 0.62; }
+          0%, 100% {
+            opacity: 0.16;
+            transform: translate3d(0, 0, 0) scale(0.94);
+          }
+          50% {
+            opacity: 0.32;
+            transform: translate3d(-18px, 10px, 0) scale(1.10);
+          }
         }
 
         @keyframes wmbHeroOrbDelayed {
-          0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.28; }
-          50% { transform: translate3d(18px, -10px, 0) scale(1.06); opacity: 0.42; }
+          0%, 100% {
+            opacity: 0.12;
+            transform: translate3d(0, 0, 0) scale(0.96);
+          }
+          50% {
+            opacity: 0.26;
+            transform: translate3d(15px, -8px, 0) scale(1.08);
+          }
         }
 
         @keyframes wmbFadeUp {
@@ -1229,21 +1330,34 @@ ${topUsage.trim()}` : ""}`;
         }
 
         @keyframes wmbHeroGradientShift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+          0%, 100% { background-position: 12% 50%; }
+          50% { background-position: 70% 50%; }
         }
 
-        @keyframes wmbSoftSheen {
-          0%, 100% { opacity: 0.18; transform: translateX(-6%) skewX(-8deg); }
-          50% { opacity: 0.32; transform: translateX(8%) skewX(-8deg); }
+        @keyframes wmbInsightChange {
+          from { opacity: 0; transform: translateY(4px); filter: blur(2px); }
+          to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
+
+        @keyframes wmbHeroBreath {
+          0%, 100% {
+            opacity: 0.22;
+            transform: translate3d(0, 0, 0) scale(0.96);
+          }
+          50% {
+            opacity: 0.40;
+            transform: translate3d(-22px, 9px, 0) scale(1.09);
+          }
+        }
+
+        
 
         .wmb-hero-orb {
-          animation: wmbHeroOrb 9s ease-in-out infinite;
+          animation: wmbHeroOrb 16s ease-in-out infinite;
         }
 
         .wmb-hero-orb-delayed {
-          animation: wmbHeroOrbDelayed 11s ease-in-out infinite;
+          animation: wmbHeroOrbDelayed 19s ease-in-out infinite;
         }
 
         .wmb-fade-up {
@@ -1255,20 +1369,16 @@ ${topUsage.trim()}` : ""}`;
         }
 
         .wmb-hero-gradient {
-          background-size: 160% 160%;
-          animation: wmbHeroGradientShift 14s ease-in-out infinite;
+          background-size: 145% 145%;
+          animation: wmbHeroGradientShift 18s ease-in-out infinite;
         }
 
-        .wmb-soft-sheen {
-          animation: wmbSoftSheen 12s ease-in-out infinite;
+        .wmb-hero-breath {
+          animation: wmbHeroBreath 15s ease-in-out infinite;
         }
 
-        .wmb-hero-noise {
-          background-image:
-            radial-gradient(circle at 20% 30%, rgba(255,255,255,0.18) 0 1px, transparent 1px),
-            radial-gradient(circle at 80% 10%, rgba(255,255,255,0.12) 0 1px, transparent 1px);
-          background-size: 46px 46px, 62px 62px;
-          mix-blend-mode: soft-light;
+        .wmb-insight-change {
+          animation: wmbInsightChange 520ms ease-out both;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1277,7 +1387,8 @@ ${topUsage.trim()}` : ""}`;
           .wmb-fade-up,
           .wmb-energy-pulse,
           .wmb-hero-gradient,
-          .wmb-soft-sheen {
+          .wmb-hero-breath,
+          .wmb-insight-change {
             animation: none !important;
           }
         }
@@ -1288,19 +1399,19 @@ ${topUsage.trim()}` : ""}`;
           <Logo darkMode={darkMode} />
         </div>
 
-        <div className="wmb-hero-gradient relative isolate mb-3 md:mb-4 p-5 md:px-6 md:pt-6 md:pb-4 rounded-3xl overflow-hidden bg-gradient-to-r from-[#064e3b] via-[#047857] to-[#0f766e] text-white shadow-[0_18px_45px_rgba(4,120,87,0.18)] ring-1 ring-white/10 transition-all duration-300 hover:shadow-[0_22px_55px_rgba(4,120,87,0.22)]">
+        <div ref={heroSectionRef} className="wmb-hero-gradient relative isolate mb-5 md:mb-6 p-5 md:px-6 md:pt-6 md:pb-4 rounded-3xl overflow-hidden bg-gradient-to-r from-[#064e3b] via-[#067a5f] to-[#0f766e] text-white shadow-[0_20px_70px_rgba(4,120,87,0.14),inset_0_1px_0_rgba(255,255,255,0.06)] transition-all duration-300 hover:shadow-[0_24px_76px_rgba(4,120,87,0.18),inset_0_1px_0_rgba(255,255,255,0.07)]">
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-3xl">
-            <div className="wmb-hero-orb absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-200/25 blur-3xl" />
-            <div className="wmb-hero-orb-delayed absolute -left-20 bottom-0 h-44 w-44 rounded-full bg-emerald-200/20 blur-3xl" />
-            <div className="wmb-soft-sheen absolute -right-28 top-0 h-full w-1/2 bg-gradient-to-r from-transparent via-white/8 to-transparent blur-2xl" />
-            <div className="wmb-hero-noise absolute inset-0 opacity-[0.10]" />
+            <div className="wmb-hero-breath absolute -right-20 -top-16 h-80 w-80 rounded-full bg-emerald-300/42 blur-3xl" />
+            <div className="wmb-hero-orb absolute left-[38%] top-8 h-56 w-56 rounded-full bg-teal-200/24 blur-3xl" />
+            <div className="wmb-hero-orb-delayed absolute -left-16 bottom-[-28px] h-52 w-52 rounded-full bg-lime-200/18 blur-3xl" />
+            <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.055),transparent_38%,rgba(255,255,255,0.035))]" />
           </div>
 
           <button
             type="button"
             onClick={() => setDarkMode((current) => !current)}
             title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-            className="pointer-events-auto absolute right-5 top-5 z-[60] grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/10 text-white/70 backdrop-blur-md shadow-sm shadow-emerald-950/5 ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/16 hover:text-white/85 hover:shadow-[0_0_12px_rgba(255,255,255,0.10)] active:scale-95"
+            className="pointer-events-auto absolute right-5 top-5 z-[60] grid h-9 w-9 place-items-center rounded-2xl border border-white/[0.07] bg-white/[0.045] text-white/80 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_4px_12px_rgba(6,78,59,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-white/14 hover:bg-white/9 hover:text-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_0_10px_rgba(167,243,208,0.08)] active:scale-95"
             aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
             {darkMode ? (
@@ -1310,17 +1421,51 @@ ${topUsage.trim()}` : ""}`;
             )}
           </button>
 
+          <p className="relative z-20 mb-2 text-[10px] font-black uppercase tracking-[0.22em] text-white/70">
+            Live estimate
+          </p>
+
           <h2 className="relative z-20 pr-12 text-3xl font-black leading-tight">
             {displayCurrency}
-            {Number(animatedTotal).toLocaleString(undefined, {
+            {safeNumber(animatedTotal).toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
             })}
           </h2>
 
           <p className="relative z-20 mt-1 opacity-90">
-            Estimated monthly electricity bill
+            {totalKwh > 0
+              ? "Estimated monthly electricity bill"
+              : "Add appliances below to estimate your monthly bill"}
           </p>
+
+          <div className="relative z-20 mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                inputSectionRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start"
+                })
+              }
+              className="rounded-full border border-white/20 bg-white/16 px-3 py-1.5 text-xs font-semibold text-white/95 backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/22 hover:text-white"
+            >
+              Start calculating ↓
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                insightsSectionRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start"
+                })
+              }
+              className="rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs font-semibold text-white/78 backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/14 hover:text-white/95"
+            >
+              View insights ↓
+            </button>
+          </div>
 
           <div className="relative z-20 mt-4 grid md:grid-cols-4 gap-3">
             <div className="bg-white/18 px-4 py-2.5 rounded-2xl backdrop-blur-md ring-1 ring-white/10 transition-all duration-200 hover:bg-white/24 hover:-translate-y-0.5">
@@ -1347,7 +1492,7 @@ ${topUsage.trim()}` : ""}`;
               <p className="text-xs opacity-80">Daily Average</p>
               <p className="font-bold">
                 {displayCurrency}
-                {Number(animatedDailyAverage).toLocaleString(undefined, {
+                {safeNumber(animatedDailyAverage).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 })}/day
@@ -1380,27 +1525,21 @@ ${topUsage.trim()}` : ""}`;
           </div>
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-2.5 border-b border-white/5 pb-5 md:mb-7 md:gap-3.5 md:pb-6">
-          {["No signup required", "Free to use", "Based on appliance wattage"].map((trustItem) => (
-            <div
-              key={trustItem}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold backdrop-blur-md transition-colors duration-200 ${
-                darkMode
-                  ? "border-emerald-300/15 bg-slate-800/45 text-slate-100/85 shadow-none"
-                  : "border-emerald-200/40 bg-white/55 text-gray-700 shadow-[0_3px_10px_rgba(15,23,42,0.025)]"
-              }`}
-            >
-              <CheckCircle2
-                size={12}
-                strokeWidth={2.4}
-                className={darkMode ? "text-emerald-300/70" : "text-emerald-600/85"}
-              />
-              {trustItem}
-            </div>
-          ))}
+        <div className={`-mt-1 mb-5 px-1 text-xs leading-relaxed ${
+          darkMode ? "text-slate-200/90" : "text-emerald-950/70"
+        }`}>
+          <span className={darkMode ? "font-black text-emerald-300" : "font-black text-emerald-700"}>
+            Did you know?
+          </span>{" "}
+          <span key={didYouKnowIndex} className="inline wmb-insight-change">
+            {currentMicroInsight}
+          </span>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4 mb-6">
+        <div className="mb-8 md:mb-10" aria-hidden="true" />
+
+
+        <div ref={inputSectionRef} className="grid md:grid-cols-3 gap-4 mb-6">
           <label className="block">
             <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide opacity-70">
               Country
@@ -1434,10 +1573,11 @@ ${topUsage.trim()}` : ""}`;
 
             <input
               type="number"
+              min="0"
               className="w-full p-4 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
               placeholder="Enter amount"
               value={actualBill}
-              onChange={(e) => setActualBill(e.target.value)}
+              onChange={(e) => setActualBill(cleanNonNegativeInput(e.target.value))}
             />
           </label>
 
@@ -1449,10 +1589,12 @@ ${topUsage.trim()}` : ""}`;
 
               <input
                 type="number"
+                min="0"
+                step="any"
                 className="w-full p-4 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                 placeholder={`${displayCurrency || "Currency"} per kWh`}
                 value={customRate}
-                onChange={(e) => setCustomRate(e.target.value)}
+                onChange={(e) => setCustomRate(cleanNonNegativeInput(e.target.value))}
               />
             </label>
 
@@ -1460,6 +1602,12 @@ ${topUsage.trim()}` : ""}`;
               Optional. Add your provider’s rate for a more accurate estimate. 
               Otherwise, we’ll use your country’s average rate.
             </p>
+
+            {rateWarning && (
+              <p className="mt-2 rounded-2xl border border-amber-200/70 bg-amber-50/70 px-3 py-2 text-xs font-medium text-amber-800">
+                This rate seems unusually high. Please double-check your provider rate.
+              </p>
+            )}
           </div>
         </div>
 
@@ -1483,8 +1631,8 @@ ${topUsage.trim()}` : ""}`;
           </div>
         )}
 
-        {Number(actualBill) > 0 && (
-          <div className="mb-5 md:mb-6 rounded-3xl border border-slate-200/70 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-black/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+        {safeNumber(actualBill) > 0 && (
+          <div className="mb-5 md:mb-6 rounded-3xl border border-slate-200/70 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-3">
                 <div className="grid h-8 w-8 shrink-0 place-items-center rounded-2xl border border-emerald-100 bg-emerald-50/80 text-emerald-700 sm:h-9 sm:w-9">
@@ -1502,12 +1650,12 @@ ${topUsage.trim()}` : ""}`;
               </div>
 
               <div
-                className={`ml-11 mt-2 flex w-fit min-w-[168px] max-w-[calc(100%-2.75rem)] items-center justify-between gap-3 rounded-2xl border px-3 py-2 text-left shadow-sm backdrop-blur-sm sm:mt-0 sm:ml-0 sm:min-w-[178px] sm:self-center sm:px-4 sm:py-2 sm:text-right ${
+                className={`ml-11 mt-2 grid w-[calc(100%-2.75rem)] max-w-full grid-cols-1 gap-1 rounded-2xl border px-3 py-2 text-left shadow-sm backdrop-blur-sm sm:mt-0 sm:ml-0 sm:w-auto sm:min-w-[178px] sm:max-w-[260px] sm:self-center sm:px-4 sm:py-2 sm:text-right ${
                   difference > 0
-                    ? "border-rose-100/80 bg-rose-50/45"
+                    ? "border-rose-100/70 bg-rose-50/30"
                     : difference < 0
-                      ? "border-amber-100/80 bg-amber-50/45"
-                      : "border-emerald-100/80 bg-emerald-50/55"
+                      ? "border-amber-100/80 bg-amber-50/32"
+                      : "border-emerald-100/80 bg-emerald-50/45"
                 }`}
               >
                 <p className={`text-[9px] font-extrabold uppercase tracking-[0.15em] sm:text-[10px] ${
@@ -1519,9 +1667,9 @@ ${topUsage.trim()}` : ""}`;
                 }`}>
                   Difference
                 </p>
-                <p className={`text-[15px] font-black leading-none tracking-tight sm:text-base ${
+                <p className={`max-w-full break-words text-[15px] font-black leading-tight tracking-tight sm:text-base ${
                   difference > 0
-                    ? "text-rose-600"
+                    ? "text-rose-500"
                     : difference < 0
                       ? "text-amber-600"
                       : "text-emerald-600"
@@ -1560,10 +1708,10 @@ ${topUsage.trim()}` : ""}`;
                   onClick={() => addHouseholdPreset(preset)}
                   className={`group min-h-[86px] md:min-h-[88px] rounded-2xl border p-2.5 text-left text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_3px_10px_rgba(16,185,129,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_8px_22px_rgba(16,185,129,0.14)] active:scale-[0.98] ${
                     isSelected
-                      ? "border-emerald-400 bg-emerald-100/90 ring-2 ring-emerald-300 shadow-emerald-900/10"
-                      : "border-emerald-200/75 bg-[#e4f7ef] hover:border-emerald-300 hover:bg-[#dcf4ea] hover:ring-1 hover:ring-emerald-200/70"
+                      ? "border-emerald-400 bg-emerald-100/90 ring-0.75 ring-emerald-300 shadow-emerald-900/10"
+                      : "border-emerald-200/75 bg-white-75 hover:border-emerald-100 hover:bg-[#dcf4ea] hover:ring-1 hover:ring-emerald-200/70"
                   }`}
-                  title={`${preset.name} ${preset.size}`}
+                  aria-label={`${preset.name} ${preset.size}`}
                 >
                   <span className="mb-1.5 flex items-start justify-between gap-2">
                     <span className="grid h-7 w-7 place-items-center rounded-xl bg-white text-sm shadow-sm ring-1 ring-emerald-100">
@@ -1592,7 +1740,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
 
           {activeHouseholdPreset && (
-            <div className="mt-4 rounded-3xl border border-emerald-100 bg-white/85 p-4 shadow-sm">
+            <div className="mt-4 rounded-3xl border border-emerald-100/80 bg-white/90 p-4 shadow-sm">
               <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
@@ -1648,7 +1796,7 @@ ${topUsage.trim()}` : ""}`;
             <div className="max-w-xl">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-xl font-black tracking-tight">Quick Add Appliances</h2>
-                <span className="rounded-full border border-emerald-100/80 bg-emerald-50/55 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
+                <span className="rounded-full border border-emerald-100/80 bg-emerald-50/45 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
                   Manual builder
                 </span>
               </div>
@@ -1790,7 +1938,7 @@ ${topUsage.trim()}` : ""}`;
                 className={`p-5 rounded-3xl text-black shadow-lg relative transition-all duration-500 ${
                   highlightedIndex === i
                     ? "bg-emerald-50 ring-2 ring-emerald-400 shadow-2xl"
-                    : "bg-[#f7f8f8] ring-1 ring-black/5 hover:shadow-xl hover:-translate-y-0.5"
+                    : "bg-[#f7f8f8] ring-1 ring-slate-900/5 hover:shadow-xl hover:-translate-y-0.5"
                 }`}
               >
               <button
@@ -1818,9 +1966,10 @@ ${topUsage.trim()}` : ""}`;
                     className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
                     min="1"
+                    step="1"
                     placeholder="Qty"
                     value={item.quantity}
-                    onChange={(e) => updateAppliance(i, "quantity", e.target.value)}
+                    onChange={(e) => updateAppliance(i, "quantity", cleanNonNegativeInput(e.target.value, { allowZero: false }))}
                   />
                 </label>
 
@@ -1829,9 +1978,11 @@ ${topUsage.trim()}` : ""}`;
                   <input
                     className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
+                    min="0"
+                    step="any"
                     placeholder="W"
                     value={item.watts}
-                    onChange={(e) => updateAppliance(i, "watts", e.target.value)}
+                    onChange={(e) => updateAppliance(i, "watts", cleanNonNegativeInput(e.target.value))}
                   />
                 </label>
 
@@ -1840,9 +1991,11 @@ ${topUsage.trim()}` : ""}`;
                   <input
                     className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
+                    min="0"
+                    step="any"
                     placeholder="Hours"
                     value={item.hours}
-                    onChange={(e) => updateAppliance(i, "hours", e.target.value)}
+                    onChange={(e) => updateAppliance(i, "hours", cleanNonNegativeInput(e.target.value))}
                   />
                 </label>
 
@@ -1851,9 +2004,11 @@ ${topUsage.trim()}` : ""}`;
                   <input
                     className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
+                    min="0"
+                    step="any"
                     placeholder="Days"
                     value={item.days}
-                    onChange={(e) => updateAppliance(i, "days", e.target.value)}
+                    onChange={(e) => updateAppliance(i, "days", cleanNonNegativeInput(e.target.value))}
                   />
                 </label>
               </div>
@@ -1895,7 +2050,7 @@ ${topUsage.trim()}` : ""}`;
 
                   <h3 className="font-black text-2xl text-emerald-600">
                     {displayCurrency}
-                    {Number(item.cost).toLocaleString(undefined, {
+                    {safeNumber(item.cost).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2
                     })}
@@ -1907,16 +2062,20 @@ ${topUsage.trim()}` : ""}`;
           })}
         </div>
 
-        <div className="wmb-fade-up mt-6 mb-5 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-black/5">
-          <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">Smart usage insights</p>
+        <div ref={insightsSectionRef} className="wmb-fade-up mt-6 mb-5 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-black/5">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">Smart usage insights</p>
 
-          <h2 className="mt-1 text-xl font-black tracking-tight">
-            {topAppliance?.name
-              ? "Here’s what is driving your estimate."
-              : "Your audit is waiting for appliance data."}
-          </h2>
+            <h2 className="mt-1 text-xl font-black tracking-tight">
+              {topAppliance?.name
+                ? "Here’s what is driving your estimate."
+                : "Your audit is waiting for appliance data."}
+            </h2>
 
-          <p className="mt-2 max-w-4xl text-sm leading-relaxed text-gray-600">{auditMessage}</p>
+            <p className="mt-2 max-w-none text-sm leading-relaxed text-gray-600">
+              {auditMessage}
+            </p>
+          </div>
 
           {topAppliance?.name ? (
             <div className="mt-4 grid gap-3 md:grid-cols-4">
@@ -1933,7 +2092,7 @@ ${topUsage.trim()}` : ""}`;
               <div className="rounded-2xl border border-emerald-100/80 bg-emerald-50/75 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
                 <p className="text-xs font-semibold text-gray-500">Potential monthly saving</p>
                 <p className="mt-1 text-lg font-black text-emerald-700">
-                  {displayCurrency}{Number(possibleSavings).toLocaleString(undefined, {
+                  {displayCurrency}{safeNumber(possibleSavings).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                   })}
@@ -1957,7 +2116,7 @@ ${topUsage.trim()}` : ""}`;
             </div>
           )}
 
-          {Number(actualBill) > 0 && topAppliance?.name && (
+          {safeNumber(actualBill) > 0 && topAppliance?.name && (
             <div className="mt-3 rounded-2xl border border-gray-200 bg-white/80 p-4">
               <p className="text-xs font-semibold text-gray-500">Bill check</p>
               <p className="mt-1 text-sm leading-relaxed text-gray-700">{billComparisonInsight}</p>
@@ -2085,7 +2244,7 @@ ${topUsage.trim()}` : ""}`;
           </button>
         </div>
 
-        <div className="mb-8 rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-[#f7f8f8] to-teal-50 p-5 md:p-6 text-black shadow-sm ring-1 ring-black/5 transition-all duration-200 hover:shadow-md">
+        <div className="mb-8 rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-[#f7f8f8] to-teal-50 p-5 md:p-6 text-black shadow-sm ring-1 ring-slate-900/5 transition-all duration-200 hover:shadow-md">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="flex items-center gap-2 font-black text-xl mb-2">
@@ -2226,6 +2385,29 @@ ${topUsage.trim()}` : ""}`;
             </div>
           </div>
 
+          {activeInfoSection && (
+            <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="font-black text-emerald-900">
+                    {activeInfoSection.title}
+                  </h3>
+
+                  <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                    {activeInfoSection.description}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setActiveInfoPage(null)}
+                  className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-600 shadow-sm hover:bg-gray-100"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="mt-6 border-t border-gray-200 pt-4 text-xs font-semibold text-gray-500">
             © 2026 Watts My Bill? All rights reserved.
           </div>
@@ -2280,31 +2462,27 @@ ${topUsage.trim()}` : ""}`;
           </div>
         )}
 
-        {activeInfoSection && (
-            <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="font-black text-emerald-900">
-                    {activeInfoSection.title}
-                  </h3>
-
-                  <p className="mt-2 text-sm leading-relaxed text-gray-700">
-                    {activeInfoSection.description}
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => setActiveInfoPage(null)}
-                  className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-600 shadow-sm hover:bg-gray-100"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          )}
         </footer>
 
       </div>
+
+
+      {showBackToEstimate && (
+        <button
+          type="button"
+          onClick={() =>
+            heroSectionRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            })
+          }
+          className="fixed bottom-4 right-4 z-[70] inline-flex items-center gap-1.5 rounded-full border border-emerald-200/50 bg-white/85 px-3.5 py-2 text-xs font-bold text-emerald-900 shadow-[0_10px_30px_rgba(15,23,42,0.16)] ring-1 ring-slate-900/5 backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 md:hidden"
+          aria-label="Back to live estimate"
+        >
+          <ArrowUp size={14} strokeWidth={2.4} />
+          Live estimate
+        </button>
+      )}
     </div>
   );
   
