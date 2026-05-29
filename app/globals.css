@@ -25,45 +25,80 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
-/* Watts My Bill — ultra subtle premium ambient lighting */
-@keyframes wmbAmbientFloatLeft {
-  0% {
-    transform: translate3d(0px, 0px, 0px) scale(1);
-    opacity: 0.9;
-  }
-  50% {
-    transform: translate3d(10px, -6px, 0px) scale(1.03);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(0px, 0px, 0px) scale(1);
-    opacity: 0.9;
-  }
+/* Watts My Bill — calm premium emerald hero */
+.wmb-hero-card {
+  background:
+    radial-gradient(circle at 58% 45%, rgba(45, 212, 191, 0.06), transparent 36%),
+    radial-gradient(circle at 82% 18%, rgba(167, 243, 208, 0.095), transparent 24%),
+    radial-gradient(circle at 50% 8%, rgba(45, 212, 191, 0.035), transparent 30%),
+    radial-gradient(circle at 16% 112%, rgba(255, 255, 255, 0.03), transparent 28%),
+    linear-gradient(135deg, #043a33 0%, #075342 34%, #0b7356 68%, #10956c 100%);
+  box-shadow: 0 18px 36px rgba(4, 58, 51, 0.16), inset 0 1px 0 rgba(255,255,255,0.07);
 }
 
-@keyframes wmbAmbientFloatRight {
-  0% {
-    transform: translate3d(0px, 0px, 0px) scale(1);
-    opacity: 0.82;
-  }
-  50% {
-    transform: translate3d(-12px, 4px, 0px) scale(1.025);
-    opacity: 0.96;
-  }
-  100% {
-    transform: translate3d(0px, 0px, 0px) scale(1);
-    opacity: 0.82;
-  }
+.wmb-hero-action-primary {
+  border: 1px solid rgba(236, 253, 245, 0.17);
+  background: rgba(236, 253, 245, 0.135);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.065), 0 10px 20px rgba(16, 185, 129, 0.075);
 }
 
-.wmb-ambient-left {
-  animation: wmbAmbientFloatLeft 22s ease-in-out infinite;
-  will-change: transform, opacity;
+.wmb-hero-action-primary:hover {
+  background: rgba(236, 253, 245, 0.20);
 }
 
-.wmb-ambient-right {
-  animation: wmbAmbientFloatRight 26s ease-in-out infinite;
-  will-change: transform, opacity;
+.wmb-hero-action-secondary {
+  border: 1px solid rgba(167, 243, 208, 0.13);
+  background: rgba(4, 72, 56, 0.52);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
 }
 
+.wmb-hero-action-secondary:hover {
+  background: rgba(4, 72, 56, 0.66);
+}
+
+.wmb-hero-action-quiet {
+  border: 1px solid rgba(167, 243, 208, 0.10);
+  background: rgba(4, 72, 56, 0.36);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.018);
+}
+
+.wmb-hero-action-quiet:hover {
+  background: rgba(4, 72, 56, 0.52);
+}
+
+.wmb-stat-tile {
+  border: 1px solid rgba(187, 247, 208, 0.075);
+  background: rgba(5, 84, 66, 0.72);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 7px 16px rgba(4, 58, 51, 0.085);
+}
+
+.wmb-stat-tile:nth-child(2),
+.wmb-stat-tile:nth-child(3),
+.wmb-stat-tile:nth-child(4) {
+  background: rgba(5, 84, 66, 0.72);
+}
+
+.wmb-flow-panel {
+  border: 1px solid rgba(187, 247, 208, 0.075);
+  background: rgba(4, 58, 51, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.022), 0 7px 16px rgba(4, 58, 51, 0.07);
+}
+
+.wmb-flow-dot {
+  background: rgba(236, 253, 245, 0.135);
+  border: 1px solid rgba(167, 243, 208, 0.12);
+}
+
+.wmb-mobile-driver-strip {
+  border: 1px solid rgba(187, 247, 208, 0.075);
+  background: rgba(4, 58, 51, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.022), 0 7px 16px rgba(4, 58, 51, 0.07);
+}
+
+/* Biggest energy user card helper */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
