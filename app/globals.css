@@ -24,3 +24,46 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+/* Watts My Bill — ultra subtle premium ambient lighting */
+@keyframes wmbAmbientFloatLeft {
+  0% {
+    transform: translate3d(0px, 0px, 0px) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate3d(10px, -6px, 0px) scale(1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0px, 0px, 0px) scale(1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes wmbAmbientFloatRight {
+  0% {
+    transform: translate3d(0px, 0px, 0px) scale(1);
+    opacity: 0.82;
+  }
+  50% {
+    transform: translate3d(-12px, 4px, 0px) scale(1.025);
+    opacity: 0.96;
+  }
+  100% {
+    transform: translate3d(0px, 0px, 0px) scale(1);
+    opacity: 0.82;
+  }
+}
+
+.wmb-ambient-left {
+  animation: wmbAmbientFloatLeft 22s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.wmb-ambient-right {
+  animation: wmbAmbientFloatRight 26s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
