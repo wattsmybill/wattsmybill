@@ -1351,7 +1351,7 @@ ${topUsage.trim()}` : ""}`;
 
           <div className="relative z-20 grid gap-5 lg:grid-cols-[minmax(0,0.74fr)_minmax(370px,0.92fr)] lg:items-start lg:gap-5 xl:grid-cols-[minmax(0,0.66fr)_minmax(220px,0.42fr)_minmax(390px,0.76fr)]">
             <div className="max-w-2xl pr-10 lg:pr-0">
-              <p className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-white/80">
+              <p className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-white/88">
                 Live estimate
               </p>
 
@@ -1363,7 +1363,7 @@ ${topUsage.trim()}` : ""}`;
                 })}
               </h2>
 
-              <p className="mt-2 text-sm text-white/90 md:text-base">
+              <p className="mt-2 text-sm text-white/96 md:text-base">
                 {totalKwh > 0
                   ? "Estimated monthly electricity bill"
                   : "Add appliances below to begin"}
@@ -1430,7 +1430,7 @@ ${topUsage.trim()}` : ""}`;
                         {topAppliance.name}
                       </h3>
 
-                      <p className="mt-2 text-[11px] leading-relaxed text-white/64">
+                      <p className="mt-2 text-[11px] leading-relaxed text-white/80">
                         About <span className="font-black text-white/86">{topApplianceShare.toFixed(0)}%</span> of your estimated usage comes from this appliance.
                       </p>
                     </>
@@ -1440,14 +1440,14 @@ ${topUsage.trim()}` : ""}`;
                         Add appliances to reveal your biggest energy driver.
                       </h3>
 
-                      <p className="mt-2 text-[11px] leading-relaxed text-white/64">
+                      <p className="mt-2 text-[11px] leading-relaxed text-white/80">
                         Your biggest energy user will appear here once usage is added.
                       </p>
                     </>
                   )}
                 </div>
 
-                <p className="mt-3 text-[11px] font-bold leading-snug text-white/70">
+                <p className="mt-3 text-[11px] font-bold leading-snug text-white/84">
                   {topAppliance?.name
                     ? `💡 Try reducing it by 1 hour/day to test possible savings.`
                     : `Start with an appliance or household preset.`}
@@ -1457,7 +1457,7 @@ ${topUsage.trim()}` : ""}`;
 
             <div className="grid grid-cols-2 gap-2.5 lg:mr-10 lg:gap-2.5 xl:mr-12 xl:gap-2.5">
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/72">Total Usage</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/84">Total Usage</p>
                 <div className="mt-1.5 flex min-w-0 items-center gap-2">
                   <span className="shrink-0 text-sm">⚡</span>
                   <p className="min-w-0 truncate text-[0.9rem] font-black leading-tight text-white md:text-[0.92rem]">{animatedTotalKwh.toFixed(2)} kWh</p>
@@ -1465,7 +1465,7 @@ ${topUsage.trim()}` : ""}`;
               </div>
 
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/72">Country</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/84">Country</p>
                 <div className="mt-1.5 flex min-w-0 items-center gap-2">
                   <span className="shrink-0 text-sm">{country.flag}</span>
                   <p className="min-w-0 truncate text-[0.9rem] font-black leading-tight text-white md:text-[0.92rem]">
@@ -1475,7 +1475,7 @@ ${topUsage.trim()}` : ""}`;
               </div>
 
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/72">Rate Used</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/84">Rate Used</p>
                 <p className="mt-1.5 min-w-0 truncate text-[0.9rem] font-black leading-tight text-white md:text-[0.92rem]">
                   {displayCurrency}
                   {activeRate || 0}/kWh
@@ -1483,7 +1483,7 @@ ${topUsage.trim()}` : ""}`;
               </div>
 
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/72">Daily Average</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/84">Daily Average</p>
                 <p className="mt-1.5 min-w-0 truncate text-[0.9rem] font-black leading-tight text-white md:text-[0.92rem]">
                   {displayCurrency}
                   {safeNumber(animatedDailyAverage).toLocaleString(undefined, {
@@ -1497,7 +1497,7 @@ ${topUsage.trim()}` : ""}`;
             <div className="wmb-mobile-driver-strip mt-1.5 rounded-2xl px-3.5 py-3 lg:col-span-2 xl:hidden">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/64">
+                  <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/76">
                     Biggest energy user
                   </p>
 
@@ -1505,7 +1505,7 @@ ${topUsage.trim()}` : ""}`;
                     {topAppliance?.name || "Add appliances"}
                   </p>
 
-                  <p className="mt-1 text-[11px] font-semibold leading-snug text-white/60">
+                  <p className="mt-1 text-[11px] font-semibold leading-snug text-white/82">
                     {topAppliance?.name
                       ? "Try reducing it by 1 hour/day to test possible savings."
                       : "Your biggest energy user will appear here"}
@@ -1527,26 +1527,26 @@ ${topUsage.trim()}` : ""}`;
 
           <div className="relative z-20 mt-4 flex flex-col gap-2 border-t border-white/[0.055] pt-3 md:flex-row md:items-center md:justify-between">
             {topAppliance?.name ? (
-              <div className="inline-flex items-center gap-1.5 text-sm text-white/92">
+              <div className="inline-flex items-center gap-1.5 text-sm text-white/96">
                 <span aria-hidden="true" className="text-base">🔥</span>
                 <span>Top energy user: <span className="font-extrabold">{topAppliance.name}</span></span>
               </div>
             ) : (
-              <div className="text-sm text-white/72">
+              <div className="text-sm text-white/86">
                 Add appliances to reveal your top energy user.
               </div>
             )}
 
             <button
               onClick={() => setShowEstimateHelp(!showEstimateHelp)}
-              className="w-fit text-xs font-semibold underline underline-offset-4 text-white/84 hover:text-white"
+              className="w-fit text-xs font-semibold underline underline-offset-4 text-white/95 hover:text-white"
             >
               {showEstimateHelp ? "Hide estimate note" : "Why is this only an estimate?"}
             </button>
           </div>
 
           {showEstimateHelp && (
-            <p className="relative z-20 mt-2 max-w-3xl text-xs leading-relaxed text-white/78">
+            <p className="relative z-20 mt-2 max-w-3xl text-xs leading-relaxed text-white/84">
               Actual electric bills may include generation, transmission,
               distribution, service fees, VAT, taxes, and provider-specific
               adjustments that are not included in a simple appliance estimate.
@@ -1555,12 +1555,12 @@ ${topUsage.trim()}` : ""}`;
         </div>
 
         <div className={`relative z-10 -mt-1 mb-5 px-1 text-[13px] leading-relaxed ${
-          darkMode ? "text-slate-200/95" : "text-slate-800"
+          darkMode ? "text-slate-200/92" : "text-slate-700"
         }`}>
           <span className={darkMode ? "font-black text-emerald-300" : "font-black text-emerald-700"}>
             Did you know?
           </span>{" "}
-          <span key={didYouKnowIndex} className="inline font-medium">
+          <span key={didYouKnowIndex} className="inline font-medium leading-relaxed">
             {currentMicroInsight}
           </span>
         </div>
