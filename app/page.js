@@ -1363,7 +1363,7 @@ ${topUsage.trim()}` : ""}`;
                 })}
               </h2>
 
-              <p className="mt-2 text-sm text-white/96 md:text-base">
+              <p className="mt-2 text-[15px] text-white/97 md:text-base">
                 {totalKwh > 0
                   ? "Estimated monthly electricity bill"
                   : "Add appliances below to begin"}
@@ -1420,7 +1420,7 @@ ${topUsage.trim()}` : ""}`;
             <div className="wmb-flow-panel hidden rounded-2xl px-4 py-3 xl:block">
               <div className="flex h-full flex-col justify-between">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/68">
+                  <p className="text-[10.5px] font-black uppercase tracking-[0.14em] text-white/78">
                     Biggest energy user
                   </p>
 
@@ -1430,7 +1430,7 @@ ${topUsage.trim()}` : ""}`;
                         {topAppliance.name}
                       </h3>
 
-                      <p className="mt-2 text-[11px] leading-relaxed text-white/80">
+                      <p className="mt-2 text-[12px] leading-relaxed text-white/84">
                         About <span className="font-black text-white/86">{topApplianceShare.toFixed(0)}%</span> of your estimated usage comes from this appliance.
                       </p>
                     </>
@@ -1440,14 +1440,14 @@ ${topUsage.trim()}` : ""}`;
                         Add appliances to reveal your biggest energy driver.
                       </h3>
 
-                      <p className="mt-2 text-[11px] leading-relaxed text-white/80">
+                      <p className="mt-2 text-[12px] leading-relaxed text-white/84">
                         Your biggest energy user will appear here once usage is added.
                       </p>
                     </>
                   )}
                 </div>
 
-                <p className="mt-3 text-[11px] font-bold leading-snug text-white/84">
+                <p className="mt-3 text-[12px] font-bold leading-snug text-white/86">
                   {topAppliance?.name
                     ? `💡 Try reducing it by 1 hour/day to test possible savings.`
                     : `Start with an appliance or household preset.`}
@@ -1457,34 +1457,34 @@ ${topUsage.trim()}` : ""}`;
 
             <div className="grid grid-cols-2 gap-2.5 lg:mr-10 lg:gap-2.5 xl:mr-12 xl:gap-2.5">
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/84">Total Usage</p>
+                <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Total Usage</p>
                 <div className="mt-1.5 flex min-w-0 items-center gap-2">
                   <span className="shrink-0 text-sm">⚡</span>
-                  <p className="min-w-0 truncate text-[0.9rem] font-black leading-tight text-white md:text-[0.92rem]">{animatedTotalKwh.toFixed(2)} kWh</p>
+                  <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">{animatedTotalKwh.toFixed(2)} kWh</p>
                 </div>
               </div>
 
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/84">Country</p>
+                <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Country</p>
                 <div className="mt-1.5 flex min-w-0 items-center gap-2">
                   <span className="shrink-0 text-sm">{country.flag}</span>
-                  <p className="min-w-0 truncate text-[0.9rem] font-black leading-tight text-white md:text-[0.92rem]">
+                  <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
                     {displayCountry}
                   </p>
                 </div>
               </div>
 
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/84">Rate Used</p>
-                <p className="mt-1.5 min-w-0 truncate text-[0.9rem] font-black leading-tight text-white md:text-[0.92rem]">
+                <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Rate Used</p>
+                <p className="mt-1.5 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
                   {displayCurrency}
                   {activeRate || 0}/kWh
                 </p>
               </div>
 
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10px] font-black uppercase tracking-[0.075em] text-white/84">Daily Average</p>
-                <p className="mt-1.5 min-w-0 truncate text-[0.9rem] font-black leading-tight text-white md:text-[0.92rem]">
+                <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Daily Average</p>
+                <p className="mt-1.5 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
                   {displayCurrency}
                   {safeNumber(animatedDailyAverage).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
@@ -1505,7 +1505,7 @@ ${topUsage.trim()}` : ""}`;
                     {topAppliance?.name || "Add appliances"}
                   </p>
 
-                  <p className="mt-1 text-[11px] font-semibold leading-snug text-white/82">
+                  <p className="mt-1 text-[12px] font-semibold leading-snug text-white/86">
                     {topAppliance?.name
                       ? "Try reducing it by 1 hour/day to test possible savings."
                       : "Your biggest energy user will appear here"}
@@ -1513,11 +1513,11 @@ ${topUsage.trim()}` : ""}`;
                 </div>
 
                 <div className="shrink-0 rounded-xl border border-emerald-200/[0.12] bg-white/[0.055] px-2.5 py-1.5 text-right">
-                  <p className="text-sm font-black text-white/90">
+                  <p className="text-base font-black text-white/94">
                     {topAppliance?.name ? `${topApplianceShare.toFixed(0)}%` : "—"}
                   </p>
 
-                  <p className="text-[10px] font-bold text-white/58">
+                  <p className="text-[10.5px] font-bold text-white/70">
                     usage
                   </p>
                 </div>
@@ -1554,8 +1554,8 @@ ${topUsage.trim()}` : ""}`;
           )}
         </div>
 
-        <div className={`relative z-10 -mt-1 mb-5 px-1 text-[13px] leading-relaxed ${
-          darkMode ? "text-slate-200/92" : "text-slate-700"
+        <div className={`relative z-10 -mt-1 mb-5 px-1 text-[14px] leading-relaxed ${
+          darkMode ? "text-slate-100/94" : "text-slate-800"
         }`}>
           <span className={darkMode ? "font-black text-emerald-300" : "font-black text-emerald-700"}>
             Did you know?

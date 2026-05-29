@@ -28,12 +28,12 @@ body {
 /* Watts My Bill — calm premium emerald hero */
 .wmb-hero-card {
   background:
-    radial-gradient(circle at 58% 45%, rgba(45, 212, 191, 0.06), transparent 36%),
-    radial-gradient(circle at 82% 18%, rgba(167, 243, 208, 0.095), transparent 24%),
-    radial-gradient(circle at 50% 8%, rgba(45, 212, 191, 0.035), transparent 30%),
-    radial-gradient(circle at 16% 112%, rgba(255, 255, 255, 0.03), transparent 28%),
+    radial-gradient(circle at 64% 36%, rgba(45, 212, 191, 0.105), transparent 34%),
+    radial-gradient(circle at 82% 18%, rgba(167, 243, 208, 0.105), transparent 24%),
+    radial-gradient(circle at 50% 8%, rgba(45, 212, 191, 0.04), transparent 30%),
+    radial-gradient(circle at 12% 100%, rgba(255, 255, 255, 0.018), transparent 24%),
     linear-gradient(135deg, #043a33 0%, #075342 34%, #0b7356 68%, #10956c 100%);
-  box-shadow: 0 12px 24px rgba(4, 58, 51, 0.11), inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow: 0 12px 22px rgba(4, 58, 51, 0.10), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 .wmb-hero-action-primary {
