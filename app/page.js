@@ -1442,24 +1442,24 @@ ${topUsage.trim()}` : ""}`;
                         {topAppliance.name}
                       </h3>
 
-                      <p className="mt-2 text-[12px] leading-relaxed text-white/84">
+                      <p className="mt-2 text-[12px] leading-relaxed text-white/90">
                         About <span className="font-black text-white/86">{topApplianceShare.toFixed(0)}%</span> of your estimated usage comes from this appliance.
                       </p>
                     </>
                   ) : (
                     <>
                       <h3 className="mt-2 text-sm font-black leading-tight text-white">
-                        Add appliances to reveal your biggest energy driver.
+                        Add appliances to reveal your biggest energy user.
                       </h3>
 
-                      <p className="mt-2 text-[12px] leading-relaxed text-white/84">
-                        Your biggest energy user will appear here once usage is added.
+                      <p className="mt-2 text-[12px] leading-relaxed text-white/90">
+                        Your top appliance will appear here once usage is added.
                       </p>
                     </>
                   )}
                 </div>
 
-                <p className="mt-3 text-[11.5px] font-bold leading-relaxed text-white/86">
+                <p className="mt-3 text-[11.5px] font-bold leading-relaxed text-white/90">
                   {topAppliance?.name
                     ? `💡 Try reducing it by 1 hour/day to test possible savings.`
                     : `Start with an appliance or household preset.`}
