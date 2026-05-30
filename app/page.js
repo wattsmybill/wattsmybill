@@ -1577,7 +1577,9 @@ ${topUsage.trim()}` : ""}`;
 
         <div ref={inputSectionRef} className="grid md:grid-cols-3 gap-4 mb-6">
           <label className="block">
-            <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">
+            <span className={`mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] ${
+              darkMode ? "text-slate-200" : "text-slate-500"
+            }`}>
               Country
             </span>
 
@@ -1603,7 +1605,9 @@ ${topUsage.trim()}` : ""}`;
           </label>
 
           <label className="block">
-            <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">
+            <span className={`mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] ${
+              darkMode ? "text-slate-200" : "text-slate-500"
+            }`}>
               Current Monthly Bill
             </span>
 
@@ -1619,7 +1623,9 @@ ${topUsage.trim()}` : ""}`;
 
           <div>
             <label className="block">
-              <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">
+              <span className={`mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] ${
+              darkMode ? "text-slate-200" : "text-slate-500"
+            }`}>
                 Provider Rate / kWh
               </span>
 
@@ -1634,7 +1640,9 @@ ${topUsage.trim()}` : ""}`;
               />
             </label>
 
-            <p className="mt-2 px-1 text-[12px] leading-relaxed text-slate-500">
+            <p className={`mt-2 px-1 text-[12px] leading-relaxed ${
+                darkMode ? "text-slate-200/85" : "text-slate-500"
+              }`}>
               Optional. Add your provider’s rate for a more accurate estimate. 
               Otherwise, we’ll use your country’s average rate.
             </p>
@@ -1857,7 +1865,7 @@ ${topUsage.trim()}` : ""}`;
             })}
           </div>
 
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               {filteredPresets.length > 10 && (
                 <button
