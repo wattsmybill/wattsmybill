@@ -23,7 +23,7 @@ export const metadata = {
   category: "Utility",
 
   title: {
-    default: "Watts My Bill? | Electricity Bill Estimator",
+    default: "Watts My Bill? | Understand Your Electricity Bill",
     template: `%s | ${siteName}`,
   },
 
@@ -55,8 +55,7 @@ export const metadata = {
     "electricity",
     "wattage:",
     "how much does it cost to run appliances",
-    "appliance wattage calculator",
-    "appliance wattage"
+    "appliance wattage calculator"
   ],
 
   authors: [{ name: siteName }],
@@ -80,7 +79,7 @@ export const metadata = {
   },
 
   openGraph: {
-    title: "Watts My Bill? | Electricity Bill Estimator",
+    title: "Watts My Bill? | Understand Your Electricity Bill",
     description:
       "Estimate appliance energy costs, compare usage, try household presets, and generate a simple energy audit report.",
     url: siteUrl,
@@ -92,14 +91,14 @@ export const metadata = {
         url: ogImage,
         width: 1200,
         height: 630,
-        alt: "Watts My Bill? electricity bill estimator and usage calculator",
+        alt: "Watts My Bill? Understand Your Electricity Bill",
       },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Watts My Bill? | Electricity Bill Estimator",
+    title: "Watts My Bill? | Understand Your Electricity Bill",
     description:
       "Understand your electricity bill with a free appliance wattage calculator, household presets, and an energy usage report.",
     images: [ogImage],
