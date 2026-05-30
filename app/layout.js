@@ -28,7 +28,7 @@ export const metadata = {
   },
 
   description:
-    "Understand your electricity bill with a free appliance wattage calculator. Estimate monthly electricity costs, compare usage, use household presets, and generate a simple energy audit report.",
+    "Understand your electricity bill with a free appliance wattage calculator. Estimate monthly costs, compare usage, try household presets, and generate a simple energy audit report.",
 
   keywords: [
     "Watts My Bill",
@@ -48,6 +48,15 @@ export const metadata = {
     "energy bill calculator",
     "how to calculate electricity bill",
     "how to save energy",
+    "Why is my electricity bill high?",
+    "understand electricity",
+    "aircon wattage",
+    "gaming pc wattage",
+    "electricity",
+    "wattage:",
+    "how much does it cost to run appliances",
+    "appliance wattage calculator",
+    "appliance wattage"
   ],
 
   authors: [{ name: siteName }],
@@ -73,7 +82,7 @@ export const metadata = {
   openGraph: {
     title: "Watts My Bill? | Electricity Bill Estimator",
     description:
-      "Estimate appliance energy costs, compare usage, use household presets, and generate a simple energy audit report.",
+      "Estimate appliance energy costs, compare usage, try household presets, and generate a simple energy audit report.",
     url: siteUrl,
     siteName,
     type: "website",
@@ -121,6 +130,8 @@ const jsonLd = {
   url: siteUrl,
   applicationCategory: "UtilityApplication",
   operatingSystem: "Any",
+  inLanguage: "en",
+  isAccessibleForFree: true,
   description:
     "A free electricity bill estimator that helps users estimate appliance energy costs using wattage, hours, quantity, electricity rates, and household presets.",
   offers: {

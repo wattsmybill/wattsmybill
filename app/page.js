@@ -523,7 +523,7 @@ export default function Page() {
   const formatCompactCurrency = (value) => {
     const number = safeNumber(value);
 
-    if (number >= 1_000_000_000_000) {
+    if (number >= 1_000_000_000) {
       return `${displayCurrency}${number.toLocaleString(undefined, {
         notation: "compact",
         maximumFractionDigits: 2
@@ -531,6 +531,22 @@ export default function Page() {
     }
 
     return formatCurrency(number);
+  };
+
+  const formatCompactNumber = (value, digits = 2) => {
+    const number = safeNumber(value);
+
+    if (number >= 1_000_000) {
+      return number.toLocaleString(undefined, {
+        notation: "compact",
+        maximumFractionDigits: 2
+      });
+    }
+
+    return number.toLocaleString(undefined, {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits
+    });
   };
 
   const rateWarning =
@@ -811,7 +827,7 @@ export default function Page() {
       )} per month. ${coolingShare >= 40 ? `Cooling appliances account for about ${coolingShare.toFixed(0)}% of your total estimated usage. ` : ""}${applianceInsight}`
     : "Add appliance details to generate an energy audit insight.";
 
-  const usageDriverLabel = "Top energy user";
+  const usageDriverLabel = "Biggest energy user";
 
   const savingsTip = topAppliance
     ? `Try reducing ${topAppliance.name} by 1 hour/day to test a possible monthly saving.`
@@ -1334,7 +1350,7 @@ ${topUsage.trim()}` : ""}`;
           <Logo darkMode={darkMode} />
         </div>
 
-        <div ref={heroSectionRef} className="wmb-hero-card relative isolate mb-5 md:mb-7 overflow-hidden rounded-[30px] px-4 py-4 md:px-6 md:py-5 text-white">
+        <div ref={heroSectionRef} className="wmb-hero-card relative isolate mb-5 md:mb-7 overflow-hidden rounded-[30px] px-4 py-4 md:px-6 md:py-5 lg:py-6 text-white">
           <button
             type="button"
             onClick={() => setDarkMode((current) => !current)}
@@ -1349,18 +1365,14 @@ ${topUsage.trim()}` : ""}`;
             )}
           </button>
 
-          <div className="relative z-20 grid gap-5 lg:grid-cols-[minmax(0,0.74fr)_minmax(370px,0.92fr)] lg:items-start lg:gap-5 xl:grid-cols-[minmax(0,0.66fr)_minmax(220px,0.42fr)_minmax(390px,0.76fr)]">
+          <div className="relative z-20 grid gap-5 lg:grid-cols-[minmax(0,0.72fr)_minmax(360px,0.9fr)] lg:items-start lg:gap-4 xl:grid-cols-[minmax(0,0.62fr)_minmax(250px,0.48fr)_minmax(370px,0.72fr)] xl:gap-4">
             <div className="max-w-2xl pr-10 lg:pr-0">
               <p className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-white/88">
                 Live estimate
               </p>
 
-              <h2 className="text-[2.05rem] font-black leading-none md:text-[2.45rem]">
-                {displayCurrency}
-                {safeNumber(animatedTotal).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                })}
+              <h2 className="max-w-full break-words text-[2.05rem] font-black leading-none md:text-[2.45rem]">
+                {formatCompactCurrency(animatedTotal)}
               </h2>
 
               <p className="mt-2 text-[15px] text-white/97 md:text-base">
@@ -1417,7 +1429,7 @@ ${topUsage.trim()}` : ""}`;
               </div>
             </div>
 
-            <div className="wmb-flow-panel hidden rounded-2xl px-4 py-3 xl:block">
+            <div className="wmb-flow-panel hidden rounded-2xl px-[18px] py-3.5 xl:block">
               <div className="flex h-full flex-col justify-between">
                 <div>
                   <p className="text-[10.5px] font-black uppercase tracking-[0.14em] text-white/78">
@@ -1447,7 +1459,7 @@ ${topUsage.trim()}` : ""}`;
                   )}
                 </div>
 
-                <p className="mt-3 text-[12px] font-bold leading-snug text-white/86">
+                <p className="mt-3 text-[11.5px] font-bold leading-relaxed text-white/86">
                   {topAppliance?.name
                     ? `💡 Try reducing it by 1 hour/day to test possible savings.`
                     : `Start with an appliance or household preset.`}
@@ -1455,24 +1467,34 @@ ${topUsage.trim()}` : ""}`;
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5 lg:mr-10 lg:gap-2.5 xl:mr-12 xl:gap-2.5">
+            <div className="grid grid-cols-2 gap-2.5 lg:mr-8 lg:gap-2.5 xl:mr-10 xl:gap-2.5">
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
                 <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Total Usage</p>
                 <div className="mt-1.5 flex min-w-0 items-center gap-2">
                   <span className="shrink-0 text-sm">⚡</span>
-                  <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">{animatedTotalKwh.toFixed(2)} kWh</p>
+                  <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">{formatCompactNumber(animatedTotalKwh)} kWh</p>
                 </div>
               </div>
 
-              <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
+              <button
+                type="button"
+                onClick={() =>
+                  inputSectionRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                  })
+                }
+                className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 text-left transition-transform duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-200/50 lg:min-h-[62px] lg:px-3.5 lg:py-2.5"
+                aria-label="Select or change country"
+              >
                 <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Country</p>
                 <div className="mt-1.5 flex min-w-0 items-center gap-2">
                   <span className="shrink-0 text-sm">{country.flag}</span>
                   <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
-                    {displayCountry}
+                    {displayCountry === "Select your country" ? "Select country" : displayCountry}
                   </p>
                 </div>
-              </div>
+              </button>
 
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
                 <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Rate Used</p>
@@ -1485,11 +1507,7 @@ ${topUsage.trim()}` : ""}`;
               <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
                 <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Daily Average</p>
                 <p className="mt-1.5 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
-                  {displayCurrency}
-                  {safeNumber(animatedDailyAverage).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })}/day
+                  {formatCompactCurrency(animatedDailyAverage)}/day
                 </p>
               </div>
             </div>
@@ -1525,18 +1543,7 @@ ${topUsage.trim()}` : ""}`;
             </div>
           </div>
 
-          <div className="relative z-20 mt-4 flex flex-col gap-2 border-t border-white/[0.055] pt-3 md:flex-row md:items-center md:justify-between">
-            {topAppliance?.name ? (
-              <div className="inline-flex items-center gap-1.5 text-sm text-white/96">
-                <span aria-hidden="true" className="text-base">🔥</span>
-                <span>Top energy user: <span className="font-extrabold">{topAppliance.name}</span></span>
-              </div>
-            ) : (
-              <div className="text-sm text-white/86">
-                Add appliances to reveal your top energy user.
-              </div>
-            )}
-
+          <div className="relative z-20 mt-3 flex justify-start pt-1.5">
             <button
               onClick={() => setShowEstimateHelp(!showEstimateHelp)}
               className="w-fit text-xs font-semibold underline underline-offset-4 text-white/95 hover:text-white"
@@ -1546,7 +1553,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
 
           {showEstimateHelp && (
-            <p className="relative z-20 mt-2 max-w-3xl text-xs leading-relaxed text-white/84">
+            <p className="relative z-20 mt-2 max-w-2xl text-xs leading-relaxed text-white/84">
               Actual electric bills may include generation, transmission,
               distribution, service fees, VAT, taxes, and provider-specific
               adjustments that are not included in a simple appliance estimate.
@@ -2111,7 +2118,9 @@ ${topUsage.trim()}` : ""}`;
             </h2>
 
             <p className="mt-2 max-w-none text-sm leading-relaxed text-gray-600">
-              {auditMessage}
+              {topAppliance?.name
+                ? `${topAppliance.name} is currently your biggest estimated energy user. Check its wattage and daily hours first if you want a more accurate estimate.`
+                : "Add appliance details to see which item is driving your estimated usage the most."}
             </p>
           </div>
 
@@ -2140,14 +2149,15 @@ ${topUsage.trim()}` : ""}`;
 
               <div className="rounded-2xl border border-gray-100 bg-white/85 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
                 <p className="text-xs font-semibold text-gray-500">Usage pattern</p>
-                <p className="mt-1 text-sm font-semibold text-gray-800">{coolingInsight}</p>
+                <p className="mt-1 text-sm font-semibold leading-snug text-gray-800">{coolingInsight}</p>
               </div>
 
               <div className="rounded-2xl border border-gray-100 bg-white/85 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
                 <p className="text-xs font-semibold text-gray-500">Quick action</p>
-                <p className="mt-1 text-sm font-semibold text-gray-800">{savingsTip}</p>
+                <p className="mt-1 text-sm font-semibold leading-snug text-gray-800">{savingsTip}</p>
               </div>
             </div>
+
           ) : (
             <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 text-sm text-gray-600">
               Add at least one appliance with wattage, hours, and days to unlock top-usage insights, possible savings, and appliance comparisons.
@@ -2376,7 +2386,7 @@ ${topUsage.trim()}` : ""}`;
         </section>
 
         <footer className="mb-24 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06] md:px-5 md:py-5">
-          <div className="grid gap-6 md:grid-cols-[1fr_minmax(430px,0.95fr)] md:items-start">
+          <div className="grid gap-6 md:grid-cols-[1fr_minmax(320px,0.72fr)] md:items-start">
             <div>
               <p className="text-lg font-black tracking-tight">Watts My Bill?</p>
               <p className="mt-1 text-sm font-semibold text-emerald-700">
@@ -2401,7 +2411,7 @@ ${topUsage.trim()}` : ""}`;
 
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-gray-500">Other Information</p>
-                <div className="mt-2.5 grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:ml-auto md:max-w-[340px]">
+                <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-2 md:justify-end">
                   {INFO_SECTIONS.map((section) => (
                     <button
                       key={section.id}
@@ -2410,10 +2420,10 @@ ${topUsage.trim()}` : ""}`;
                           activeInfoPage === section.id ? null : section.id
                         )
                       }
-                      className={`rounded-full border px-2.5 py-1 text-center text-[10.5px] font-semibold leading-none shadow-sm transition-all duration-200 hover:-translate-y-0.5 ${
+                      className={`text-[13px] font-semibold transition-colors duration-200 hover:text-emerald-700 hover:underline hover:underline-offset-4 ${
                         activeInfoPage === section.id
-                          ? "border-emerald-600 bg-emerald-600 text-white"
-                          : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+                          ? "text-emerald-700 underline underline-offset-4"
+                          : "text-slate-600"
                       }`}
                     >
                       {section.title.replace("Watts My Bill?", "").trim()}
@@ -2515,11 +2525,11 @@ ${topUsage.trim()}` : ""}`;
               block: "start"
             })
           }
-          className="fixed bottom-5 right-5 z-[70] inline-flex items-center gap-1.5 rounded-full border border-emerald-200/35 bg-white/75 px-3.5 py-2 text-xs font-bold text-emerald-900/85 shadow-[0_10px_26px_rgba(15,23,42,0.11)] ring-1 ring-slate-900/[0.03] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/90 hover:text-emerald-950"
-          aria-label="Back to estimate"
+          className="fixed bottom-5 right-5 z-[70] inline-flex items-center gap-1.5 rounded-full border border-emerald-200/25 bg-white/62 px-3 py-1.5 text-[11px] font-bold text-emerald-900/72 shadow-[0_8px_20px_rgba(15,23,42,0.08)] ring-1 ring-slate-900/[0.03] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/86 hover:text-emerald-950"
+          aria-label="Back to top"
         >
           <ArrowUp size={14} strokeWidth={2.4} />
-          Back to estimate
+          Back to top
         </button>
       )}
     </div>
