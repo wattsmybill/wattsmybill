@@ -2254,7 +2254,7 @@ ${topUsage.trim()}` : ""}`;
           <h2 className="font-black text-xl mb-2">Energy Audit Report</h2>
 
           <p className="text-sm opacity-70 mb-2">
-            Optionally add your name and address before downloading your report.
+            Optionally add your name and address before downloading your report for a more personalized experience.
           </p>
 
           <p className="mb-4 text-xs leading-relaxed text-gray-500">
@@ -2306,7 +2306,7 @@ ${topUsage.trim()}` : ""}`;
             <div>
               <h2 className="flex items-center gap-2 font-black text-xl mb-2">
                 <Coffee size={19} className="text-emerald-700" />
-                Support Watts My Bill?
+                Enjoying Watts My Bill?
               </h2>
 
               <p className="text-sm opacity-70">
