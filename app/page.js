@@ -2095,7 +2095,7 @@ ${topUsage.trim()}` : ""}`;
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 text-lg">🔁</div>
                   <h3 className="font-black text-gray-950">Cycling usage</h3>
                   <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                    These appliances do not pull power every second. Refrigerators, freezers, and some heaters run for a while, then pause once the target temperature is reached.
+                    These appliances don't use power every second. Refrigerators, freezers, and some heaters automatically cycle on and off once the desired temperature is reached.
                   </p>
                 </div>
 
