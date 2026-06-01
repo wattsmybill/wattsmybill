@@ -17,7 +17,7 @@ const siteName = "Watts My Bill?";
 const siteDescription =
   "Understand your electricity bill with a free appliance wattage calculator. Estimate monthly costs, compare usage, try household presets, and generate a simple energy audit report.";
 
-const ogImage = `${siteUrl}/og-image-7.jpg`;
+const ogImage = `${siteUrl}/og-image-final.jpg`;
 const logoUrl = `${siteUrl}/icon.png`;
 
 export const metadata = {
