@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
-import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Calculator, Home, CheckCircle2, Coffee, ArrowUp } from "lucide-react";
+import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Calculator, Home, CheckCircle2, Coffee, ArrowUp, X } from "lucide-react";
 
 import { COUNTRIES } from "./data/countries";
 import { PRESETS } from "./data/appliances";
@@ -17,6 +17,7 @@ const DEFAULT_APPLIANCE = {
 };
 
 const LOGO_PATH = "/logo.png";
+const PROVIDER_RATE_GUIDE_PATH = "/provider-rate-guide.png";
 
 function safeNumber(value, fallback = 0) {
   const number = Number(value);
@@ -130,6 +131,10 @@ function getWattageGuide(applianceName = "", category = "") {
     return "Induction cooker wattage is often the maximum input rating. It may not use the full wattage continuously because power changes by heat level, pan size, cooking mode, and cycling behavior. For a closer estimate, use the setting you usually cook with rather than only the maximum rating.";
   }
 
+  if (name.includes("speaker") || name.includes("amplifier") || name.includes("sound system") || name.includes("subwoofer") || name.includes("karaoke") || type.includes("audio") || type.includes("sound system")) {
+    return "Sound system wattage depends on the speaker size, amplifier, subwoofer, volume level, and how the system is used. The rated output power is not always the same as actual wall power use. Check the rear label, adapter, manual, or input power rating for a closer estimate.";
+  }
+
   if (name.includes("kettle") || name.includes("oven") || name.includes("microwave") || name.includes("stove") || name.includes("range")) {
     return "Kitchen heating appliances are usually high wattage. The label often shows the maximum input, but actual use can depend on heat setting, cycle behavior, and cooking time. Check the label or manual, then use a realistic average for your normal use.";
   }
@@ -156,6 +161,10 @@ function getApplianceInsight(applianceName = "", category = "") {
 
   if (name.includes("desktop") || name.includes("gaming pc")) {
     return "Computers vary a lot. Office use may be moderate, while gaming or rendering can use much more power. Use the power supply only as a maximum, not always the actual usage.";
+  }
+
+  if (name.includes("speaker") || name.includes("amplifier") || name.includes("sound system") || name.includes("subwoofer") || name.includes("karaoke") || type.includes("audio") || type.includes("sound system")) {
+    return "Audio equipment can vary by volume level and setup. If several speakers, an amplifier, or a subwoofer are connected, estimate the total system wattage instead of only one device.";
   }
 
   if (name.includes("dryer") || name.includes("kettle") || name.includes("oven") || name.includes("microwave") || name.includes("induction") || name.includes("stove") || name.includes("range")) {
@@ -340,6 +349,7 @@ export default function Page() {
   const [pendingHouseholdPreset, setPendingHouseholdPreset] = useState(null);
   const [showWattageHelp, setShowWattageHelp] = useState(false);
   const [showEstimateHelp, setShowEstimateHelp] = useState(false);
+  const [showProviderRateGuide, setShowProviderRateGuide] = useState(false);
   const [activeInfoPage, setActiveInfoPage] = useState(null);
   const [addedToast, setAddedToast] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(null);
@@ -349,12 +359,15 @@ export default function Page() {
   const [activeQuestion, setActiveQuestion] = useState(null);
   const [didYouKnowIndex, setDidYouKnowIndex] = useState(0);
   const [showWattageEducation, setShowWattageEducation] = useState(false);
+  const [showAllAddedAppliances, setShowAllAddedAppliances] = useState(false);
 
   const heroSectionRef = useRef(null);
   const inputSectionRef = useRef(null);
   const insightsSectionRef = useRef(null);
   const howEstimatesSectionRef = useRef(null);
   const applianceSectionRef = useRef(null);
+  const householdPresetSectionRef = useRef(null);
+  const quickAddSectionRef = useRef(null);
   const feedbackTimerRef = useRef(null);
   const highlightTimerRef = useRef(null);
 
@@ -397,6 +410,7 @@ export default function Page() {
         setSelectedHouseholdPreset(parsed.selectedHouseholdPreset || null);
         setShowWattageHelp(parsed.showWattageHelp || false);
         setShowEstimateHelp(false);
+        setShowProviderRateGuide(false);
 
         if (parsed.country?.name) {
           const foundCountry = COUNTRIES.find(
@@ -627,6 +641,7 @@ export default function Page() {
     setPendingHouseholdPreset(null);
     setShowWattageHelp(false);
     setShowEstimateHelp(false);
+    setShowProviderRateGuide(false);
     setActiveInfoPage(null);
     setActiveQuestion(null);
     setAddedToast("");
@@ -811,9 +826,9 @@ export default function Page() {
 
   const billComparisonInsight = safeNumber(actualBill) > 0
     ? difference > 0
-      ? `Your entered bill is ${formatCurrency(Math.abs(difference))} higher than this estimate. This may come from taxes, provider fees, appliances not listed yet, or wattages that are lower than actual.`
+      ? `Your entered bill is ${formatCurrency(Math.abs(difference))} higher than this estimate. The difference may come from rate changes, taxes, tariffs, provider fees, appliances not listed yet, or wattages that are lower than actual.`
       : difference < 0
-        ? `Your estimate is ${formatCurrency(Math.abs(difference))} higher than your entered bill. Check if some wattages, hours, or days are too high.`
+        ? `Your estimate is ${formatCurrency(Math.abs(difference))} higher than your entered bill. The difference may come from rate changes, taxes, tariffs, provider adjustments, or appliance watts/hours that are set too high.`
         : "Your entered bill matches this estimate."
     : "Add your actual bill to compare it with this estimate.";
 
@@ -836,6 +851,33 @@ export default function Page() {
   const coolingInsight = coolingShare >= 40
     ? `Cooling appliances account for about ${coolingShare.toFixed(0)}% of your total estimated usage.`
     : "Your cooling usage does not dominate the estimate yet.";
+
+  const topCategoryKwh = topAppliance?.category
+    ? breakdown
+        .filter((item) => item.category === topAppliance.category)
+        .reduce((sum, item) => sum + item.kwh, 0)
+    : 0;
+
+  const topCategoryShare = totalKwh > 0 ? (topCategoryKwh / totalKwh) * 100 : 0;
+
+  const topCategoryLabel = topAppliance?.category
+    ? `${topAppliance.category.toLowerCase()} usage`
+    : "one appliance group";
+
+  const usagePatternInsight = topAppliance?.name
+    ? topAppliance.category && topCategoryShare >= 40
+      ? `About ${topCategoryShare.toFixed(0)}% of your estimate comes from ${topCategoryLabel}.`
+      : topApplianceShare >= 50
+        ? `About ${topApplianceShare.toFixed(0)}% of your estimate comes from one high-impact appliance.`
+        : "Your estimate is spread across multiple appliances."
+    : "Add appliances to see your usage pattern.";
+
+  const shouldCollapseAppliances = breakdown.length > 4;
+  const applianceDisplayEntries = breakdown.map((item, index) => ({ item, index }));
+  const visibleApplianceEntries =
+    shouldCollapseAppliances && !showAllAddedAppliances
+      ? applianceDisplayEntries.slice(0, 4)
+      : applianceDisplayEntries;
 
   const buildShareText = () => {
     const estimatedBill = `${displayCurrency}${safeNumber(total).toLocaleString(undefined, {
@@ -1345,8 +1387,8 @@ ${topUsage.trim()}` : ""}`;
 
 
 
-      <div className="mx-auto w-full max-w-[1250px]">
-        <div className="flex justify-between items-start gap-3 md:gap-4 mb-4">
+      <div className="mx-auto w-full max-w-[1280px]">
+        <div className="flex justify-between items-start gap-3 md:gap-4 mb-5 md:mb-6">
           <Logo darkMode={darkMode} />
         </div>
 
@@ -1643,8 +1685,16 @@ ${topUsage.trim()}` : ""}`;
             <p className={`mt-2 px-1 text-[12px] leading-relaxed ${
                 darkMode ? "text-slate-200/85" : "text-slate-500"
               }`}>
-              Optional. Add your provider’s rate for a more accurate estimate. 
-              Otherwise, we’ll use your country’s average rate.
+              Optional. We’ll use your country’s average rate if left blank. {" "}
+              <button
+                type="button"
+                onClick={() => setShowProviderRateGuide(true)}
+                className={`font-extrabold underline underline-offset-4 transition-colors ${
+                  darkMode ? "text-emerald-200 hover:text-emerald-100" : "text-emerald-700 hover:text-emerald-800"
+                }`}
+              >
+                Need help finding your rate?
+              </button>
             </p>
 
             {rateWarning && (
@@ -1675,7 +1725,45 @@ ${topUsage.trim()}` : ""}`;
           </div>
         )}
 
-                <div className="mb-4 rounded-3xl bg-[#f7f8f8] p-5 md:px-5 md:py-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition-all duration-200 hover:shadow-md">
+        <div className="mb-4 mt-7 rounded-3xl bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] md:mt-0 md:flex md:items-center md:justify-between md:gap-5">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">Start here</p>
+            <h2 className="mt-1 text-lg font-black tracking-tight text-gray-950">Choose how you want to build your estimate.</h2>
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-gray-600">Start with a preset, or add appliances manually.</p>
+          </div>
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 md:mt-0 md:min-w-[360px]">
+            <button
+              type="button"
+              onClick={() =>
+                householdPresetSectionRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start"
+                })
+              }
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-black text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-md active:scale-[0.98]"
+            >
+              <Home size={16} strokeWidth={2.4} />
+              Start with preset
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                quickAddSectionRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start"
+                })
+              }
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-black text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md active:scale-[0.98]"
+            >
+              <Calculator size={16} strokeWidth={2.4} />
+              Build manually
+            </button>
+          </div>
+        </div>
+
+        <div ref={householdPresetSectionRef} className="mb-4 rounded-3xl bg-[#f7f8f8] p-5 md:px-5 md:py-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition-all duration-200 hover:shadow-md">
           <div className="mb-4">
             <h2 className="flex items-center gap-2 font-black text-xl tracking-tight">
               <Home size={19} className="text-emerald-600" />
@@ -1785,7 +1873,7 @@ ${topUsage.trim()}` : ""}`;
           </button>
         </div>
 
-        <div className="mb-4 rounded-3xl bg-[#f7f8f8] p-5 md:px-5 md:py-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
+        <div ref={quickAddSectionRef} className="mb-4 rounded-3xl bg-[#f7f8f8] p-5 md:px-5 md:py-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
           <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-xl">
               <div className="flex flex-wrap items-center gap-2">
@@ -1901,8 +1989,9 @@ ${topUsage.trim()}` : ""}`;
           )}
         </div>
 
-        <div ref={applianceSectionRef} className="mb-5 space-y-4 scroll-mt-24">
-          {breakdown.map((item, i) => {
+        <div ref={applianceSectionRef} className="mb-8 space-y-4 scroll-mt-24">
+          {visibleApplianceEntries.map(({ item, index }) => {
+            const i = index;
             const wattageGuide = item.name
               ? item.wattageGuide || getWattageGuide(item.name, item.category)
               : "";
@@ -2037,6 +2126,20 @@ ${topUsage.trim()}` : ""}`;
           })}
         </div>
 
+          {shouldCollapseAppliances && (
+            <div className="flex justify-center pt-1 mb-8">
+              <button
+                type="button"
+                onClick={() => setShowAllAddedAppliances((current) => !current)}
+                className="inline-flex items-center justify-center rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-extrabold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md"
+              >
+                {showAllAddedAppliances
+                  ? "Show less appliances"
+                  : `View all appliances (${applianceDisplayEntries.length})`}
+              </button>
+            </div>
+          )}
+
 
         <section ref={howEstimatesSectionRef} className="mb-5 scroll-mt-24 rounded-3xl bg-[#fbfaf6] p-5 md:px-5 md:py-4 text-black shadow-sm ring-1 ring-amber-900/[0.05]">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -2064,7 +2167,7 @@ ${topUsage.trim()}` : ""}`;
                 Understanding appliance wattage
               </p>
               <h2 className="mt-1 text-xl font-black tracking-tight">
-                Wattage is not always constant.
+                Power usage is not always constant.
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
                 Some appliance labels show the maximum power input, but real usage can change while you use them. The number on the label is helpful, but it is not always the amount used every minute.
@@ -2095,7 +2198,7 @@ ${topUsage.trim()}` : ""}`;
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 text-lg">🔁</div>
                   <h3 className="font-black text-gray-950">Cycling usage</h3>
                   <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                    These appliances don't use power every second. Refrigerators, freezers, and some heaters automatically cycle on and off once the desired temperature is reached.
+                    These appliances do not use power every second. Refrigerators, freezers, and some heaters run for a while, then pause once the desired temperature is reached.
                   </p>
                 </div>
 
@@ -2103,13 +2206,17 @@ ${topUsage.trim()}` : ""}`;
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 text-lg">⚙️</div>
                   <h3 className="font-black text-gray-950">Variable usage</h3>
                   <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                    Inverter aircons and induction cookers can go higher or lower depending on settings, room temperature, cooking level, and load. Their label may show the maximum, not the usual average.
+                    Inverter aircons and induction cookers can use more or less power depending on the setting, room temperature, cookware, cooking level, and load. Their label may show the maximum input, not the usual average.
                   </p>
                 </div>
               </div>
 
               <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-sm leading-relaxed text-emerald-950">
-                Example: an aircon rated up to 1,900W may only hit that level during heavy cooling, startup, or full load. During normal use, especially with inverter units, it can drop much lower. An induction cooker rated at 2,000W may also use less on lower heat settings or while cycling. For better estimates, use the wattage that best matches your normal usage, not always the maximum label.
+                An aircon rated up to 1,900W may only reach that level during heavy cooling, startup, or full load. During normal use, especially with inverter units, it can drop much lower.
+
+                An induction cooker rated at 2,000W may also use less than its maximum rating. At lower heat settings, many induction cookers reduce output or pulse power on and off to maintain the selected cooking level.
+
+                For better estimates, use the wattage that best matches your normal usage, not always the maximum label.
               </div>
             </div>
           )}
@@ -2157,7 +2264,7 @@ ${topUsage.trim()}` : ""}`;
 
               <div className="rounded-2xl border border-gray-100 bg-white/85 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
                 <p className="text-xs font-semibold text-gray-500">Usage pattern</p>
-                <p className="mt-1 text-sm font-semibold leading-snug text-gray-800">{coolingInsight}</p>
+                <p className="mt-1 text-sm font-semibold leading-snug text-gray-800">{usagePatternInsight}</p>
               </div>
 
               <div className="rounded-2xl border border-gray-100 bg-white/85 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
@@ -2523,6 +2630,36 @@ ${topUsage.trim()}` : ""}`;
 
       </div>
 
+
+      {showProviderRateGuide && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/70 p-0 backdrop-blur-sm md:p-5">
+          <div className="relative h-full w-full overflow-hidden bg-white text-black shadow-2xl md:h-auto md:max-h-[92vh] md:max-w-5xl md:rounded-[28px]">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 md:px-5">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">Provider rate guide</p>
+                <h3 className="text-base font-black tracking-tight text-slate-950 md:text-lg">How to find your kWh rate</h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowProviderRateGuide(false)}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-900"
+                aria-label="Close provider rate guide"
+              >
+                <X size={20} strokeWidth={2.4} />
+              </button>
+            </div>
+
+            <div className="h-[calc(100%-65px)] overflow-y-auto p-3 md:max-h-[calc(92vh-65px)] md:p-5">
+              <img
+                src={PROVIDER_RATE_GUIDE_PATH}
+                alt="Guide showing where to find or estimate your electricity rate per kWh"
+                className="mx-auto h-auto w-full rounded-2xl border border-slate-200/70 shadow-sm"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {showBackToEstimate && (
         <button

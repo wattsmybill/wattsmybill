@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 const siteUrl = "https://www.wattsmybill.app";
 const siteName = "Watts My Bill?";
-const ogImage = `${siteUrl}/og-image-6.jpg`;
+const ogImage = `${siteUrl}/og-image-7.jpg`;
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
