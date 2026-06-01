@@ -1392,7 +1392,7 @@ ${topUsage.trim()}` : ""}`;
           <Logo darkMode={darkMode} />
         </div>
 
-        <div ref={heroSectionRef} className="wmb-hero-card relative isolate mb-5 md:mb-7 overflow-hidden rounded-[30px] px-4 py-4 md:px-6 md:py-5 lg:py-6 text-white">
+        <div ref={heroSectionRef} className="wmb-hero-card relative isolate mb-4 md:mb-5 overflow-hidden rounded-[30px] px-4 py-4 md:px-6 md:py-5 lg:py-6 text-white">
           <button
             type="button"
             onClick={() => setDarkMode((current) => !current)}
@@ -1603,7 +1603,7 @@ ${topUsage.trim()}` : ""}`;
           )}
         </div>
 
-        <div className={`relative z-10 -mt-1 mb-5 px-1 text-[14px] leading-relaxed ${
+        <div className={`relative z-10 mt-1 mb-5 px-1 text-[14px] leading-relaxed ${
           darkMode ? "text-slate-100/94" : "text-slate-800"
         }`}>
           <span className={darkMode ? "font-black text-emerald-300" : "font-black text-emerald-700"}>
@@ -1614,7 +1614,7 @@ ${topUsage.trim()}` : ""}`;
           </span>
         </div>
 
-        <div className="mb-6 md:mb-7" aria-hidden="true" />
+        <div className="mb-4 md:mb-6" aria-hidden="true" />
 
 
         <div ref={inputSectionRef} className="grid md:grid-cols-3 gap-4 mb-6">

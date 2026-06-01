@@ -33,13 +33,13 @@ body {
     radial-gradient(circle at 50% 8%, rgba(45, 212, 191, 0.04), transparent 30%),
     radial-gradient(circle at 12% 100%, rgba(255, 255, 255, 0.018), transparent 24%),
     linear-gradient(135deg, #043a33 0%, #075342 34%, #0b7356 68%, #10956c 100%);
-  box-shadow: 0 10px 20px rgba(4, 58, 51, 0.085), inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.075), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 .wmb-hero-action-primary {
   border: 1px solid rgba(236, 253, 245, 0.17);
   background: rgba(236, 253, 245, 0.135);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.065), 0 10px 20px rgba(16, 185, 129, 0.075);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.065), 0 8px 16px rgba(15, 23, 42, 0.055);
 }
 
 .wmb-hero-action-primary:hover {
@@ -69,7 +69,7 @@ body {
 .wmb-stat-tile {
   border: 1px solid rgba(187, 247, 208, 0.075);
   background: rgba(5, 84, 66, 0.70);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.028), 0 6px 14px rgba(4, 58, 51, 0.075);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.028), 0 5px 12px rgba(15, 23, 42, 0.055);
 }
 
 .wmb-stat-tile:nth-child(2),
@@ -81,7 +81,7 @@ body {
 .wmb-flow-panel {
   border: 1px solid rgba(187, 247, 208, 0.075);
   background: rgba(4, 58, 51, 0.24);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.022), 0 7px 16px rgba(4, 58, 51, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.022), 0 5px 12px rgba(15, 23, 42, 0.055);
 }
 
 .wmb-flow-dot {
@@ -92,7 +92,7 @@ body {
 .wmb-mobile-driver-strip {
   border: 1px solid rgba(187, 247, 208, 0.075);
   background: rgba(4, 58, 51, 0.24);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.022), 0 7px 16px rgba(4, 58, 51, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.022), 0 5px 12px rgba(15, 23, 42, 0.055);
 }
 
 /* Biggest energy user card helper */

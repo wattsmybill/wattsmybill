@@ -26,9 +26,9 @@ module.exports = {
         "wmb-card-hover":
           "0 14px 36px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.85)",
         "wmb-hero":
-          "0 20px 70px rgba(4, 120, 87, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.08)",
+          "0 12px 28px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.08)",
         "wmb-hero-hover":
-          "0 24px 76px rgba(4, 120, 87, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.10)",
+          "0 14px 32px rgba(15, 23, 42, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.10)",
       },
       backgroundImage: {
         "wmb-hero":
