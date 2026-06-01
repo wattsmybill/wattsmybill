@@ -1855,18 +1855,18 @@ ${topUsage.trim()}` : ""}`;
                   </div>
                 ))}
               </div>
-
-              <button
-                onClick={() => setSelectedHouseholdPreset(null)}
-                className="mt-4 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 shadow-sm transition-all duration-200 hover:bg-gray-50 sm:hidden"
-              >
-                Hide details
-              </button>
             </div>
           )}
 
           <button
-            onClick={() => setShowAllHouseholdPresets(!showAllHouseholdPresets)}
+            onClick={() => {
+              const nextShowAll = !showAllHouseholdPresets;
+              setShowAllHouseholdPresets(nextShowAll);
+
+              if (!nextShowAll) {
+                setSelectedHouseholdPreset(null);
+              }
+            }}
             className="mt-4 rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md"
           >
             {showAllHouseholdPresets ? "Show Less" : "More Presets"}
