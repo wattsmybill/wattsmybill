@@ -2127,7 +2127,7 @@ ${topUsage.trim()}` : ""}`;
         </div>
 
           {shouldCollapseAppliances && (
-            <div className="flex justify-center pt-1 mb-8">
+            <div className="flex justify-center pt-0 mb-8">
               <button
                 type="button"
                 onClick={() => setShowAllAddedAppliances((current) => !current)}

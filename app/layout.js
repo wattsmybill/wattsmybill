@@ -14,7 +14,11 @@ const geistMono = Geist_Mono({
 
 const siteUrl = "https://www.wattsmybill.app";
 const siteName = "Watts My Bill?";
+const siteDescription =
+  "Understand your electricity bill with a free appliance wattage calculator. Estimate monthly costs, compare usage, try household presets, and generate a simple energy audit report.";
+
 const ogImage = `${siteUrl}/og-image-7.jpg`;
+const logoUrl = `${siteUrl}/icon.png`;
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -27,35 +31,32 @@ export const metadata = {
     template: `%s | ${siteName}`,
   },
 
-  description:
-    "Understand your electricity bill with a free appliance wattage calculator. Estimate monthly costs, compare usage, try household presets, and generate a simple energy audit report.",
+  description: siteDescription,
 
   keywords: [
     "Watts My Bill",
     "electricity bill estimator",
-    "electricity usage calculator",
     "electricity bill calculator",
+    "electricity usage calculator",
     "appliance wattage calculator",
+    "appliance energy cost calculator",
     "kWh calculator",
     "energy usage calculator",
     "power consumption calculator",
+    "electricity cost calculator",
+    "energy bill calculator",
+    "home energy audit",
     "home energy audit report",
     "household electricity estimator",
     "monthly electric bill estimate",
-    "appliance energy cost calculator",
     "watts calculator",
-    "electricity cost calculator",
-    "energy bill calculator",
     "how to calculate electricity bill",
+    "how much does it cost to run appliances",
+    "why is my electricity bill high",
     "how to save energy",
-    "Why is my electricity bill high?",
-    "understand electricity",
+    "understand electricity bill",
     "aircon wattage",
     "gaming pc wattage",
-    "electricity",
-    "wattage:",
-    "how much does it cost to run appliances",
-    "appliance wattage calculator"
   ],
 
   authors: [{ name: siteName }],
@@ -91,7 +92,7 @@ export const metadata = {
         url: ogImage,
         width: 1200,
         height: 630,
-        alt: "Watts My Bill? Understand Your Electricity Bill",
+        alt: "Watts My Bill? app shown on laptop and phone with the message Understand. Estimate. Save.",
       },
     ],
   },
@@ -107,6 +108,10 @@ export const metadata = {
   icons: {
     icon: [
       {
+        url: "/favicon.ico",
+        sizes: "any",
+      },
+      {
         url: "/favicon-32x32.png",
         sizes: "32x32",
         type: "image/png",
@@ -116,29 +121,66 @@ export const metadata = {
         sizes: "16x16",
         type: "image/png",
       },
+      {
+        url: "/icon.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
     ],
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
+
+  formatDetection: {
+    telephone: false,
+    address: false,
+    email: false,
   },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: siteName,
-  url: siteUrl,
-  applicationCategory: "UtilityApplication",
-  operatingSystem: "Any",
-  inLanguage: "en",
-  isAccessibleForFree: true,
-  description:
-    "A free electricity bill estimator that helps users estimate appliance energy costs using wattage, hours, quantity, electricity rates, and household presets.",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": `${siteUrl}/#webapp`,
+    name: siteName,
+    url: siteUrl,
+    image: ogImage,
+    applicationCategory: "UtilityApplication",
+    operatingSystem: "Any",
+    inLanguage: "en",
+    isAccessibleForFree: true,
+    description:
+      "A free electricity bill estimator that helps users estimate appliance energy costs using wattage, hours, quantity, electricity rates, and household presets.",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    publisher: {
+      "@id": `${siteUrl}/#organization`,
+    },
   },
-};
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${siteUrl}/#organization`,
+    name: siteName,
+    url: siteUrl,
+    logo: {
+      "@type": "ImageObject",
+      url: logoUrl,
+      width: 512,
+      height: 512,
+    },
+  },
+];
 
 export default function RootLayout({ children }) {
   return (
