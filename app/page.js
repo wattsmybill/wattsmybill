@@ -429,7 +429,7 @@ export default function Page() {
   const [activeQuestion, setActiveQuestion] = useState(null);
   const [didYouKnowIndex, setDidYouKnowIndex] = useState(0);
   const [showWattageEducation, setShowWattageEducation] = useState(false);
-  const [showSimpleTerms, setShowSimpleTerms] = useState(true);
+  const [showSimpleTerms, setShowSimpleTerms] = useState(false);
   const [showAllAddedAppliances, setShowAllAddedAppliances] = useState(false);
 
   const heroSectionRef = useRef(null);
@@ -549,7 +549,7 @@ export default function Page() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowBackToEstimate(window.scrollY > 760);
+      setShowBackToEstimate(window.scrollY > 1180);
     };
 
     handleScroll();
@@ -1534,12 +1534,12 @@ ${topUsage.trim()}` : ""}`;
           <Logo darkMode={darkMode} />
         </div>
 
-        <div ref={heroSectionRef} className="wmb-hero-card relative isolate mb-4 md:mb-5 overflow-hidden rounded-[30px] px-4 py-4 md:px-6 md:py-5 lg:py-6 text-white">
+        <div ref={heroSectionRef} className="wmb-hero-card relative isolate mb-4 md:mb-5 overflow-hidden rounded-[28px] px-4 py-3 md:px-5 md:py-4 lg:px-5 lg:py-5 text-white">
           <button
             type="button"
             onClick={() => setDarkMode((current) => !current)}
             title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-            className="pointer-events-auto absolute right-4 top-4 z-[60] grid h-10 w-10 place-items-center rounded-2xl border border-white/[0.12] bg-emerald-950/[0.15] text-white/88"
+            className="pointer-events-auto absolute right-3 top-3 z-[60] grid h-10 w-10 place-items-center rounded-2xl border border-white/[0.12] bg-emerald-950/[0.15] text-white/88"
             aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
             {darkMode ? (
@@ -1549,23 +1549,23 @@ ${topUsage.trim()}` : ""}`;
             )}
           </button>
 
-          <div className="relative z-20 grid gap-4 lg:grid-cols-[minmax(0,0.72fr)_minmax(260px,0.58fr)_minmax(390px,0.86fr)] lg:items-stretch lg:gap-4 xl:grid-cols-[minmax(0,0.62fr)_minmax(280px,0.56fr)_minmax(410px,0.82fr)] xl:gap-4">
+          <div className="relative z-20 grid gap-3 lg:grid-cols-[minmax(0,0.72fr)_minmax(260px,0.58fr)_minmax(390px,0.86fr)] lg:items-stretch lg:gap-3.5 xl:grid-cols-[minmax(0,0.62fr)_minmax(280px,0.56fr)_minmax(410px,0.82fr)] xl:gap-3.5">
             <div className="flex max-w-2xl flex-col pr-10 lg:pr-0">
-              <p className="mb-3 text-[14px] font-black uppercase tracking-[0.18em] text-white/88">
+              <p className="mb-2 text-[13px] font-black uppercase tracking-[0.18em] text-white/88 md:text-[14px]">
                 Live estimate
               </p>
 
-              <h2 className="max-w-full break-words text-[2.05rem] font-black leading-none md:text-[2.45rem]">
+              <h2 className="max-w-full break-words text-[1.95rem] font-black leading-none md:text-[2.45rem]">
                 {formatCompactCurrency(animatedTotal)}
               </h2>
 
-              <p className="mt-2 max-w-[340px] text-[15px] text-white/97 md:text-base">
+              <p className="mt-1 max-w-[340px] text-[14.5px] leading-relaxed text-white/97 md:mt-1.5 md:text-base">
                 {totalKwh > 0
                   ? "Estimated monthly electricity bill"
-                  : "Start with your country, then add your appliances."}
+                  : "Start with your country, then add appliances."}
               </p>
 
-              <div className="mt-4 flex flex-wrap items-center gap-2.5">
+              <div className="mt-3 flex flex-wrap items-center gap-2 md:mt-3.5">
                 <button
                   type="button"
                   onClick={() =>
@@ -1574,7 +1574,7 @@ ${topUsage.trim()}` : ""}`;
                       block: "start"
                     })
                   }
-                  className="wmb-hero-action-primary cursor-pointer rounded-full px-4 py-2 text-[12px] font-extrabold text-white"
+                  className="wmb-hero-action-primary cursor-pointer rounded-full px-3.5 py-1.5 text-[12px] font-extrabold text-white md:px-4 md:py-2"
                 >
                   <span className="inline-flex items-center justify-center gap-1.5">
                     <Calculator size={13} strokeWidth={2.2} /> Start
@@ -1634,13 +1634,13 @@ ${topUsage.trim()}` : ""}`;
               </div>
             </div>
 
-            <div className="wmb-flow-panel rounded-2xl px-3.5 py-3 lg:-ml-3 lg:h-[252px] lg:self-start lg:px-4 lg:py-3.5 xl:-ml-5">
+            <div className="wmb-flow-panel rounded-2xl px-3 py-2 lg:-ml-3 lg:h-[232px] lg:self-start lg:px-3.5 lg:py-3 xl:-ml-5">
               <div className="flex h-full flex-col justify-center">
                 <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white">
                       Estimate in 3 simple steps
                 </p>
 
-                <div className="mt-2 flex flex-nowrap items-center gap-1 text-[10px] font-extrabold text-white/94 min-[390px]:text-[10.5px] lg:hidden">
+                <div className="mt-1.5 flex flex-nowrap items-center gap-1 text-[10px] font-extrabold text-white/94 min-[390px]:text-[10.5px] lg:hidden">
                   <button
                     type="button"
                     onClick={() =>
@@ -1668,7 +1668,7 @@ ${topUsage.trim()}` : ""}`;
                     className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-white/[0.145] px-1.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18] min-[390px]:px-2"
                   >
                     <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[10px] text-white">2</span>
-                    <span className="whitespace-nowrap">Bill (optional)</span>
+                    <span className="whitespace-nowrap">Optional bill / rate</span>
                   </button>
 
                   <span className="text-white/35">→</span>
@@ -1688,7 +1688,7 @@ ${topUsage.trim()}` : ""}`;
                   </button>
                 </div>
 
-                <div className="mt-2.5 hidden gap-2 text-[12px] font-extrabold text-white/94 lg:grid">
+                <div className="mt-2 hidden gap-1.5 text-[12px] font-extrabold text-white/94 lg:grid">
                   <button
                     type="button"
                     onClick={() =>
@@ -1697,7 +1697,7 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="flex min-h-[34px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-2 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
+                    className="flex min-h-[31px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
                     <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[11px] text-white">1</span>
                     <span>Select country</span>
@@ -1711,10 +1711,10 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="flex min-h-[34px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-2 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
+                    className="flex min-h-[31px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
                     <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[11px] text-white">2</span>
-                    <span>Enter rate or bill (optional)</span>
+                    <span>Optional bill / rate</span>
                   </button>
 
                   <button
@@ -1725,7 +1725,7 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="flex min-h-[34px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-2 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
+                    className="flex min-h-[31px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
                     <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[11px] text-white">3</span>
                     <span>Add appliances</span>
@@ -1734,11 +1734,11 @@ ${topUsage.trim()}` : ""}`;
               </div>
             </div>
 
-            <div className="flex flex-col gap-2.5 lg:mr-8 xl:mr-10">
-              <div className="grid grid-cols-2 gap-2.5">
-                <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
+            <div className="flex flex-col gap-2 lg:mr-8 xl:mr-10">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="wmb-stat-tile flex min-h-[60px] flex-col justify-center rounded-[16px] px-3 py-2 lg:min-h-[58px] lg:px-3 lg:py-2">
                   <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Total Usage</p>
-                  <div className="mt-1.5 flex min-w-0 items-center gap-2">
+                  <div className="mt-1 flex min-w-0 items-center gap-2">
                     <span className="shrink-0 text-sm">⚡</span>
                     <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">{formatCompactNumber(animatedTotalKwh)} kWh</p>
                   </div>
@@ -1752,11 +1752,11 @@ ${topUsage.trim()}` : ""}`;
                       block: "start"
                     })
                   }
-                  className="wmb-stat-tile flex min-h-[66px] cursor-pointer flex-col justify-center rounded-[16px] px-3.5 py-2.5 text-left transition-transform duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-200/50 lg:min-h-[62px] lg:px-3.5 lg:py-2.5"
+                  className="wmb-stat-tile flex min-h-[60px] cursor-pointer flex-col justify-center rounded-[16px] px-3 py-2 text-left transition-transform duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-200/50 lg:min-h-[58px] lg:px-3 lg:py-2"
                   aria-label="Select or change country"
                 >
                   <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Country</p>
-                  <div className="mt-1.5 flex min-w-0 items-center gap-2">
+                  <div className="mt-1 flex min-w-0 items-center gap-2">
                     <span className="shrink-0 text-sm">{country.flag}</span>
                     <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
                       {displayCountry === "Select your country" ? "Select country" : displayCountry}
@@ -1764,23 +1764,23 @@ ${topUsage.trim()}` : ""}`;
                   </div>
                 </button>
 
-                <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
+                <div className="wmb-stat-tile flex min-h-[60px] flex-col justify-center rounded-[16px] px-3 py-2 lg:min-h-[58px] lg:px-3 lg:py-2">
                   <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Rate Used</p>
-                  <p className="mt-1.5 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
+                  <p className="mt-1 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
                     {displayCurrency}
                     {activeRate || 0}/kWh
                   </p>
                 </div>
 
-                <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
+                <div className="wmb-stat-tile flex min-h-[60px] flex-col justify-center rounded-[16px] px-3 py-2 lg:min-h-[58px] lg:px-3 lg:py-2">
                   <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Daily Average</p>
-                  <p className="mt-1.5 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
+                  <p className="mt-1 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
                     {formatCompactCurrency(animatedDailyAverage)}/day
                   </p>
                 </div>
               </div>
 
-              <div className="wmb-mobile-driver-strip flex min-h-[104px] items-center rounded-2xl px-3.5 py-3.5 lg:min-h-[104px]">
+              <div className="wmb-mobile-driver-strip flex min-h-[92px] items-center rounded-2xl px-3 py-3 lg:min-h-[92px] lg:px-3.5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/76">
@@ -1814,22 +1814,6 @@ ${topUsage.trim()}` : ""}`;
             </div>
           </div>
 
-          <div className="relative z-20 mt-3 flex justify-start pt-1 lg:hidden">
-            <button
-              onClick={() => setShowEstimateHelp(!showEstimateHelp)}
-              className="w-fit cursor-pointer text-xs font-semibold underline underline-offset-4 text-white/95 hover:text-white"
-            >
-              {showEstimateHelp ? "Hide estimate note" : "Why is this only an estimate?"}
-            </button>
-          </div>
-
-          {showEstimateHelp && (
-            <p className="relative z-20 mt-2 max-w-2xl text-xs leading-relaxed text-white/84 lg:hidden">
-              Actual electric bills may include generation, transmission,
-              distribution, service fees, VAT, taxes, and provider-specific
-              adjustments that are not included in a simple appliance estimate.
-            </p>
-          )}
         </div>
 
         <div className={`relative z-10 mt-1 mb-5 px-1 text-[14px] leading-relaxed ${
@@ -1843,7 +1827,7 @@ ${topUsage.trim()}` : ""}`;
           </span>
         </div>
 
-        <div className="mb-4 md:mb-6" aria-hidden="true" />
+        <div className="mb-5 md:mb-7" aria-hidden="true" />
 
 
         <div ref={inputSectionRef} className="grid md:grid-cols-3 gap-4 mb-6">
@@ -2132,8 +2116,8 @@ ${topUsage.trim()}` : ""}`;
           </button>
         </div>
 
-        <div ref={quickAddSectionRef} className="mb-4 rounded-3xl bg-[#f7f8f8] p-5 md:px-5 md:py-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
-          <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div ref={quickAddSectionRef} className="mb-4 rounded-3xl bg-[#f7f8f8] p-4 md:px-5 md:py-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
+          <div className="mb-3.5 flex flex-col gap-3.5 md:flex-row md:items-start md:justify-between">
             <div className="max-w-xl">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-extrabold">Quick Add Appliances</h2>
@@ -2143,7 +2127,7 @@ ${topUsage.trim()}` : ""}`;
               </div>
               <div className="mt-1 text-sm leading-relaxed text-gray-600">
                 <p>
-                  Build your estimate one appliance at a time then fine-tune appliance power, hours, and days below.
+                  Choose a common appliance, then fine-tune its power, hours, and days.
                 </p>
 
                 <button
@@ -2177,14 +2161,14 @@ ${topUsage.trim()}` : ""}`;
             <div className="flex w-full flex-col gap-2 md:w-auto md:min-w-[380px] md:flex-row md:items-center">
               <input
                 type="text"
-                className="w-full rounded-2xl border border-gray-200 bg-white/70 p-3 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 md:min-w-[240px]"
+                className="w-full rounded-2xl border border-gray-200 bg-white/70 px-3 py-2.5 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 md:min-w-[240px] md:p-3"
                 placeholder="Search appliance..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
 
               <select
-                className="w-full rounded-2xl border border-gray-200 bg-white/70 p-3 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 md:w-[130px]"
+                className="w-full rounded-2xl border border-gray-200 bg-white/70 px-3 py-2.5 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 md:w-[130px] md:p-3"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -2208,13 +2192,13 @@ ${topUsage.trim()}` : ""}`;
 
           <div className="flex flex-wrap gap-1.5 md:gap-2">
             {visiblePresets.map((p, index) => {
-              const hideOnMobile = !showAllPresets && index >= 6;
+              const hideOnMobile = !showAllPresets && index >= 4;
 
               return (
                 <button
                   key={`${p.category}-${p.name}`}
                   onClick={() => addPreset(p)}
-                  className={`${hideOnMobile ? "hidden md:inline-flex" : "inline-flex"} items-center rounded-full border border-emerald-100/80 bg-emerald-50/75 px-3 py-1.5 text-sm font-semibold text-emerald-950 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-100/80 hover:shadow-md active:scale-[0.98] md:px-3.5 md:py-1.5`}
+                  className={`${hideOnMobile ? "hidden md:inline-flex" : "inline-flex"} items-center rounded-full border border-emerald-100/80 bg-emerald-50/65 px-2.5 py-1.5 text-[13px] font-semibold text-emerald-950 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-100/80 hover:shadow-md active:scale-[0.98] md:px-3.5 md:py-1.5 md:text-sm`}
                   title={`${p.category} • ${p.watts}W • ${p.hours}h/day • ${p.days} days/month`}
                 >
                   + {p.name}
@@ -2223,7 +2207,7 @@ ${topUsage.trim()}` : ""}`;
             })}
           </div>
 
-          <div className="mt-4 flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               {filteredPresets.length > 10 && (
                 <button
@@ -2482,7 +2466,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
         </section>
 
-        <section className="mb-5 rounded-3xl bg-[#f7fbf8] p-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
+        <section className="mb-5 rounded-3xl bg-[#f7fbf8] p-4 md:p-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-4xl">
               <p className="text-xs font-black uppercase tracking-wide text-emerald-700">
@@ -2559,13 +2543,13 @@ ${topUsage.trim()}` : ""}`;
             <h2 className="mt-1 text-xl font-black tracking-tight">
               {topAppliance?.name
                 ? "Here’s what is driving your estimate."
-                : "Your audit is waiting for appliance data."}
+                : "Add an appliance to unlock your usage insights."}
             </h2>
 
             <p className="mt-2 max-w-none text-sm leading-relaxed text-gray-600">
               {topAppliance?.name
                 ? `${topAppliance.name} is currently your biggest estimated energy user. Check its wattage and daily hours first if you want a more accurate estimate.`
-                : "Add appliance details to see which item is driving your estimated usage the most."}
+                : "Start with a preset or add one appliance manually. Your top usage, savings, and comparisons will appear here."}
             </p>
           </div>
 
@@ -2605,7 +2589,7 @@ ${topUsage.trim()}` : ""}`;
 
           ) : (
             <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 text-sm text-gray-600">
-              Add at least one appliance with wattage, hours, and days to unlock top-usage insights, possible savings, and appliance comparisons.
+              Add one appliance with wattage, hours, and days to unlock top-usage insights, possible savings, and appliance comparisons.
             </div>
           )}
 
@@ -3031,11 +3015,11 @@ ${topUsage.trim()}` : ""}`;
               block: "start"
             })
           }
-          className="fixed bottom-5 right-5 z-[70] inline-flex items-center gap-1.5 rounded-full border border-emerald-200/25 bg-white/62 px-3 py-1.5 text-[11px] font-bold text-emerald-900/72 shadow-[0_8px_20px_rgba(15,23,42,0.08)] ring-1 ring-slate-900/[0.03] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/86 hover:text-emerald-950"
+          className="fixed bottom-[calc(env(safe-area-inset-bottom)+0.9rem)] right-3 z-[70] inline-flex items-center gap-1 rounded-full border border-emerald-200/25 bg-white/55 px-2.5 py-1.5 text-[10px] font-bold text-emerald-900/65 shadow-[0_6px_16px_rgba(15,23,42,0.06)] ring-1 ring-slate-900/[0.025] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/86 hover:text-emerald-950 md:right-5 md:px-3 md:text-[11px]"
           aria-label="Back to top"
         >
-          <ArrowUp size={14} strokeWidth={2.4} />
-          Back to top
+          <ArrowUp size={13} strokeWidth={2.4} />
+          Top
         </button>
       )}
 
