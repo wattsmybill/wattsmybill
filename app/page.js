@@ -1781,7 +1781,7 @@ ${topUsage.trim()}` : ""}`;
               </div>
 
               <div className="wmb-mobile-driver-strip flex min-h-[92px] items-center rounded-2xl px-3 py-3 lg:min-h-[92px] lg:px-3.5">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex w-full items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/76">
                       Biggest energy user
