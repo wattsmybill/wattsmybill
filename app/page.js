@@ -1636,11 +1636,11 @@ ${topUsage.trim()}` : ""}`;
 
             <div className="wmb-flow-panel rounded-2xl px-3.5 py-3 lg:-ml-3 lg:h-[252px] lg:self-start lg:px-4 lg:py-3.5 xl:-ml-5">
               <div className="flex h-full flex-col justify-center">
-                <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white/92">
+                <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white">
                       Estimate in 3 simple steps
                 </p>
 
-                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] font-extrabold text-white/94 lg:hidden">
+                <div className="mt-2 flex flex-nowrap items-center gap-1 text-[10px] font-extrabold text-white/94 min-[390px]:text-[10.5px] lg:hidden">
                   <button
                     type="button"
                     onClick={() =>
@@ -1649,10 +1649,10 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.145] px-2.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
+                    className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-white/[0.145] px-1.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18] min-[390px]:px-2"
                   >
-                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[px] text-white">1</span>
-                    <span>Country</span>
+                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[10px] text-white">1</span>
+                    <span className="whitespace-nowrap">Country</span>
                   </button>
 
                   <span className="text-white/35">→</span>
@@ -1665,10 +1665,10 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.145] px-2.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
+                    className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-white/[0.145] px-1.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18] min-[390px]:px-2"
                   >
                     <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[10px] text-white">2</span>
-                    <span>Bill (optional)</span>
+                    <span className="whitespace-nowrap">Bill (optional)</span>
                   </button>
 
                   <span className="text-white/35">→</span>
@@ -1681,10 +1681,10 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.145] px-2.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
+                    className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-white/[0.145] px-1.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18] min-[390px]:px-2"
                   >
                     <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[10px] text-white">3</span>
-                    <span>Appliances</span>
+                    <span className="whitespace-nowrap">Appliances</span>
                   </button>
                 </div>
 
@@ -2467,10 +2467,10 @@ ${topUsage.trim()}` : ""}`;
             </div>
             <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
               <h3 className="font-black text-gray-950">kWh</h3>
-              <p className="mt-1 text-sm leading-relaxed text-gray-600">The total electricity used over time.</p>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">The total electricity your appliances use over time.</p>
             </div>
             <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
-              <h3 className="font-black text-gray-950">Rate</h3>
+              <h3 className="font-black text-gray-950">Electricity rate</h3>
               <p className="mt-1 text-sm leading-relaxed text-gray-600">
                 The price of each kWh from your electricity provider{providerExample ? `, such as ${providerExample}` : ""}.
               </p>
