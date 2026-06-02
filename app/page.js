@@ -19,6 +19,7 @@ const DEFAULT_APPLIANCE = {
 const LOGO_PATH = "/logo.png";
 const PROVIDER_RATE_GUIDE_PATH = "/provider-rate-guide.png";
 const WATTAGE_GUIDE_PATH = "/wattage-guide.png";
+const COUNTRY_PLACEHOLDER_NAME = "Select your country";
 
 function safeNumber(value, fallback = 0) {
   const number = Number(value);
@@ -180,6 +181,38 @@ function getApplianceInsight(applianceName = "", category = "") {
 }
 
 
+function getPersonalizedSavingTip(applianceName = "", category = "", savingsText = "") {
+  const name = applianceName.toLowerCase();
+  const type = category.toLowerCase();
+
+  if (name.includes("aircon") || name.includes("air-conditioning") || type.includes("cooling")) {
+    return `Try raising the temperature slightly, cleaning the filter, or reducing ${applianceName} by 1 hour/day. Possible saving: ${savingsText}/month.`;
+  }
+
+  if (name.includes("refrigerator") || name.includes("freezer")) {
+    return `Check the door seal, avoid frequent opening, and keep airflow clear around ${applianceName}. Possible saving from reducing equivalent runtime: ${savingsText}/month.`;
+  }
+
+  if (name.includes("dryer")) {
+    return `Use spin-dry first or air-dry some loads to reduce ${applianceName} usage. Possible saving from 1 hour/day less use: ${savingsText}/month.`;
+  }
+
+  if (name.includes("induction") || name.includes("cooker") || name.includes("kettle") || name.includes("oven") || name.includes("microwave")) {
+    return `Use the right heat level, cover pots when possible, and avoid longer cooking time on ${applianceName}. Possible saving from 1 hour/day less use: ${savingsText}/month.`;
+  }
+
+  if (name.includes("desktop") || name.includes("gaming pc") || name.includes("laptop") || type.includes("computer")) {
+    return `Use sleep mode when idle and reduce heavy-use hours on ${applianceName}. Possible saving from 1 hour/day less use: ${savingsText}/month.`;
+  }
+
+  if (name.includes("led bulb") || name.includes("lighting") || type.includes("lighting")) {
+    return `Turn off unused lights or group them by room. Possible saving from reducing ${applianceName} by 1 hour/day: ${savingsText}/month.`;
+  }
+
+  return `Try reducing ${applianceName} by 1 hour/day or adjusting how often it runs. Possible saving: ${savingsText}/month.`;
+}
+
+
 const INFO_SECTIONS = [
   {
     id: "about",
@@ -334,6 +367,10 @@ function useAnimatedNumber(value, duration = 520, largeJumpThreshold = 25000) {
 
 export default function Page() {
   const [country, setCountry] = useState(COUNTRIES[0]);
+  const [countrySearchTerm, setCountrySearchTerm] = useState(
+    COUNTRIES[0]?.name === COUNTRY_PLACEHOLDER_NAME ? "" : COUNTRIES[0]?.name || ""
+  );
+  const [showCountryOptions, setShowCountryOptions] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [actualBill, setActualBill] = useState("");
   const [customRate, setCustomRate] = useState("");
@@ -371,6 +408,7 @@ export default function Page() {
   const applianceSectionRef = useRef(null);
   const householdPresetSectionRef = useRef(null);
   const quickAddSectionRef = useRef(null);
+  const countryDropdownRef = useRef(null);
   const feedbackTimerRef = useRef(null);
   const highlightTimerRef = useRef(null);
 
@@ -422,6 +460,9 @@ export default function Page() {
 
           if (foundCountry) {
             setCountry(foundCountry);
+            setCountrySearchTerm(
+              foundCountry.name === COUNTRY_PLACEHOLDER_NAME ? "" : foundCountry.name
+            );
           }
         }
       }
@@ -487,6 +528,38 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!countryDropdownRef.current) return;
+
+      if (!countryDropdownRef.current.contains(event.target)) {
+        const exactCountry = COUNTRIES.find(
+          (item) =>
+            item.name !== COUNTRY_PLACEHOLDER_NAME &&
+            item.name.toLowerCase() === countrySearchTerm.trim().toLowerCase()
+        );
+
+        if (exactCountry) {
+          setCountry(exactCountry);
+          setCountrySearchTerm(exactCountry.name);
+          setCustomRate("");
+          setCustomCountryName("");
+          setCustomCurrency("");
+        } else {
+          setCountrySearchTerm(
+            country.name === COUNTRY_PLACEHOLDER_NAME ? "" : country.name
+          );
+        }
+
+        setShowCountryOptions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [country, countrySearchTerm]);
+
+  useEffect(() => {
     const didYouKnowTimer = window.setInterval(() => {
       setDidYouKnowIndex((current) => (current + 1) % DID_YOU_KNOW_INSIGHTS.length);
     }, 9000);
@@ -495,6 +568,30 @@ export default function Page() {
   }, [DID_YOU_KNOW_INSIGHTS.length]);
 
   const categories = ["All", ...new Set(PRESETS.map((item) => item.category))];
+
+  const selectableCountries = useMemo(
+    () => COUNTRIES.filter((item) => item.name !== COUNTRY_PLACEHOLDER_NAME),
+    []
+  );
+
+  const filteredCountries = useMemo(() => {
+    const query = countrySearchTerm.trim().toLowerCase();
+
+    if (!query) return selectableCountries;
+
+    return selectableCountries.filter((item) =>
+      `${item.flag || ""} ${item.name}`.toLowerCase().includes(query)
+    );
+  }, [countrySearchTerm, selectableCountries]);
+
+  const selectCountry = (selectedCountry) => {
+    setCountry(selectedCountry);
+    setCountrySearchTerm(selectedCountry.name);
+    setShowCountryOptions(false);
+    setCustomRate("");
+    setCustomCountryName("");
+    setCustomCurrency("");
+  };
 
   const filteredPresets = PRESETS.filter((item) => {
     const matchesSearch =
@@ -629,6 +726,10 @@ export default function Page() {
 
     localStorage.removeItem("watts-my-bill-data");
     setCountry(COUNTRIES[0]);
+    setCountrySearchTerm(
+      COUNTRIES[0]?.name === COUNTRY_PLACEHOLDER_NAME ? "" : COUNTRIES[0]?.name || ""
+    );
+    setShowCountryOptions(false);
     setActualBill("");
     setCustomRate("");
     setCustomCountryName("");
@@ -801,6 +902,8 @@ export default function Page() {
       activeRate
     : 0;
 
+  const hasRateForSavings = safeNumber(activeRate) > 0;
+
   const topApplianceShare =
     topAppliance && totalKwh > 0 ? (topAppliance.kwh / totalKwh) * 100 : 0;
 
@@ -849,7 +952,9 @@ export default function Page() {
   const usageDriverLabel = "Biggest energy user";
 
   const savingsTip = topAppliance
-    ? `Try reducing ${topAppliance.name} by 1 hour/day to test a possible monthly saving.`
+    ? hasRateForSavings
+      ? getPersonalizedSavingTip(topAppliance.name, topAppliance.category, formatCompactCurrency(possibleSavings))
+      : "Select a country or enter your rate to see possible savings."
     : "Add appliances to unlock usage insights and saving suggestions.";
 
   const coolingInsight = coolingShare >= 40
@@ -870,10 +975,10 @@ export default function Page() {
 
   const usagePatternInsight = topAppliance?.name
     ? topAppliance.category && topCategoryShare >= 40
-      ? `About ${topCategoryShare.toFixed(0)}% of your estimate comes from ${topCategoryLabel}.`
+      ? `About ${topCategoryShare.toFixed(0)}% of your estimated usage comes from ${topAppliance.category.toLowerCase()} appliances.`
       : topApplianceShare >= 50
-        ? `About ${topApplianceShare.toFixed(0)}% of your estimate comes from one high-impact appliance.`
-        : "Your estimate is spread across multiple appliances."
+        ? `About ${topApplianceShare.toFixed(0)}% of your estimated usage is concentrated in one appliance.`
+        : "Your estimated usage is spread across multiple appliances."
     : "Add appliances to see your usage pattern.";
 
   const shouldCollapseAppliances = breakdown.length > 4;
@@ -1496,9 +1601,9 @@ ${topUsage.trim()}` : ""}`;
               </div>
             </div>
 
-            <div className="wmb-flow-panel rounded-2xl px-3.5 py-3 lg:-ml-3 lg:min-h-[158px] lg:px-4 lg:py-3.5 xl:-ml-5">
+            <div className="wmb-flow-panel rounded-2xl px-3.5 py-3 lg:-ml-3 lg:h-[234px] lg:self-start lg:px-4 lg:py-4 xl:-ml-5">
               <div className="flex h-full flex-col justify-center">
-                <p className="text-[10.5px] font-black uppercase tracking-[0.14em] text-white/78">
+                <p className="text-[10.5px] font-black uppercase tracking-[0.14em] text-white/92">
                   Estimate in 3 simple steps
                 </p>
 
@@ -1511,9 +1616,9 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.08] px-2.5 py-1.5 text-left transition-colors hover:bg-white/[0.12]"
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.145] px-2.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
-                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[10px] text-white">1</span>
+                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[10px] text-white">1</span>
                     <span>Country</span>
                   </button>
 
@@ -1527,9 +1632,9 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.08] px-2.5 py-1.5 text-left transition-colors hover:bg-white/[0.12]"
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.145] px-2.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
-                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[10px] text-white">2</span>
+                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[10px] text-white">2</span>
                     <span>Bill</span>
                   </button>
 
@@ -1543,9 +1648,9 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.08] px-2.5 py-1.5 text-left transition-colors hover:bg-white/[0.12]"
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.145] px-2.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
-                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[10px] text-white">3</span>
+                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[10px] text-white">3</span>
                     <span>Appliances</span>
                   </button>
                 </div>
@@ -1559,9 +1664,9 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-white/[0.07] px-3 py-1.5 text-left transition-colors hover:bg-white/[0.11]"
+                    className="flex min-h-[34px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-2 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
-                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[11px] text-white">1</span>
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[11px] text-white">1</span>
                     <span>Select country</span>
                   </button>
 
@@ -1573,9 +1678,9 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-white/[0.07] px-3 py-1.5 text-left transition-colors hover:bg-white/[0.11]"
+                    className="flex min-h-[34px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-2 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
-                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[11px] text-white">2</span>
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[11px] text-white">2</span>
                     <span>Enter bill</span>
                   </button>
 
@@ -1587,9 +1692,9 @@ ${topUsage.trim()}` : ""}`;
                         block: "start"
                       })
                     }
-                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-white/[0.07] px-3 py-1.5 text-left transition-colors hover:bg-white/[0.11]"
+                    className="flex min-h-[34px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-2 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
-                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[11px] text-white">3</span>
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[11px] text-white">3</span>
                     <span>Add appliances</span>
                   </button>
                 </div>
@@ -1650,12 +1755,14 @@ ${topUsage.trim()}` : ""}`;
                     </p>
 
                     <p className="mt-0.5 truncate text-sm font-black text-white">
-                      {topAppliance?.name || "Add appliances"}
+                      {topAppliance?.name || "Start by adding appliances"}
                     </p>
 
                     <p className="mt-1 text-[12px] font-semibold leading-snug text-white/86">
                       {topAppliance?.name
-                        ? `Possible savings estimate: ${formatCompactCurrency(possibleSavings)}/month by reducing usage by 1 hour/day.`
+                        ? hasRateForSavings
+                          ? `Possible savings estimate: ${formatCompactCurrency(possibleSavings)}/month by reducing usage by 1 hour/day.`
+                          : "Select a country or enter your rate to see possible savings."
                         : "Your highest energy-consuming appliance will appear here."}
                     </p>
                   </div>
@@ -1707,33 +1814,63 @@ ${topUsage.trim()}` : ""}`;
 
 
         <div ref={inputSectionRef} className="grid md:grid-cols-3 gap-4 mb-6">
-          <label className="block">
-            <span className={`mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] ${
-              darkMode ? "text-slate-200" : "text-slate-500"
-            }`}>
-              Country
-            </span>
+          <div ref={countryDropdownRef} className="relative">
+            <label className="block">
+              <span className={`mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] ${
+                darkMode ? "text-slate-200" : "text-slate-500"
+              }`}>
+                Country
+              </span>
 
-            <select
-              className="w-full p-4 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-emerald-950/[0.06] focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-              value={country.name}
-              onChange={(e) => {
-                setCountry(
-                  COUNTRIES.find((c) => c.name === e.target.value) ||
-                    COUNTRIES[0]
-                );
-                setCustomRate("");
-                setCustomCountryName("");
-                setCustomCurrency("");
-              }}
-            >
-              {COUNTRIES.map((c) => (
-                <option key={c.name} value={c.name}>
-                  {`${c.flag} ${c.name}`}
-                </option>
-              ))}
-            </select>
-          </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full p-4 pr-12 rounded-2xl border border-gray-200 bg-[#f7f8f8] text-black shadow-sm ring-1 ring-emerald-950/[0.06] focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
+                  placeholder="Select or type your country"
+                  value={countrySearchTerm}
+                  onFocus={() => setShowCountryOptions(true)}
+                  onChange={(e) => {
+                    setCountrySearchTerm(e.target.value);
+                    setShowCountryOptions(true);
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowCountryOptions((current) => !current)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-xl px-2 py-1 text-sm font-black text-emerald-700 hover:bg-emerald-50"
+                  aria-label="Show country options"
+                >
+                  ⌄
+                </button>
+              </div>
+            </label>
+
+            {showCountryOptions && (
+              <div className="absolute z-50 mt-2 max-h-72 w-full overflow-auto rounded-2xl border border-emerald-100 bg-white p-1.5 text-black shadow-xl ring-1 ring-emerald-950/[0.08]">
+                {filteredCountries.length > 0 ? (
+                  filteredCountries.map((c) => (
+                    <button
+                      key={c.name}
+                      type="button"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => selectCountry(c)}
+                      className={`flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors hover:bg-emerald-50 ${
+                        c.name === country.name ? "bg-emerald-50 font-black text-emerald-800" : "text-gray-800"
+                      }`}
+                    >
+                      <span className="min-w-0 truncate">{c.flag} {c.name}</span>
+                      {c.name === country.name && (
+                        <span className="shrink-0 text-xs font-black text-emerald-700">Selected</span>
+                      )}
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-3 py-3 text-sm text-gray-500">No country found.</div>
+                )}
+              </div>
+            )}
+          </div>
 
           <label className="block">
             <span className={`mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] ${
