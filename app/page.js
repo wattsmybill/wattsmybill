@@ -48,12 +48,12 @@ const DID_YOU_KNOW_INSIGHTS = [
   "Small wattage changes can create noticeable monthly differences over time.",
   "Air-conditioners, refrigerators, and water heaters often drive the highest usage.",
   "Reducing your top appliance by even 1 hour/day can lower your estimate noticeably.",
-  "Provider rates can change over time, so updating your bill improves estimate accuracy.",
+  "Electricity prices can change over time, so updating your bill helps improve the estimate.",
   "High-watt appliances are not always expensive if they are only used briefly.",
   "Low-watt appliances can still add up when running continuously throughout the day.",
-  "Electricity costs are usually driven more by usage habits than appliance quantity.",
+  "Your bill is usually affected more by how long appliances run than by how many appliances you own.",
   "Cooling settings and room insulation can greatly affect aircon electricity usage.",
-  "Your estimate becomes more accurate when appliance wattage labels are used directly."
+  "Your estimate becomes more accurate when you use the wattage printed on the appliance label."
 ];
 
 function calculatePresetKwh(preset) {
@@ -85,24 +85,55 @@ function getPresetTypeLabel(preset) {
 }
 
 
+function getProviderExample(countryName = "") {
+  const normalized = countryName.toLowerCase();
+
+  const examples = [
+    { match: "philippines", provider: "Meralco" },
+    { match: "united states", provider: "PG&E or your local utility" },
+    { match: "usa", provider: "PG&E or your local utility" },
+    { match: "united kingdom", provider: "Octopus Energy or British Gas" },
+    { match: "uk", provider: "Octopus Energy or British Gas" },
+    { match: "australia", provider: "AGL or Origin Energy" },
+    { match: "japan", provider: "TEPCO or Kansai Electric" },
+    { match: "poland", provider: "PGE or Tauron" },
+    { match: "canada", provider: "Hydro One or BC Hydro" },
+    { match: "new zealand", provider: "Meridian or Contact Energy" },
+    { match: "singapore", provider: "SP Group" },
+    { match: "india", provider: "Tata Power or your local DISCOM" },
+    { match: "malaysia", provider: "TNB" },
+    { match: "indonesia", provider: "PLN" },
+    { match: "thailand", provider: "MEA or PEA" },
+    { match: "vietnam", provider: "EVN" },
+    { match: "south africa", provider: "Eskom" },
+    { match: "mexico", provider: "CFE" },
+    { match: "brazil", provider: "Enel or your local utility" },
+    { match: "united arab emirates", provider: "DEWA or ADDC" },
+    { match: "uae", provider: "DEWA or ADDC" }
+  ];
+
+  return examples.find((item) => normalized.includes(item.match))?.provider || "";
+}
+
+
 function getWattageGuide(applianceName = "", category = "") {
   const name = applianceName.toLowerCase();
   const type = category.toLowerCase();
 
   if (name.includes("aircon") || name.includes("air-conditioning")) {
-    return "Aircon wattage is not always constant. A label may show the maximum input, but actual use can ramp up and down depending on inverter/non-inverter type, room temperature, thermostat setting, insulation, and compressor load. Use the label as a guide, but average running watts may be lower than the maximum.";
+    return "Aircon wattage is not always constant. The label may show the highest possible power, but normal use can go up and down depending on the setting, room temperature, insulation, and whether it is inverter or non-inverter. Use the label as a guide, but actual use may be lower.";
   }
 
   if (name.includes("refrigerator") || name.includes("freezer")) {
-    return "Refrigerators and freezers cycle on and off. Check the energy label, nameplate, or model number. Typical listed running wattage can range from 100W–400W.";
+    return "Refrigerators and freezers do not use full power all the time. They turn on and off to keep the temperature steady. Check the energy label, sticker, or model number. Common wattage can range from 100W–400W.";
   }
 
   if (name.includes("tv") || name.includes("television")) {
-    return "TV wattage depends on size and type. Typical ranges: 32 inch LED 30W–55W, 43 inch 60W–100W, 55 inch 80W–150W, large OLED/older TVs can be higher.";
+    return "TV wattage depends on size and screen type. Typical ranges: 32 inch LED 30W–55W, 43 inch 60W–100W, 55 inch 80W–150W. Larger or older TVs can be higher.";
   }
 
   if (name.includes("desktop") || name.includes("gaming pc")) {
-    return "Computer wattage depends on workload. Office PCs may use 100W–250W, while gaming PCs can use 300W–700W+ during gaming.";
+    return "Computer wattage depends on what you are doing. Office use may be around 100W–250W, while gaming can use 300W–700W+.";
   }
 
   if (name.includes("laptop")) {
@@ -122,26 +153,26 @@ function getWattageGuide(applianceName = "", category = "") {
   }
 
   if (name.includes("washing")) {
-    return "Washing machine wattage varies by cycle. Check the label or manual. Typical running wattage can range from 400W–1000W.";
+    return "Washing machine wattage can change depending on the wash setting. Check the label or manual. Common wattage can range from 400W–1000W.";
   }
 
   if (name.includes("dryer")) {
-    return "Dryers are usually high-consumption appliances. Check the rating label. Electric dryers can commonly range from 2000W–5000W.";
+    return "Dryers usually use a lot of electricity. Check the label. Electric dryers commonly range from 2000W–5000W.";
   }
 
   if (name.includes("induction")) {
-    return "Induction cooker wattage is often the maximum input rating. It may not use the full wattage continuously because power changes by heat level, pan size, cooking mode, and cycling behavior. For a closer estimate, use the setting you usually cook with rather than only the maximum rating.";
+    return "Induction cooker wattage often shows the highest possible power. It may use less depending on heat level, pan size, cooking mode, and how it cycles. For a closer estimate, use the setting you usually cook with.";
   }
 
   if (name.includes("speaker") || name.includes("amplifier") || name.includes("sound system") || name.includes("subwoofer") || name.includes("karaoke") || type.includes("audio") || type.includes("sound system")) {
-    return "Sound system wattage depends on the speaker size, amplifier, subwoofer, volume level, and how the system is used. The rated output power is not always the same as actual wall power use. Check the rear label, adapter, manual, or input power rating for a closer estimate.";
+    return "Sound system wattage depends on speaker size, amplifier, subwoofer, volume level, and how it is used. The advertised speaker power is not always the same as the electricity it uses. Check the rear label, adapter, or manual.";
   }
 
   if (name.includes("kettle") || name.includes("oven") || name.includes("microwave") || name.includes("stove") || name.includes("range")) {
-    return "Kitchen heating appliances are usually high wattage. The label often shows the maximum input, but actual use can depend on heat setting, cycle behavior, and cooking time. Check the label or manual, then use a realistic average for your normal use.";
+    return "Kitchen heating appliances usually use a lot of electricity. The label may show the highest possible wattage, but actual use can change with heat setting and cooking time. Check the label or manual, then use a realistic number for your normal use.";
   }
 
-  return "For the most accurate estimate, use the actual wattage printed on the appliance sticker, power adapter, user manual, or official product page.";
+  return "For a better estimate, use the wattage printed on the appliance sticker, power adapter, manual, or official product page.";
 }
 
 
@@ -150,27 +181,27 @@ function getApplianceInsight(applianceName = "", category = "") {
   const type = category.toLowerCase();
 
   if (name.includes("aircon") || name.includes("air-conditioning")) {
-    return "Air-conditioning usually drives the bill the most. For a better estimate, check if it is inverter or non-inverter, confirm the HP size, and use the actual rated or average wattage from the unit label.";
+    return "Air-conditioning often uses the most electricity. For a better estimate, check if it is inverter or non-inverter, confirm the HP size, and use the wattage on the unit label.";
   }
 
   if (name.includes("refrigerator") || name.includes("freezer")) {
-    return "Refrigerators run all day but cycle on and off. If the estimate feels high, check the energy label or model page instead of relying only on running watts.";
+    return "Refrigerators are plugged in all day, but they turn on and off to keep the temperature steady. If the estimate feels high, check the energy label or model page.";
   }
 
   if (name.includes("tv") || name.includes("television")) {
-    return "TV wattage changes by size and panel type. A 32-inch LED TV can be far lower than a 55-inch Smart TV or OLED TV, so searching the exact model can improve accuracy.";
+    return "TV wattage changes by size and screen type. A 32-inch LED TV can use much less than a 55-inch Smart TV or OLED TV, so checking the exact model can help.";
   }
 
   if (name.includes("desktop") || name.includes("gaming pc")) {
-    return "Computers vary a lot. Office use may be moderate, while gaming or rendering can use much more power. Use the power supply only as a maximum, not always the actual usage.";
+    return "Computers can vary a lot. Office use may be moderate, while gaming can use much more electricity. Treat the power supply number as a maximum, not the normal use.";
   }
 
   if (name.includes("speaker") || name.includes("amplifier") || name.includes("sound system") || name.includes("subwoofer") || name.includes("karaoke") || type.includes("audio") || type.includes("sound system")) {
-    return "Audio equipment can vary by volume level and setup. If several speakers, an amplifier, or a subwoofer are connected, estimate the total system wattage instead of only one device.";
+    return "Audio equipment can use more or less electricity depending on volume and setup. If you use speakers, an amplifier, or a subwoofer together, estimate the whole setup.";
   }
 
   if (name.includes("dryer") || name.includes("kettle") || name.includes("oven") || name.includes("microwave") || name.includes("induction") || name.includes("stove") || name.includes("range")) {
-    return "This is a high-wattage appliance. Even short use can add up quickly, so accurate hours and days matter more here.";
+    return "This appliance can use a lot of electricity. Even short use can add up, so accurate hours and days matter here.";
   }
 
   if (name.includes("led bulb") || name.includes("lighting") || type.includes("lighting")) {
@@ -190,7 +221,7 @@ function getPersonalizedSavingTip(applianceName = "", category = "", savingsText
   }
 
   if (name.includes("refrigerator") || name.includes("freezer")) {
-    return `Check the door seal, avoid frequent opening, and keep airflow clear around ${applianceName}. Possible saving from reducing equivalent runtime: ${savingsText}/month.`;
+    return `Check the door seal, avoid opening it too often, and keep airflow clear around ${applianceName}. Possible saving: ${savingsText}/month.`;
   }
 
   if (name.includes("dryer")) {
@@ -218,7 +249,7 @@ const INFO_SECTIONS = [
     id: "about",
     title: "About Watts My Bill?",
     description:
-      "Watts My Bill? is a free electricity usage calculator that helps users estimate monthly electricity costs based on appliance wattage, quantity, usage hours, days per month, and electricity rate. It is built to help everyday users better understand how appliances may contribute to their bill."
+      "Watts My Bill? is a free electricity calculator that helps users estimate monthly electricity costs based on appliance wattage, quantity, usage hours, days per month, and electricity rate. It is built to help everyday users understand how appliances may affect their bill."
   },
   {
     id: "privacy",
@@ -230,13 +261,13 @@ const INFO_SECTIONS = [
     id: "terms",
     title: "Terms of Use",
     description:
-      "By using Watts My Bill?, you understand that the tool provides estimates for educational and personal budgeting purposes only. You are responsible for checking your actual utility bill, provider rates, and appliance information before making financial or household decisions."
+      "By using Watts My Bill?, you understand that the tool provides estimates for learning and personal budgeting only. Please still check your actual utility bill, electricity rate, and appliance label before making financial or household decisions."
   },
   {
     id: "disclaimer",
     title: "Disclaimer",
     description:
-      "Watts My Bill? is not an electricity provider and is not affiliated with any utility company. Results are estimates only. Actual electric bills may include generation charges, transmission, distribution, service fees, VAT, taxes, fuel adjustments, demand charges, and other provider-specific charges."
+      "Watts My Bill? is not an electricity provider and is not connected to any utility company. Results are estimates only. Actual electric bills may include electricity supply charges, delivery charges, service fees, VAT/taxes, fuel adjustments, and other provider charges."
   },
   {
     id: "contact",
@@ -628,6 +659,8 @@ export default function Page() {
     ? customCurrency || ""
     : country.currency;
 
+  const providerExample = getProviderExample(displayCountry);
+
   const formatCurrency = (value) =>
     `${displayCurrency}${safeNumber(value).toLocaleString(undefined, {
       minimumFractionDigits: 2,
@@ -933,9 +966,9 @@ export default function Page() {
 
   const billComparisonInsight = safeNumber(actualBill) > 0
     ? difference > 0
-      ? `Your entered bill is ${formatCurrency(Math.abs(difference))} higher than this estimate. The difference may come from rate changes, taxes, tariffs, provider fees, appliances not listed yet, or wattages that are lower than actual.`
+      ? `Your entered bill is ${formatCurrency(Math.abs(difference))} higher than this estimate. The difference may come from electricity price changes, taxes, extra provider charges, appliances not listed yet, or appliance wattages that are too low.`
       : difference < 0
-        ? `Your estimate is ${formatCurrency(Math.abs(difference))} higher than your entered bill. The difference may come from rate changes, taxes, tariffs, provider adjustments, or appliance watts/hours that are set too high.`
+        ? `Your estimate is ${formatCurrency(Math.abs(difference))} higher than your entered bill. The difference may come from electricity price changes, taxes, extra provider charges, or appliance watts/hours that are set too high.`
         : "Your entered bill matches this estimate."
     : "Add your actual bill to compare it with this estimate.";
 
@@ -1471,7 +1504,7 @@ ${topUsage.trim()}` : ""}`;
       doc.setTextColor(90, 90, 90);
 
       writeWrappedText(
-        "This report is for estimation and educational purposes only. Actual electric bills may include taxes, generation charges, transmission, distribution, service fees, VAT, and provider-specific adjustments.",
+        "This report is for estimation and learning purposes only. Actual electric bills may include taxes, electricity supply charges, delivery charges, service fees, and other provider charges.",
         marginX,
         y,
         contentWidth,
@@ -1518,7 +1551,7 @@ ${topUsage.trim()}` : ""}`;
 
           <div className="relative z-20 grid gap-4 lg:grid-cols-[minmax(0,0.72fr)_minmax(260px,0.58fr)_minmax(390px,0.86fr)] lg:items-stretch lg:gap-4 xl:grid-cols-[minmax(0,0.62fr)_minmax(280px,0.56fr)_minmax(410px,0.82fr)] xl:gap-4">
             <div className="flex max-w-2xl flex-col pr-10 lg:pr-0">
-              <p className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-white/88">
+              <p className="mb-3 text-[14px] font-black uppercase tracking-[0.18em] text-white/88">
                 Live estimate
               </p>
 
@@ -1529,7 +1562,7 @@ ${topUsage.trim()}` : ""}`;
               <p className="mt-2 max-w-[340px] text-[15px] text-white/97 md:text-base">
                 {totalKwh > 0
                   ? "Estimated monthly electricity bill"
-                  : "Start with your country and enter your bill."}
+                  : "Start with your country, then add your appliances."}
               </p>
 
               <div className="mt-4 flex flex-wrap items-center gap-2.5">
@@ -1590,24 +1623,24 @@ ${topUsage.trim()}` : ""}`;
                 </button>
 
                 <p className="mt-1.5 text-[12px] font-medium leading-relaxed text-white/78">
-                  Your actual bill may include provider fees, taxes, rate changes, and usage differences.
+                  Your actual bill may include extra charges, taxes, price changes, and usage differences.
                 </p>
 
                 {showEstimateHelp && (
                   <p className="mt-2 text-[12px] leading-relaxed text-white/74">
-                    Actual bills may also include generation, transmission, distribution, service fees, VAT, taxes, and provider-specific adjustments.
+                    Actual bills may also include electricity supply charges, delivery charges, service fees, VAT/taxes, and other provider charges.
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="wmb-flow-panel rounded-2xl px-3.5 py-3 lg:-ml-3 lg:h-[234px] lg:self-start lg:px-4 lg:py-4 xl:-ml-5">
+            <div className="wmb-flow-panel rounded-2xl px-3.5 py-3 lg:-ml-3 lg:h-[252px] lg:self-start lg:px-4 lg:py-3.5 xl:-ml-5">
               <div className="flex h-full flex-col justify-center">
-                <p className="text-[10.5px] font-black uppercase tracking-[0.14em] text-white/92">
-                  Estimate in 3 simple steps
+                <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white/92">
+                      Estimate in 3 simple steps
                 </p>
 
-                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] font-extrabold text-white/94 lg:hidden">
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11.2px] font-extrabold text-white/94 lg:hidden">
                   <button
                     type="button"
                     onClick={() =>
@@ -1635,7 +1668,7 @@ ${topUsage.trim()}` : ""}`;
                     className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.145] px-2.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
                     <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[10px] text-white">2</span>
-                    <span>Bill</span>
+                    <span>Bill (optional)</span>
                   </button>
 
                   <span className="text-white/35">→</span>
@@ -1681,7 +1714,7 @@ ${topUsage.trim()}` : ""}`;
                     className="flex min-h-[34px] w-full cursor-pointer items-center gap-2 rounded-xl bg-white/[0.145] px-3 py-2 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
                     <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[11px] text-white">2</span>
-                    <span>Enter bill</span>
+                    <span>Enter rate or bill (optional)</span>
                   </button>
 
                   <button
@@ -1894,7 +1927,7 @@ ${topUsage.trim()}` : ""}`;
               <span className={`mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] ${
               darkMode ? "text-slate-200" : "text-slate-500"
             }`}>
-                Provider Rate / kWh
+                Electricity Rate / kWh
               </span>
 
               <input
@@ -1911,7 +1944,7 @@ ${topUsage.trim()}` : ""}`;
             <p className={`mt-2 px-1 text-[12px] leading-relaxed ${
                 darkMode ? "text-slate-200/85" : "text-slate-500"
               }`}>
-              Optional. We’ll use your country’s average rate if left blank. {" "}
+              Optional. We’ll use your country’s average electricity rate if left blank. {" "}
               <button
                 type="button"
                 onClick={() => setShowProviderRateGuide(true)}
@@ -1919,7 +1952,7 @@ ${topUsage.trim()}` : ""}`;
                   darkMode ? "text-emerald-200 hover:text-emerald-100" : "text-emerald-700 hover:text-emerald-800"
                 }`}
               >
-                Need help finding your rate?
+                Need help finding your electricity rate?
               </button>
             </p>
 
@@ -2429,20 +2462,22 @@ ${topUsage.trim()}` : ""}`;
 
           <div className={`${showSimpleTerms ? "grid" : "hidden"} mt-4 gap-3 md:grid md:grid-cols-4`}>
             <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
-              <h3 className="font-black text-gray-950">Appliance power</h3>
-              <p className="mt-1 text-sm leading-relaxed text-gray-600">The watts printed on your appliance label. Higher power can cost more if used for a long time.</p>
+              <h3 className="font-black text-gray-950">Wattage</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">How much electricity an appliance uses while it is running.</p>
             </div>
             <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
-              <h3 className="font-black text-gray-950">kWh usage</h3>
-              <p className="mt-1 text-sm leading-relaxed text-gray-600">The electricity used over time. This is what your bill is usually based on.</p>
+              <h3 className="font-black text-gray-950">kWh</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">The total electricity your appliances use over time.</p>
             </div>
             <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
-              <h3 className="font-black text-gray-950">Electricity price</h3>
-              <p className="mt-1 text-sm leading-relaxed text-gray-600">The cost your provider charges per kWh. You can use the average rate or enter your own.</p>
+              <h3 className="font-black text-gray-950">Electricity rate</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">
+                The price of each kWh from your electricity provider{providerExample ? `, such as ${providerExample}` : ""}.
+              </p>
             </div>
             <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
-              <h3 className="font-black text-gray-950">Estimated cost</h3>
-              <p className="mt-1 text-sm leading-relaxed text-gray-600">A helpful estimate based on your inputs. Your actual bill may include extra charges.</p>
+              <h3 className="font-black text-gray-950">Estimate</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">A helpful guess based on your inputs. Your actual bill may still include extra charges.</p>
             </div>
           </div>
         </section>
@@ -2451,13 +2486,13 @@ ${topUsage.trim()}` : ""}`;
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-4xl">
               <p className="text-xs font-black uppercase tracking-wide text-emerald-700">
-                Understanding appliance power
+                Understanding wattage
               </p>
               <h2 className="mt-1 text-xl font-black tracking-tight">
-                Power usage is not always constant.
+                Wattage is not always constant.
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                Some appliance labels show the maximum power input, but real usage can change while the appliance runs. The number on the label is helpful, but it is not always the amount used every minute.
+                Some appliance labels show the highest possible wattage, but actual use can go up and down while the appliance runs. The label is helpful, but it may not be the amount used every minute.
               </p>
             </div>
 
@@ -2485,9 +2520,9 @@ ${topUsage.trim()}` : ""}`;
               <div className="grid gap-3 md:grid-cols-3">
                 <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-emerald-950/[0.06]">
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 text-lg">💡</div>
-                  <h3 className="font-black text-gray-950">Steady usage</h3>
+                  <h3 className="font-black text-gray-950">Steady wattage</h3>
                   <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                    Lights, basic fans, routers, and chargers usually stay closer to their listed wattage while running.
+                    Lights, basic fans, routers, and chargers usually stay close to their listed wattage while running.
                   </p>
                 </div>
 
@@ -2495,23 +2530,23 @@ ${topUsage.trim()}` : ""}`;
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 text-lg">🔁</div>
                   <h3 className="font-black text-gray-950">Cycling usage</h3>
                   <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                    These appliances do not use power every second. Refrigerators, freezers, and some heaters run for a while, then pause once the desired temperature is reached.
+                    These appliances do not use full power nonstop. Refrigerators, freezers, and some heaters run for a while, then pause once the right temperature is reached.
                   </p>
                 </div>
 
                 <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-emerald-950/[0.06]">
                   <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 text-lg">⚙️</div>
-                  <h3 className="font-black text-gray-950">Variable usage</h3>
+                  <h3 className="font-black text-gray-950">Variable wattage</h3>
                   <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                    Inverter aircons and induction cookers can use more or less power depending on the setting, room temperature, cookware, cooking level, and load. Their label may show the maximum input, not the usual average.
+                    Inverter aircons and induction cookers can use more or less electricity depending on the setting, room temperature, cookware, and how hard they are working. Their label may show the highest possible wattage, not the usual average.
                   </p>
                 </div>
               </div>
 
               <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-sm leading-relaxed text-emerald-950">
-                For example, an aircon rated up to 1,900W may only reach that level during heavy cooling. In normal use, especially with inverter units, it may use much less.
-                An induction cooker rated at 2,000W may also use less at lower heat settings.
-                For a better estimate, use the power level that matches your normal use, not always the maximum rating.
+                For example, an aircon listed at 1,900W may only reach that level during heavy cooling. In normal use, especially with inverter units, it may use much less.
+                An induction cooker listed at 2,000W may also use less at lower heat settings.
+                For a better estimate, use the wattage that matches your normal use, not always the highest number on the label.
               </div>
             </div>
           )}
