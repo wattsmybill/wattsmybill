@@ -1640,7 +1640,7 @@ ${topUsage.trim()}` : ""}`;
                       Estimate in 3 simple steps
                 </p>
 
-                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11.2px] font-extrabold text-white/94 lg:hidden">
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] font-extrabold text-white/94 lg:hidden">
                   <button
                     type="button"
                     onClick={() =>
@@ -1651,7 +1651,7 @@ ${topUsage.trim()}` : ""}`;
                     }
                     className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.145] px-2.5 py-1.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.055)] ring-1 ring-white/[0.055] transition-colors hover:bg-white/[0.18]"
                   >
-                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[10px] text-white">1</span>
+                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-100/24 text-[px] text-white">1</span>
                     <span>Country</span>
                   </button>
 
@@ -1780,7 +1780,7 @@ ${topUsage.trim()}` : ""}`;
                 </div>
               </div>
 
-              <div className="wmb-mobile-driver-strip rounded-2xl px-3.5 py-3.5">
+              <div className="wmb-mobile-driver-strip flex min-h-[104px] items-center rounded-2xl px-3.5 py-3.5 lg:min-h-[104px]">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/76">
@@ -2467,10 +2467,10 @@ ${topUsage.trim()}` : ""}`;
             </div>
             <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
               <h3 className="font-black text-gray-950">kWh</h3>
-              <p className="mt-1 text-sm leading-relaxed text-gray-600">The total electricity your appliances use over time.</p>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">The total electricity used over time.</p>
             </div>
             <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
-              <h3 className="font-black text-gray-950">Electricity rate</h3>
+              <h3 className="font-black text-gray-950">Rate</h3>
               <p className="mt-1 text-sm leading-relaxed text-gray-600">
                 The price of each kWh from your electricity provider{providerExample ? `, such as ${providerExample}` : ""}.
               </p>
