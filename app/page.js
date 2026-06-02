@@ -18,6 +18,7 @@ const DEFAULT_APPLIANCE = {
 
 const LOGO_PATH = "/logo.png";
 const PROVIDER_RATE_GUIDE_PATH = "/provider-rate-guide.png";
+const WATTAGE_GUIDE_PATH = "/wattage-guide.png";
 
 function safeNumber(value, fallback = 0) {
   const number = Number(value);
@@ -348,6 +349,7 @@ export default function Page() {
   const [selectedHouseholdPreset, setSelectedHouseholdPreset] = useState(null);
   const [pendingHouseholdPreset, setPendingHouseholdPreset] = useState(null);
   const [showWattageHelp, setShowWattageHelp] = useState(false);
+  const [showWattageGuideImage, setShowWattageGuideImage] = useState(false);
   const [showEstimateHelp, setShowEstimateHelp] = useState(false);
   const [showProviderRateGuide, setShowProviderRateGuide] = useState(false);
   const [activeInfoPage, setActiveInfoPage] = useState(null);
@@ -359,6 +361,7 @@ export default function Page() {
   const [activeQuestion, setActiveQuestion] = useState(null);
   const [didYouKnowIndex, setDidYouKnowIndex] = useState(0);
   const [showWattageEducation, setShowWattageEducation] = useState(false);
+  const [showSimpleTerms, setShowSimpleTerms] = useState(true);
   const [showAllAddedAppliances, setShowAllAddedAppliances] = useState(false);
 
   const heroSectionRef = useRef(null);
@@ -640,6 +643,7 @@ export default function Page() {
     setSelectedHouseholdPreset(null);
     setPendingHouseholdPreset(null);
     setShowWattageHelp(false);
+    setShowWattageGuideImage(false);
     setShowEstimateHelp(false);
     setShowProviderRateGuide(false);
     setActiveInfoPage(null);
@@ -1407,8 +1411,8 @@ ${topUsage.trim()}` : ""}`;
             )}
           </button>
 
-          <div className="relative z-20 grid gap-5 lg:grid-cols-[minmax(0,0.72fr)_minmax(360px,0.9fr)] lg:items-start lg:gap-4 xl:grid-cols-[minmax(0,0.62fr)_minmax(250px,0.48fr)_minmax(370px,0.72fr)] xl:gap-4">
-            <div className="max-w-2xl pr-10 lg:pr-0">
+          <div className="relative z-20 grid gap-4 lg:grid-cols-[minmax(0,0.72fr)_minmax(260px,0.58fr)_minmax(390px,0.86fr)] lg:items-stretch lg:gap-4 xl:grid-cols-[minmax(0,0.62fr)_minmax(280px,0.56fr)_minmax(410px,0.82fr)] xl:gap-4">
+            <div className="flex max-w-2xl flex-col pr-10 lg:pr-0">
               <p className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-white/88">
                 Live estimate
               </p>
@@ -1417,10 +1421,10 @@ ${topUsage.trim()}` : ""}`;
                 {formatCompactCurrency(animatedTotal)}
               </h2>
 
-              <p className="mt-2 text-[15px] text-white/97 md:text-base">
+              <p className="mt-2 max-w-[340px] text-[15px] text-white/97 md:text-base">
                 {totalKwh > 0
                   ? "Estimated monthly electricity bill"
-                  : "Add appliances below to begin"}
+                  : "Start with your country and enter your bill."}
               </p>
 
               <div className="mt-4 flex flex-wrap items-center gap-2.5">
@@ -1432,7 +1436,7 @@ ${topUsage.trim()}` : ""}`;
                       block: "start"
                     })
                   }
-                  className="wmb-hero-action-primary rounded-full px-4 py-2 text-[12px] font-extrabold text-white"
+                  className="wmb-hero-action-primary cursor-pointer rounded-full px-4 py-2 text-[12px] font-extrabold text-white"
                 >
                   <span className="inline-flex items-center justify-center gap-1.5">
                     <Calculator size={13} strokeWidth={2.2} /> Start
@@ -1447,7 +1451,7 @@ ${topUsage.trim()}` : ""}`;
                       block: "start"
                     })
                   }
-                  className="wmb-hero-action-secondary rounded-full px-3.5 py-1.5 text-[12px] font-bold text-white/92"
+                  className="wmb-hero-action-secondary cursor-pointer rounded-full px-3.5 py-1.5 text-[12px] font-bold text-white/92"
                 >
                   <span className="inline-flex items-center justify-center gap-1.5">
                     <BarChart3 size={13} strokeWidth={2.15} /> Insights
@@ -1462,140 +1466,225 @@ ${topUsage.trim()}` : ""}`;
                       block: "start"
                     })
                   }
-                  className="wmb-hero-action-quiet rounded-full px-3.5 py-1.5 text-[12px] font-bold text-white/84"
+                  className="wmb-hero-action-quiet cursor-pointer rounded-full px-3.5 py-1.5 text-[12px] font-bold text-white/84"
                 >
                   <span className="inline-flex items-center justify-center gap-1.5">
-                    <CheckCircle2 size={13} strokeWidth={2.15} /> How it works
+                    <CheckCircle2 size={13} strokeWidth={2.15} /> Let’s learn
                   </span>
                 </button>
               </div>
-            </div>
 
-            <div className="wmb-flow-panel hidden rounded-2xl px-[18px] py-3.5 xl:block">
-              <div className="flex h-full flex-col justify-between">
-                <div>
-                  <p className="text-[10.5px] font-black uppercase tracking-[0.14em] text-white/78">
-                    Biggest energy user
-                  </p>
 
-                  {topAppliance?.name ? (
-                    <>
-                      <h3 className="mt-2 line-clamp-2 text-sm font-black leading-tight text-white">
-                        {topAppliance.name}
-                      </h3>
+              <div className="mt-5 hidden max-w-[390px] text-white/88 lg:block">
+                <button
+                  type="button"
+                  onClick={() => setShowEstimateHelp(!showEstimateHelp)}
+                  className="w-fit cursor-pointer text-xs font-extrabold underline underline-offset-4 text-white/95 hover:text-white"
+                >
+                  {showEstimateHelp ? "Hide estimate note" : "Why is this only an estimate?"}
+                </button>
 
-                      <p className="mt-2 text-[12px] leading-relaxed text-white/90">
-                        About <span className="font-black text-white/86">{topApplianceShare.toFixed(0)}%</span> of your estimated usage comes from this appliance.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="mt-2 text-sm font-black leading-tight text-white">
-                        Add appliances to reveal your biggest energy user.
-                      </h3>
-
-                      <p className="mt-2 text-[12px] leading-relaxed text-white/90">
-                        Your top appliance will appear here once usage is added.
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                <p className="mt-3 text-[11.5px] font-bold leading-relaxed text-white/90">
-                  {topAppliance?.name
-                    ? `💡 Try reducing it by 1 hour/day to test possible savings.`
-                    : `Start with an appliance or household preset.`}
+                <p className="mt-1.5 text-[12px] font-medium leading-relaxed text-white/78">
+                  Your actual bill may include provider fees, taxes, rate changes, and usage differences.
                 </p>
+
+                {showEstimateHelp && (
+                  <p className="mt-2 text-[12px] leading-relaxed text-white/74">
+                    Actual bills may also include generation, transmission, distribution, service fees, VAT, taxes, and provider-specific adjustments.
+                  </p>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5 lg:mr-8 lg:gap-2.5 xl:mr-10 xl:gap-2.5">
-              <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Total Usage</p>
-                <div className="mt-1.5 flex min-w-0 items-center gap-2">
-                  <span className="shrink-0 text-sm">⚡</span>
-                  <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">{formatCompactNumber(animatedTotalKwh)} kWh</p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() =>
-                  inputSectionRef.current?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                  })
-                }
-                className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 text-left transition-transform duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-200/50 lg:min-h-[62px] lg:px-3.5 lg:py-2.5"
-                aria-label="Select or change country"
-              >
-                <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Country</p>
-                <div className="mt-1.5 flex min-w-0 items-center gap-2">
-                  <span className="shrink-0 text-sm">{country.flag}</span>
-                  <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
-                    {displayCountry === "Select your country" ? "Select country" : displayCountry}
-                  </p>
-                </div>
-              </button>
-
-              <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Rate Used</p>
-                <p className="mt-1.5 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
-                  {displayCurrency}
-                  {activeRate || 0}/kWh
+            <div className="wmb-flow-panel rounded-2xl px-3.5 py-3 lg:-ml-3 lg:min-h-[158px] lg:px-4 lg:py-3.5 xl:-ml-5">
+              <div className="flex h-full flex-col justify-center">
+                <p className="text-[10.5px] font-black uppercase tracking-[0.14em] text-white/78">
+                  Estimate in 3 simple steps
                 </p>
-              </div>
 
-              <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
-                <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Daily Average</p>
-                <p className="mt-1.5 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
-                  {formatCompactCurrency(animatedDailyAverage)}/day
-                </p>
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] font-extrabold text-white/94 lg:hidden">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      inputSectionRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                      })
+                    }
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.08] px-2.5 py-1.5 text-left transition-colors hover:bg-white/[0.12]"
+                  >
+                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[10px] text-white">1</span>
+                    <span>Country</span>
+                  </button>
+
+                  <span className="text-white/35">→</span>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      inputSectionRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                      })
+                    }
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.08] px-2.5 py-1.5 text-left transition-colors hover:bg-white/[0.12]"
+                  >
+                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[10px] text-white">2</span>
+                    <span>Bill</span>
+                  </button>
+
+                  <span className="text-white/35">→</span>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      householdPresetSectionRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                      })
+                    }
+                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-white/[0.08] px-2.5 py-1.5 text-left transition-colors hover:bg-white/[0.12]"
+                  >
+                    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[10px] text-white">3</span>
+                    <span>Appliances</span>
+                  </button>
+                </div>
+
+                <div className="mt-2.5 hidden gap-2 text-[12px] font-extrabold text-white/94 lg:grid">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      inputSectionRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                      })
+                    }
+                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-white/[0.07] px-3 py-1.5 text-left transition-colors hover:bg-white/[0.11]"
+                  >
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[11px] text-white">1</span>
+                    <span>Select country</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      inputSectionRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                      })
+                    }
+                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-white/[0.07] px-3 py-1.5 text-left transition-colors hover:bg-white/[0.11]"
+                  >
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[11px] text-white">2</span>
+                    <span>Enter bill</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      householdPresetSectionRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                      })
+                    }
+                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-white/[0.07] px-3 py-1.5 text-left transition-colors hover:bg-white/[0.11]"
+                  >
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-200/18 text-[11px] text-white">3</span>
+                    <span>Add appliances</span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="wmb-mobile-driver-strip mt-1.5 rounded-2xl px-3.5 py-3 lg:col-span-2 xl:hidden">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/76">
-                    Biggest energy user
-                  </p>
+            <div className="flex flex-col gap-2.5 lg:mr-8 xl:mr-10">
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
+                  <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Total Usage</p>
+                  <div className="mt-1.5 flex min-w-0 items-center gap-2">
+                    <span className="shrink-0 text-sm">⚡</span>
+                    <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">{formatCompactNumber(animatedTotalKwh)} kWh</p>
+                  </div>
+                </div>
 
-                  <p className="mt-0.5 truncate text-sm font-black text-white">
-                    {topAppliance?.name || "Add appliances"}
-                  </p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    inputSectionRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start"
+                    })
+                  }
+                  className="wmb-stat-tile flex min-h-[66px] cursor-pointer flex-col justify-center rounded-[16px] px-3.5 py-2.5 text-left transition-transform duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-200/50 lg:min-h-[62px] lg:px-3.5 lg:py-2.5"
+                  aria-label="Select or change country"
+                >
+                  <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Country</p>
+                  <div className="mt-1.5 flex min-w-0 items-center gap-2">
+                    <span className="shrink-0 text-sm">{country.flag}</span>
+                    <p className="min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
+                      {displayCountry === "Select your country" ? "Select country" : displayCountry}
+                    </p>
+                  </div>
+                </button>
 
-                  <p className="mt-1 text-[12px] font-semibold leading-snug text-white/86">
-                    {topAppliance?.name
-                      ? "Try reducing it by 1 hour/day to test possible savings."
-                      : "Your biggest energy user will appear here"}
+                <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
+                  <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Rate Used</p>
+                  <p className="mt-1.5 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
+                    {displayCurrency}
+                    {activeRate || 0}/kWh
                   </p>
                 </div>
 
-                <div className="shrink-0 rounded-xl border border-emerald-200/[0.12] bg-white/[0.055] px-2.5 py-1.5 text-right">
-                  <p className="text-base font-black text-white/94">
-                    {topAppliance?.name ? `${topApplianceShare.toFixed(0)}%` : "—"}
+                <div className="wmb-stat-tile flex min-h-[66px] flex-col justify-center rounded-[16px] px-3.5 py-2.5 lg:min-h-[62px] lg:px-3.5 lg:py-2.5">
+                  <p className="text-[10.5px] font-black uppercase tracking-[0.075em] text-white/88">Daily Average</p>
+                  <p className="mt-1.5 min-w-0 truncate text-[0.96rem] font-black leading-tight text-white md:text-[0.98rem]">
+                    {formatCompactCurrency(animatedDailyAverage)}/day
                   </p>
+                </div>
+              </div>
 
-                  <p className="text-[10.5px] font-bold text-white/70">
-                    usage
-                  </p>
+              <div className="wmb-mobile-driver-strip rounded-2xl px-3.5 py-3.5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/76">
+                      Biggest energy user
+                    </p>
+
+                    <p className="mt-0.5 truncate text-sm font-black text-white">
+                      {topAppliance?.name || "Add appliances"}
+                    </p>
+
+                    <p className="mt-1 text-[12px] font-semibold leading-snug text-white/86">
+                      {topAppliance?.name
+                        ? `Possible savings estimate: ${formatCompactCurrency(possibleSavings)}/month by reducing usage by 1 hour/day.`
+                        : "Your highest energy-consuming appliance will appear here."}
+                    </p>
+                  </div>
+
+                  <div className="shrink-0 rounded-xl border border-emerald-200/[0.12] bg-white/[0.055] px-2.5 py-1.5 text-right">
+                    <p className="text-base font-black text-white/94">
+                      {topAppliance?.name ? `${topApplianceShare.toFixed(0)}%` : "—"}
+                    </p>
+
+                    <p className="text-[10.5px] font-bold text-white/70">
+                      usage
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="relative z-20 mt-3 flex justify-start pt-1.5">
+          <div className="relative z-20 mt-3 flex justify-start pt-1 lg:hidden">
             <button
               onClick={() => setShowEstimateHelp(!showEstimateHelp)}
-              className="w-fit text-xs font-semibold underline underline-offset-4 text-white/95 hover:text-white"
+              className="w-fit cursor-pointer text-xs font-semibold underline underline-offset-4 text-white/95 hover:text-white"
             >
               {showEstimateHelp ? "Hide estimate note" : "Why is this only an estimate?"}
             </button>
           </div>
 
           {showEstimateHelp && (
-            <p className="relative z-20 mt-2 max-w-2xl text-xs leading-relaxed text-white/84">
+            <p className="relative z-20 mt-2 max-w-2xl text-xs leading-relaxed text-white/84 lg:hidden">
               Actual electric bills may include generation, transmission,
               distribution, service fees, VAT, taxes, and provider-specific
               adjustments that are not included in a simple appliance estimate.
@@ -1884,7 +1973,7 @@ ${topUsage.trim()}` : ""}`;
               </div>
               <div className="mt-1 text-sm leading-relaxed text-gray-600">
                 <p>
-                  Build your estimate appliance by appliance, then fine-tune wattage, hours, and days below.
+                  Build your estimate one appliance at a time then fine-tune appliance power, hours, and days below.
                 </p>
 
                 <button
@@ -1893,14 +1982,25 @@ ${topUsage.trim()}` : ""}`;
                   className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline"
                 >
                   <CheckCircle2 size={12} strokeWidth={2.4} />
-                  {showWattageHelp ? "Hide wattage guide" : "Wattage guide"}
+                  {showWattageHelp ? "Hide wattage help" : "Where do I find wattage?"}
                 </button>
               </div>
 
               {showWattageHelp && (
-                <p className="mt-2 max-w-xl rounded-2xl border border-emerald-100 bg-emerald-50/50 px-3 py-2 text-xs leading-relaxed text-gray-600 transition-all duration-300 ease-out">
-                  Check the appliance sticker, power adapter, user manual, or search the exact appliance model online. Actual wattage gives a better estimate than generic presets.
-                </p>
+                <div className="mt-2 max-w-xl rounded-2xl border border-emerald-100 bg-emerald-50/50 px-3 py-2 text-xs leading-relaxed text-gray-600 transition-all duration-300 ease-out">
+                  <p>
+                    Look for the label or sticker on the appliance, power adapter, user manual, or search the exact model online. The actual appliance power gives a better estimate than a generic preset.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowWattageGuideImage(true)}
+                    className="mt-2 inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-[11px] font-extrabold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
+                  >
+                    <CheckCircle2 size={12} strokeWidth={2.4} />
+                    View visual guide
+                  </button>
+                </div>
               )}
             </div>
 
@@ -2038,7 +2138,7 @@ ${topUsage.trim()}` : ""}`;
                 </label>
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Wattage (W)</span>
+                  <span className="mb-1.5 block text-xs font-semibold text-gray-500" title="Appliance power in watts. This is usually printed on the appliance label or adapter.">Appliance power (W)</span>
                   <input
                     className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
@@ -2051,7 +2151,7 @@ ${topUsage.trim()}` : ""}`;
                 </label>
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Hours / Day</span>
+                  <span className="mb-1.5 block text-xs font-semibold text-gray-500" title="How many hours you usually use this appliance per day.">Hours / Day</span>
                   <input
                     className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
@@ -2064,7 +2164,7 @@ ${topUsage.trim()}` : ""}`;
                 </label>
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Days / Month</span>
+                  <span className="mb-1.5 block text-xs font-semibold text-gray-500" title="How many days per month you usually use this appliance.">Days / Month</span>
                   <input
                     className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
                     type="number"
@@ -2080,23 +2180,33 @@ ${topUsage.trim()}` : ""}`;
               {item.name && (
                 <details className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/50 px-4 py-3 shadow-sm">
                   <summary className="cursor-pointer text-xs font-semibold text-emerald-800">
-                    Need wattage guidance for this appliance?
+                    Need help finding appliance power?
                   </summary>
 
                   <p className="mt-2 text-xs leading-relaxed text-gray-700">
                     💡 {wattageGuide}
                   </p>
 
-                  <a
-                    href={`https://www.google.com/search?q=${encodeURIComponent(
-                      `${item.name} wattage`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-block text-xs font-semibold text-emerald-700 hover:underline"
-                  >
-                    🔎 Search actual wattage for “{item.name}”
-                  </a>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowWattageGuideImage(true)}
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-extrabold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
+                    >
+                      View visual guide
+                    </button>
+
+                    <a
+                      href={`https://www.google.com/search?q=${encodeURIComponent(
+                        `${item.name} watts power consumption`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 hover:underline"
+                    >
+                      🔎 Search actual power for “{item.name}”
+                    </a>
+                  </div>
                 </details>
               )}
 
@@ -2145,17 +2255,57 @@ ${topUsage.trim()}` : ""}`;
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
-                How estimates work
+                Let’s learn
               </p>
               <h2 className="mt-1 text-xl font-black tracking-tight">
-                Transparent, simple calculation.
+                Understand your electricity estimate.
               </h2>
               <p className="mt-2 max-w-3xl text-sm leading-relaxed text-gray-600">
-                Energy usage is estimated using appliance watts, quantity, hours used, and days used per month. Your estimated cost uses your selected country’s average electricity rate or your custom provider rate.
+                Energy usage is estimated using appliance power, quantity, hours used, and days used per month. Your estimated cost uses your selected country’s average electricity price or your custom provider rate.
               </p>
             </div>
             <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 px-4 py-3 text-sm font-semibold text-emerald-900">
-              Watts × Qty × Hours × Days ÷ 1000 = kWh
+              Power (W) × Qty × Hours × Days ÷ 1000 = kWh
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-5 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-wide text-emerald-700">
+                Simple terms
+              </p>
+              <h2 className="mt-1 text-xl font-black tracking-tight">
+                Electricity words, explained plainly.
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowSimpleTerms((current) => !current)}
+              className="md:hidden inline-flex shrink-0 cursor-pointer items-center rounded-full border border-emerald-200 bg-white px-3.5 py-2 text-xs font-extrabold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
+            >
+              {showSimpleTerms ? "Hide terms" : "Show terms"}
+            </button>
+          </div>
+
+          <div className={`${showSimpleTerms ? "grid" : "hidden"} mt-4 gap-3 md:grid md:grid-cols-4`}>
+            <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
+              <h3 className="font-black text-gray-950">Appliance power</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">The watts printed on your appliance label. Higher power can cost more if used for a long time.</p>
+            </div>
+            <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
+              <h3 className="font-black text-gray-950">kWh usage</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">The electricity used over time. This is what your bill is usually based on.</p>
+            </div>
+            <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
+              <h3 className="font-black text-gray-950">Electricity price</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">The cost your provider charges per kWh. You can use the average rate or enter your own.</p>
+            </div>
+            <div className="rounded-2xl bg-white/75 p-4 shadow-sm ring-1 ring-emerald-950/[0.05]">
+              <h3 className="font-black text-gray-950">Estimated cost</h3>
+              <p className="mt-1 text-sm leading-relaxed text-gray-600">A helpful estimate based on your inputs. Your actual bill may include extra charges.</p>
             </div>
           </div>
         </section>
@@ -2164,23 +2314,33 @@ ${topUsage.trim()}` : ""}`;
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-4xl">
               <p className="text-xs font-black uppercase tracking-wide text-emerald-700">
-                Understanding appliance wattage
+                Understanding appliance power
               </p>
               <h2 className="mt-1 text-xl font-black tracking-tight">
                 Power usage is not always constant.
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                Some appliance labels show the maximum power input, but real usage can change while you use them. The number on the label is helpful, but it is not always the amount used every minute.
+                Some appliance labels show the maximum power input, but real usage can change while the appliance runs. The number on the label is helpful, but it is not always the amount used every minute.
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setShowWattageEducation((current) => !current)}
-              className="inline-flex w-fit shrink-0 items-center rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
-            >
-              {showWattageEducation ? "Show less" : "Show more"}
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setShowWattageGuideImage(true)}
+                className="inline-flex w-fit shrink-0 cursor-pointer items-center rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
+              >
+                View wattage guide
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowWattageEducation((current) => !current)}
+                className="inline-flex w-fit shrink-0 cursor-pointer items-center rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
+              >
+                {showWattageEducation ? "Show less" : "Show more"}
+              </button>
+            </div>
           </div>
 
           {showWattageEducation && (
@@ -2212,11 +2372,9 @@ ${topUsage.trim()}` : ""}`;
               </div>
 
               <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-sm leading-relaxed text-emerald-950">
-                An aircon rated up to 1,900W may only reach that level during heavy cooling, startup, or full load. During normal use, especially with inverter units, it can drop much lower.
-
-                An induction cooker rated at 2,000W may also use less than its maximum rating. At lower heat settings, many induction cookers reduce output or pulse power on and off to maintain the selected cooking level.
-
-                For better estimates, use the wattage that best matches your normal usage, not always the maximum label.
+                For example, an aircon rated up to 1,900W may only reach that level during heavy cooling. In normal use, especially with inverter units, it may use much less.
+                An induction cooker rated at 2,000W may also use less at lower heat settings.
+                For a better estimate, use the power level that matches your normal use, not always the maximum rating.
               </div>
             </div>
           )}
@@ -2631,6 +2789,37 @@ ${topUsage.trim()}` : ""}`;
       </div>
 
 
+
+      {showWattageGuideImage && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/70 p-0 backdrop-blur-sm md:p-5">
+          <div className="relative h-full w-full overflow-hidden bg-white text-black shadow-2xl md:h-auto md:max-h-[92vh] md:max-w-6xl md:rounded-[28px]">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 md:px-5">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">Wattage guide</p>
+                <h3 className="text-base font-black tracking-tight text-slate-950 md:text-lg">Where to find appliance power</h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowWattageGuideImage(false)}
+                className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50 hover:text-slate-900"
+                aria-label="Close wattage guide"
+              >
+                <X size={20} strokeWidth={2.4} />
+              </button>
+            </div>
+
+            <div className="h-[calc(100%-65px)] overflow-y-auto p-3 md:max-h-[calc(92vh-65px)] md:p-5">
+              <img
+                src={WATTAGE_GUIDE_PATH}
+                alt="Guide showing where to find appliance wattage or power labels"
+                className="mx-auto h-auto w-full rounded-2xl border border-slate-200/70 shadow-sm"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {showProviderRateGuide && (
         <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/70 p-0 backdrop-blur-sm md:p-5">
           <div className="relative h-full w-full overflow-hidden bg-white text-black shadow-2xl md:h-auto md:max-h-[92vh] md:max-w-5xl md:rounded-[28px]">
@@ -2677,6 +2866,7 @@ ${topUsage.trim()}` : ""}`;
           Back to top
         </button>
       )}
+
     </div>
   );
   
