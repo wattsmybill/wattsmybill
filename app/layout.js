@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 const siteUrl = "https://www.wattsmybill.app";
 const siteName = "Watts My Bill?";
 const siteDescription =
-  "Understand your electricity bill with a free appliance wattage calculator. Estimate monthly costs, compare usage, try household presets, and generate a simple energy audit report.";
+  "Estimate your monthly electricity bill by adding appliances, usage hours, and electricity rates. Watts My Bill helps you understand your energy cost.";
 
 const ogImage = `${siteUrl}/og-image-final.jpg`;
 const logoUrl = `${siteUrl}/icon.png`;
@@ -27,7 +27,7 @@ export const metadata = {
   category: "Utility",
 
   title: {
-    default: "Watts My Bill? | Understand Your Electricity Bill",
+    default: "Watts My Bill? | Electricity Bill Usage Calculator",
     template: `%s | ${siteName}`,
   },
 
@@ -80,9 +80,8 @@ export const metadata = {
   },
 
   openGraph: {
-    title: "Watts My Bill? | Understand Your Electricity Bill",
-    description:
-      "Estimate appliance energy costs, compare usage, try household presets, and generate a simple energy audit report.",
+    title: "Watts My Bill? | Electricity Bill Usage Calculator",
+    description: siteDescription,
     url: siteUrl,
     siteName,
     type: "website",
@@ -99,9 +98,8 @@ export const metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Watts My Bill? | Understand Your Electricity Bill",
-    description:
-      "Understand your electricity bill with a free appliance wattage calculator, household presets, and an energy usage report.",
+    title: "Watts My Bill? | Electricity Bill Usage Calculator",
+    description: siteDescription,
     images: [ogImage],
   },
 

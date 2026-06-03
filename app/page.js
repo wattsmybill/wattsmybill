@@ -121,60 +121,71 @@ function getWattageGuide(applianceName = "", category = "") {
   const type = category.toLowerCase();
 
   if (name.includes("aircon") || name.includes("air-conditioning")) {
-    return "Aircon wattage is not always constant. The label may show the highest possible power, but normal use can go up and down depending on the setting, room temperature, insulation, and whether it is inverter or non-inverter. Use the label as a guide, but actual use may be lower.";
+    return "Aircon use can vary a lot. Inverter units may use less after cooling the room, while non-inverter units cycle on and off. Preset watts are starting estimates — adjust using your unit label for better accuracy.";
   }
 
   if (name.includes("refrigerator") || name.includes("freezer")) {
-    return "Refrigerators and freezers do not use full power all the time. They turn on and off to keep the temperature steady. Check the energy label, sticker, or model number. Common wattage can range from 100W–400W.";
+    return "Refrigerator and freezer wattage cycles on and off during the day, so actual average use may be lower than the rated watts.";
   }
 
-  if (name.includes("tv") || name.includes("television")) {
-    return "TV wattage depends on size and screen type. Typical ranges: 32 inch LED 30W–55W, 43 inch 60W–100W, 55 inch 80W–150W. Larger or older TVs can be higher.";
+  if (name.includes("induction") || name.includes("electric stove") || name.includes("electric range")) {
+    return "Rated watts show maximum power. Actual use depends on heat level, cooking mode, pan size, and cooking time.";
   }
 
-  if (name.includes("desktop") || name.includes("gaming pc")) {
-    return "Computer wattage depends on what you are doing. Office use may be around 100W–250W, while gaming can use 300W–700W+.";
-  }
-
-  if (name.includes("laptop")) {
-    return "Laptop chargers usually show wattage on the adapter. Common ranges: 45W–100W for regular laptops, 120W–240W for gaming or workstation laptops.";
-  }
-
-  if (name.includes("led bulb") || name.includes("lighting") || type.includes("lighting")) {
-    return "Bulb wattage is usually printed on the bulb or box. LED bulbs are commonly 5W–15W each. Use quantity for multiple bulbs.";
-  }
-
-  if (name.includes("charger")) {
-    return "Phone and tablet chargers usually show output watts on the adapter. Common phone chargers range from 5W–30W, fast chargers can be higher.";
-  }
-
-  if (name.includes("router") || name.includes("modem") || name.includes("wifi")) {
-    return "Routers and modems are usually low power. Check the adapter label. Typical range is around 8W–20W each.";
+  if (name.includes("microwave")) {
+    return "Use the input wattage if available, since output wattage may be lower than the actual electricity used.";
   }
 
   if (name.includes("washing")) {
-    return "Washing machine wattage can change depending on the wash setting. Check the label or manual. Common wattage can range from 400W–1000W.";
+    return "Actual use can vary depending on wash mode, water heating, spin cycle, and load size.";
   }
 
   if (name.includes("dryer")) {
-    return "Dryers usually use a lot of electricity. Check the label. Electric dryers commonly range from 2000W–5000W.";
+    return "Dryers use high wattage, but actual cost depends heavily on cycle length and how often you use them.";
   }
 
-  if (name.includes("induction")) {
-    return "Induction cooker wattage often shows the highest possible power. It may use less depending on heat level, pan size, cooking mode, and how it cycles. For a closer estimate, use the setting you usually cook with.";
+  if (name.includes("desktop") || name.includes("gaming pc")) {
+    return "Power supply wattage is usually the maximum capacity, not normal everyday usage. Actual use depends on workload, parts, and idle time.";
+  }
+
+  if (name.includes("laptop")) {
+    return "Charger wattage is the maximum output. Actual use may be lower depending on workload, battery level, and charging.";
+  }
+
+  if (name.includes("water heater") || name.includes("shower heater")) {
+    return "Water heaters use high wattage. Even short usage times can affect electricity cost.";
+  }
+
+  if (name.includes("electric fan") || name.includes("ceiling fan")) {
+    return "Fan wattage is usually easier to estimate, but actual use can change depending on speed setting.";
+  }
+
+  if (name.includes("tv") || name.includes("television")) {
+    return "TV wattage depends on size and screen type. Check the model label or manual for a better estimate.";
+  }
+
+  if (name.includes("led bulb") || name.includes("lighting") || type.includes("lighting")) {
+    return "Bulb wattage is usually printed on the bulb or box. Use quantity for multiple bulbs.";
+  }
+
+  if (name.includes("charger")) {
+    return "Charger wattage is usually the maximum output. Actual use may be lower depending on the device and charging state.";
+  }
+
+  if (name.includes("router") || name.includes("modem") || name.includes("wifi")) {
+    return "Routers and modems are usually low power. Check the adapter label for the best estimate.";
   }
 
   if (name.includes("speaker") || name.includes("amplifier") || name.includes("sound system") || name.includes("subwoofer") || name.includes("karaoke") || type.includes("audio") || type.includes("sound system")) {
-    return "Sound system wattage depends on speaker size, amplifier, subwoofer, volume level, and how it is used. The advertised speaker power is not always the same as the electricity it uses. Check the rear label, adapter, or manual.";
+    return "Audio equipment use can change with volume and setup. If you use speakers, an amplifier, or a subwoofer together, estimate the whole setup.";
   }
 
-  if (name.includes("kettle") || name.includes("oven") || name.includes("microwave") || name.includes("stove") || name.includes("range")) {
-    return "Kitchen heating appliances usually use a lot of electricity. The label may show the highest possible wattage, but actual use can change with heat setting and cooking time. Check the label or manual, then use a realistic number for your normal use.";
+  if (name.includes("kettle") || name.includes("oven") || name.includes("stove") || name.includes("range")) {
+    return "Heating appliances often show maximum wattage. Actual use depends on heat setting and usage time.";
   }
 
-  return "For a better estimate, use the wattage printed on the appliance sticker, power adapter, manual, or official product page.";
+  return "Preset watts are starting estimates. For better accuracy, use your appliance label or adjust based on your normal use.";
 }
-
 
 function getApplianceInsight(applianceName = "", category = "") {
   const name = applianceName.toLowerCase();
@@ -267,7 +278,7 @@ const INFO_SECTIONS = [
     id: "disclaimer",
     title: "Disclaimer",
     description:
-      "Watts My Bill? is not an electricity provider and is not connected to any utility company. Results are estimates only. Actual electric bills may include electricity supply charges, delivery charges, service fees, VAT/taxes, fuel adjustments, and other provider charges."
+      "Watts My Bill? is not an electricity provider and is not connected to any utility company. Results are estimates only. Actual electric bills may include electricity supply charges, delivery charges, service fees, VAT/taxes, fuel adjustments, and other provider charges. Watts My Bill? is an electricity bill usage calculator that helps estimate monthly electricity costs based on appliance wattage, quantity, usage hours, days per month, and electricity provider rates."
   },
   {
     id: "contact",
@@ -333,9 +344,9 @@ function Logo({ darkMode = false }) {
       </div>
 
       <div className="min-w-0">
-        <div className={`font-extrabold text-[1.6rem] min-[390px]:text-[1.7rem] sm:text-[2rem] md:text-[2.25rem] tracking-tight leading-none drop-shadow-none ${darkMode ? "text-white" : "text-gray-950"}`}>
+        <h1 className={`m-0 font-extrabold text-[1.6rem] min-[390px]:text-[1.7rem] sm:text-[2rem] md:text-[2.25rem] tracking-tight leading-none drop-shadow-none ${darkMode ? "text-white" : "text-gray-950"}`}>
           Watts My Bill?
-        </div>
+        </h1>
 
         <div className={`text-xs md:text-sm mt-1 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
           Understand Your Electricity Bill
@@ -431,6 +442,7 @@ export default function Page() {
   const [showWattageEducation, setShowWattageEducation] = useState(false);
   const [showSimpleTerms, setShowSimpleTerms] = useState(false);
   const [showAllAddedAppliances, setShowAllAddedAppliances] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const heroSectionRef = useRef(null);
   const inputSectionRef = useRef(null);
@@ -1075,6 +1087,29 @@ ${topUsage.trim()}` : ""}`;
     (section) => section.id === activeInfoPage
   );
 
+  const scrollToSection = (targetRef, offset = 18) => {
+    setShowMobileMenu(false);
+
+    if (!targetRef.current || typeof window === "undefined") return;
+
+    const targetTop = targetRef.current.getBoundingClientRect().top + window.scrollY - offset;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: "smooth"
+    });
+  };
+
+  const openInfoSection = (sectionId) => {
+    setShowMobileMenu(false);
+    setActiveInfoPage(sectionId);
+  };
+
+  const openSupportPanel = () => {
+    setShowMobileMenu(false);
+    setShowDonate(true);
+  };
+
   const downloadPDF = async () => {
     try {
       const doc = new jsPDF("p", "mm", "a4");
@@ -1530,9 +1565,84 @@ ${topUsage.trim()}` : ""}`;
 
 
       <div className="mx-auto w-full max-w-[1280px]">
-        <div className="flex justify-between items-start gap-3 md:gap-4 mb-5 md:mb-6">
-          <Logo darkMode={darkMode} />
-        </div>
+        <header className="relative z-[80] mb-4 md:mb-6">
+          <div className="flex items-start justify-between gap-3 md:items-center">
+            <button
+              type="button"
+              onClick={() => scrollToSection(heroSectionRef)}
+              className="cursor-pointer text-left"
+              aria-label="Go to Watts My Bill home"
+            >
+              <Logo darkMode={darkMode} />
+            </button>
+
+            <nav className="hidden items-center gap-4 translate-y-[10px] md:flex lg:gap-5" aria-label="Main navigation">
+              <button type="button" onClick={() => scrollToSection(inputSectionRef)} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
+                Explore Usage
+              </button>
+              <button type="button" onClick={() => openInfoSection("about")} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
+                About
+              </button>
+              <button type="button" onClick={() => openInfoSection("disclaimer")} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
+                Disclaimer
+              </button>
+              <button type="button" onClick={openSupportPanel} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
+                Support
+              </button>
+              <button type="button" onClick={() => openInfoSection("contact")} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
+                Contact
+              </button>
+            </nav>
+
+            <button
+              type="button"
+              onClick={() => setShowMobileMenu((current) => !current)}
+              className={`cursor-pointer grid h-11 w-11 shrink-0 place-items-center rounded-2xl border shadow-sm md:hidden ${
+                darkMode
+                  ? "border-white/10 bg-white/[0.06] text-white"
+                  : "border-emerald-950/[0.08] bg-white/80 text-slate-900"
+              }`}
+              aria-label={showMobileMenu ? "Close menu" : "Open menu"}
+            >
+              {showMobileMenu ? <X size={24} strokeWidth={2.5} /> : <span className="text-[1.55rem] font-black leading-none">☰</span>}
+            </button>
+          </div>
+
+          {showMobileMenu && (
+            <div className={`absolute left-0 right-0 top-[calc(100%+0.65rem)] z-[90] overflow-hidden rounded-[22px] border shadow-xl md:hidden ${
+              darkMode
+                ? "border-white/10 bg-slate-950/92 text-white"
+                : "border-emerald-950/[0.08] bg-white/95 text-slate-950"
+            }`}>
+              <div className={`${darkMode ? "bg-white/[0.025]" : "bg-slate-50"} py-2`}>
+                <button type="button" onClick={() => scrollToSection(inputSectionRef)} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+                  Explore Usage
+                </button>
+                <button type="button" onClick={() => openInfoSection("about")} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+                  About
+                </button>
+                <button type="button" onClick={() => openInfoSection("disclaimer")} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+                  Disclaimer
+                </button>
+                <button type="button" onClick={openSupportPanel} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+                  Support
+                </button>
+                <button type="button" onClick={() => openInfoSection("contact")} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+                  Contact
+                </button>
+
+                <div className={`mt-1 border-t px-5 pt-2 ${darkMode ? "border-white/10" : "border-slate-200"}`}>
+                  <button type="button" onClick={() => openInfoSection("privacy")} className={`block w-full cursor-pointer py-1.5 text-left text-[13px] font-semibold ${darkMode ? "text-white/78 hover:text-white" : "text-slate-600 hover:text-emerald-700"}`}>
+                    Privacy Policy
+                  </button>
+                  <button type="button" onClick={() => openInfoSection("terms")} className={`block w-full cursor-pointer py-1.5 text-left text-[13px] font-semibold ${darkMode ? "text-white/78 hover:text-white" : "text-slate-600 hover:text-emerald-700"}`}>
+                    Terms of Use
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </header>
 
         <div ref={heroSectionRef} className="wmb-hero-card relative isolate mb-4 md:mb-5 overflow-hidden rounded-[28px] px-4 py-3 md:px-5 md:py-4 lg:px-5 lg:py-5 text-white">
           <button
@@ -1598,12 +1708,7 @@ ${topUsage.trim()}` : ""}`;
 
                 <button
                   type="button"
-                  onClick={() =>
-                    howEstimatesSectionRef.current?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start"
-                    })
-                  }
+                  onClick={() => scrollToSection(howEstimatesSectionRef, 12)}
                   className="wmb-hero-action-quiet cursor-pointer rounded-full px-3.5 py-1.5 text-[12px] font-bold text-white/84"
                 >
                   <span className="inline-flex items-center justify-center gap-1.5">
@@ -2405,7 +2510,7 @@ ${topUsage.trim()}` : ""}`;
           )}
 
 
-        <section ref={howEstimatesSectionRef} className="mb-5 scroll-mt-24 rounded-3xl bg-[#fbfaf6] p-5 md:px-5 md:py-4 text-black shadow-sm ring-1 ring-amber-900/[0.05]">
+        <section ref={howEstimatesSectionRef} className="mb-5 scroll-mt-32 rounded-3xl bg-[#fbfaf6] p-5 md:px-5 md:py-4 text-black shadow-sm ring-1 ring-amber-900/[0.05]">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
@@ -2714,7 +2819,7 @@ ${topUsage.trim()}` : ""}`;
 
           <button
             onClick={downloadPDF}
-            className="mt-4 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm transition-all duration-200 hover:shadow-md"
+            className="mt-4 cursor-pointer px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm transition-all duration-200 hover:shadow-md"
           >
             Download Energy Audit Report
           </button>
@@ -2722,173 +2827,133 @@ ${topUsage.trim()}` : ""}`;
 
 
 
-        <div className="mt-8 mb-10 md:mt-10 md:mb-12 rounded-3xl bg-[#f2fbf6] p-5 md:px-5 md:py-4 text-black shadow-sm ring-1 ring-emerald-900/[0.07] transition-all duration-200 hover:shadow-md">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="flex items-center gap-2 font-black text-xl mb-2">
-                <Coffee size={19} className="text-emerald-700" />
-                Enjoying Watts My Bill?
-              </h2>
-
-              <p className="text-sm opacity-70">
-                This tool is free to use. If it helped you understand your
-                electricity bill, you may support the project.
-              </p>
-            </div>
-
-            <button
-              onClick={() => setShowDonate(!showDonate)}
-              className="self-start px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm transition-all duration-200 hover:shadow-md"
-            >
-              {showDonate ? "Hide" : "Support"}
-            </button>
-          </div>
-
-          {showDonate && (
-            <div className="grid md:grid-cols-2 gap-4 mt-5">
-              <div className="rounded-3xl bg-white/86 p-5 shadow-sm ring-1 ring-emerald-900/[0.06]">
-                <img
-                  src="/Gcash-qr.jpg"
-                  alt="Gcash QR"
-                  className="w-52 h-52 object-contain rounded-2xl mx-auto"
-                />
-
-                <h3 className="font-bold text-lg mt-4">
-                  GCash
-                </h3>
-
-                <p className="text-xs opacity-50 mt-3">
-                  Scan using GCash or InstaPay-supported banking apps.
-                </p>
-              </div>
-
-              <div className="rounded-3xl bg-white/86 p-5 shadow-sm ring-1 ring-emerald-900/[0.06]">
-                <img
-                  src="/paypal-qr.jpg"
-                  alt="PayPal QR"
-                  className="w-52 h-52 object-contain rounded-2xl mx-auto"
-                />
-
-                <h3 className="font-bold text-lg mt-4">
-                  PayPal
-                </h3>
-
-                <p className="text-xs opacity-50 mt-3">
-                  Scan the QR code or use the PayPal link.
-                </p>
-
-                <a
-                  href="https://paypal.me/wattsmybill"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-block text-sm font-semibold text-emerald-700 hover:underline"
-                >
-                  paypal.me/wattsmybill
-                </a>
-              </div>
-            </div>
-          )}
-
-          <p className="text-xs opacity-50 mt-4">
-            Your support helps keep Watts My Bill? free and improving.
-          </p>
-        </div>
-
-
-
-        <section className="mb-4 mt-0 rounded-3xl bg-[#fbfaf6] p-5 md:px-5 md:py-4 text-black shadow-sm ring-1 ring-amber-900/[0.05]">
-          <h2 className="text-xl font-black leading-tight">
-            Electricity Bill Usage Calculator
-          </h2>
-
-          <p className="mt-2 text-sm leading-relaxed text-gray-600">
-            Watts My Bill? is your friendly tool that helps estimate monthly
-            electricity costs based on appliance wattage, quantity, usage, hours, 
-            days per month, and electricity provider rates.
-          </p>
-
-          <p className="mt-2 text-sm leading-relaxed text-gray-600">
-            Use it to understand how appliances such as air-conditioning units,
-            refrigerators, lighting, computers, heaters, and kitchen appliances
-            may contribute to your electricity bill.
-          </p>
-        </section>
-
-        <footer className="mb-24 rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06] md:px-5 md:py-5">
-          <div className="grid gap-6 md:grid-cols-[1fr_minmax(320px,0.72fr)] md:items-start">
+        <footer className={`mb-24 rounded-[26px] px-5 py-5 ring-1 md:px-5 md:py-5 ${darkMode ? "bg-white/[0.035] text-white ring-white/[0.08]" : "bg-white/45 text-slate-950 ring-emerald-950/[0.055]"}`}>
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
               <p className="text-lg font-black tracking-tight">Watts My Bill?</p>
               <p className="mt-1 text-sm font-semibold text-emerald-700">
-                Understand Your Electricity Bill
+                Understand Your Electricity Bill.
               </p>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-600">
-                Estimate appliance energy costs and understand your electricity bill.
-                For guidance only; not affiliated with any utility provider.
+              <p className={`mt-3 max-w-2xl text-sm leading-relaxed ${darkMode ? "text-white/68" : "text-slate-600"}`}>
+                Estimates are based on appliance wattage, usage patterns, and electricity rates. Actual bills may vary.
               </p>
             </div>
 
-            <div className="grid gap-3 md:text-right">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-gray-500">Contact</p>
-                <a
-                  href="mailto:hello@wattsmybill.app"
-                  className="mt-1 inline-block text-[13px] font-bold text-emerald-700 hover:underline"
-                >
-                  hello@wattsmybill.app
-                </a>
-              </div>
-
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-gray-500">Other Information</p>
-                <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-2 md:justify-end">
-                  {INFO_SECTIONS.map((section) => (
-                    <button
-                      key={section.id}
-                      onClick={() =>
-                        setActiveInfoPage(
-                          activeInfoPage === section.id ? null : section.id
-                        )
-                      }
-                      className={`text-[13px] font-semibold transition-colors duration-200 hover:text-emerald-700 hover:underline hover:underline-offset-4 ${
-                        activeInfoPage === section.id
-                          ? "text-emerald-700 underline underline-offset-4"
-                          : "text-slate-600"
-                      }`}
-                    >
-                      {section.title.replace("Watts My Bill?", "").trim()}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div className="hidden shrink-0 items-center gap-4 text-xs font-bold md:flex">
+              <button type="button" onClick={() => openInfoSection("privacy")} className={`cursor-pointer transition hover:text-emerald-700 ${darkMode ? "text-white/72 hover:text-white" : "text-slate-500"}`}>
+                Privacy Policy
+              </button>
+              <button type="button" onClick={() => openInfoSection("terms")} className={`cursor-pointer transition hover:text-emerald-700 ${darkMode ? "text-white/72 hover:text-white" : "text-slate-500"}`}>
+                Terms of Use
+              </button>
             </div>
           </div>
 
-          {activeInfoSection && (
-            <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+          <div className={`mt-5 border-t pt-4 text-xs font-semibold ${darkMode ? "border-white/[0.08] text-white/48" : "border-slate-200/80 text-slate-500"}`}>
+            © 2026 Watts My Bill? All rights reserved.
+          </div>
+        </footer>
+
+        {activeInfoSection && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-xl rounded-[28px] bg-white p-5 text-slate-950 shadow-2xl">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-black text-emerald-900">
-                    {activeInfoSection.title}
-                  </h3>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-700">Watts My Bill?</p>
+                  <h2 className="mt-1 text-2xl font-black tracking-tight">{activeInfoSection.title}</h2>
+                </div>
 
-                  <p className="mt-2 text-sm leading-relaxed text-gray-700">
-                    {activeInfoSection.description}
+                <button
+                  type="button"
+                  onClick={() => setActiveInfoPage(null)}
+                  className="cursor-pointer grid h-10 w-10 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-slate-200"
+                  aria-label="Close information"
+                >
+                  <X size={21} strokeWidth={2.4} />
+                </button>
+              </div>
+
+              <p className="mt-4 text-sm leading-relaxed text-slate-600">
+                {activeInfoSection.description}
+              </p>
+
+              {activeInfoSection.id === "contact" && (
+                <a
+                  href="mailto:hello@wattsmybill.app"
+                  className="mt-5 inline-flex rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-extrabold text-white shadow-sm transition hover:bg-emerald-700"
+                >
+                  Email hello@wattsmybill.app
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {showDonate && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+            <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-[28px] bg-[#f2fbf6] p-5 text-slate-950 shadow-2xl">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-700">Support</p>
+                  <h2 className="mt-1 flex items-center gap-2 text-2xl font-black tracking-tight">
+                    <Coffee size={21} className="text-emerald-700" />
+                    Enjoying Watts My Bill?
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    This tool is free to use. If it helped you understand your electricity bill, you may support the project.
                   </p>
                 </div>
 
                 <button
-                  onClick={() => setActiveInfoPage(null)}
-                  className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-600 shadow-sm hover:bg-gray-100"
+                  type="button"
+                  onClick={() => setShowDonate(false)}
+                  className="cursor-pointer grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-slate-700 shadow-sm transition hover:bg-slate-100"
+                  aria-label="Close support"
                 >
-                  Close
+                  <X size={21} strokeWidth={2.4} />
                 </button>
               </div>
-            </div>
-          )}
 
-          <div className="mt-6 border-t border-gray-200 pt-4 text-xs font-semibold text-gray-500">
-            © 2026 Watts My Bill? All rights reserved.
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                <div className="rounded-3xl bg-white/90 p-5 shadow-sm ring-1 ring-emerald-900/[0.06]">
+                  <img
+                    src="/Gcash-qr.jpg"
+                    alt="Gcash QR"
+                    className="mx-auto h-52 w-52 rounded-2xl object-contain"
+                  />
+                  <h3 className="mt-4 text-lg font-bold">GCash</h3>
+                  <p className="mt-3 text-xs text-slate-500">
+                    Scan using GCash or InstaPay-supported banking apps.
+                  </p>
+                </div>
+
+                <div className="rounded-3xl bg-white/90 p-5 shadow-sm ring-1 ring-emerald-900/[0.06]">
+                  <img
+                    src="/paypal-qr.jpg"
+                    alt="PayPal QR"
+                    className="mx-auto h-52 w-52 rounded-2xl object-contain"
+                  />
+                  <h3 className="mt-4 text-lg font-bold">PayPal</h3>
+                  <p className="mt-3 text-xs text-slate-500">
+                    Scan the QR code or use the PayPal link.
+                  </p>
+                  <a
+                    href="https://paypal.me/wattsmybill"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-block cursor-pointer text-sm font-semibold text-emerald-700 hover:underline"
+                  >
+                    paypal.me/wattsmybill
+                  </a>
+                </div>
+              </div>
+
+              <p className="mt-4 text-xs text-slate-500">
+                Your support helps keep Watts My Bill? free and improving.
+              </p>
+            </div>
           </div>
+        )}
 
           {pendingHouseholdPreset && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
@@ -2940,7 +3005,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
         )}
 
-        </footer>
+        
 
       </div>
 
