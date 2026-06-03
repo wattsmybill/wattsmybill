@@ -14,20 +14,32 @@ const geistMono = Geist_Mono({
 
 const siteUrl = "https://www.wattsmybill.app";
 const siteName = "Watts My Bill?";
+const appName = "Watts My Bill";
 const siteDescription =
   "Estimate your monthly electricity bill by adding appliances, usage hours, and electricity rates. Watts My Bill helps you understand your energy cost.";
 
 const ogImage = `${siteUrl}/og-image-final.jpg`;
-const logoUrl = `${siteUrl}/icon.png`;
+const logoUrl = `${siteUrl}/android-chrome-512x512.png`;
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#eef3f1" },
+    { media: "(prefers-color-scheme: dark)", color: "#06142b" },
+  ],
+};
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
 
-  applicationName: siteName,
+  applicationName: appName,
+  manifest: "/site.webmanifest",
   category: "Utility",
 
   title: {
-    default: "Watts My Bill? | Electricity Bill Usage Calculator",
+    default: "Watts My Bill? | Estimate & Understand Your Electricity Bill",
     template: `%s | ${siteName}`,
   },
 
@@ -80,7 +92,7 @@ export const metadata = {
   },
 
   openGraph: {
-    title: "Watts My Bill? | Electricity Bill Usage Calculator",
+    title: "Watts My Bill? | Estimate & Understand Your Electricity Bill",
     description: siteDescription,
     url: siteUrl,
     siteName,
@@ -98,7 +110,7 @@ export const metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Watts My Bill? | Electricity Bill Usage Calculator",
+    title: "Watts My Bill? | Estimate & Understand Your Electricity Bill",
     description: siteDescription,
     images: [ogImage],
   },
@@ -133,6 +145,12 @@ export const metadata = {
         type: "image/png",
       },
     ],
+  },
+
+  appleWebApp: {
+    capable: true,
+    title: appName,
+    statusBarStyle: "black-translucent",
   },
 
   formatDetection: {
@@ -187,6 +205,10 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="Watts My Bill" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="theme-color" content="#06142b" />
         <script
           id="watts-my-bill-jsonld"
           type="application/ld+json"

@@ -443,6 +443,9 @@ export default function Page() {
   const [showSimpleTerms, setShowSimpleTerms] = useState(false);
   const [showAllAddedAppliances, setShowAllAddedAppliances] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [installPromptEvent, setInstallPromptEvent] = useState(null);
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
 
   const heroSectionRef = useRef(null);
   const inputSectionRef = useRef(null);
@@ -610,6 +613,35 @@ export default function Page() {
     return () => window.clearInterval(didYouKnowTimer);
   }, [DID_YOU_KNOW_INSIGHTS.length]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const standaloneMode =
+      window.matchMedia?.("(display-mode: standalone)")?.matches ||
+      window.navigator.standalone === true;
+
+    setIsAppInstalled(Boolean(standaloneMode));
+
+    const handleBeforeInstallPrompt = (event) => {
+      event.preventDefault();
+      setInstallPromptEvent(event);
+    };
+
+    const handleAppInstalled = () => {
+      setIsAppInstalled(true);
+      setInstallPromptEvent(null);
+      setShowInstallHelp(false);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
+  }, []);
+
   const categories = ["All", ...new Set(PRESETS.map((item) => item.category))];
 
   const selectableCountries = useMemo(
@@ -740,6 +772,8 @@ export default function Page() {
     !String(item.hours || "").trim() &&
     !String(item.days || "").trim() &&
     safePositiveNumber(item.quantity) === 1;
+
+  const hasExistingAppliances = !appliances.every(isBlankAppliance);
 
   const showAddedFeedback = (name, index) => {
     if (feedbackTimerRef.current) {
@@ -879,15 +913,18 @@ export default function Page() {
     }, 120);
   };
 
-  const addHouseholdPreset = (preset) => {
-    setSelectedHouseholdPreset(preset.name);
-
-    if (appliances.every(isBlankAppliance)) {
-      applyHouseholdPreset(preset, "replace");
+  const useHouseholdPresetFromPreview = (preset, mode = "replace") => {
+    if (mode === "replace" && hasExistingAppliances) {
+      setPendingHouseholdPreset(preset);
       return;
     }
 
-    setPendingHouseholdPreset(preset);
+    applyHouseholdPreset(preset, mode);
+  };
+
+  const addHouseholdPreset = (preset) => {
+    setSelectedHouseholdPreset(preset.name);
+    setPendingHouseholdPreset(null);
   };
 
   const updateAppliance = (i, field, value) => {
@@ -1108,6 +1145,30 @@ ${topUsage.trim()}` : ""}`;
   const openSupportPanel = () => {
     setShowMobileMenu(false);
     setShowDonate(true);
+  };
+
+  const handleInstallApp = async () => {
+    setShowMobileMenu(false);
+
+    if (isAppInstalled) {
+      setShowInstallHelp(true);
+      return;
+    }
+
+    if (installPromptEvent) {
+      installPromptEvent.prompt();
+
+      try {
+        await installPromptEvent.userChoice;
+      } catch {
+        // Keep fallback available if the prompt fails.
+      }
+
+      setInstallPromptEvent(null);
+      return;
+    }
+
+    setShowInstallHelp(true);
   };
 
   const downloadPDF = async () => {
@@ -1578,7 +1639,7 @@ ${topUsage.trim()}` : ""}`;
 
             <nav className="hidden items-center gap-4 translate-y-[10px] md:flex lg:gap-5" aria-label="Main navigation">
               <button type="button" onClick={() => scrollToSection(inputSectionRef)} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
-                Explore Usage
+                Explore
               </button>
               <button type="button" onClick={() => openInfoSection("about")} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
                 About
@@ -1591,6 +1652,9 @@ ${topUsage.trim()}` : ""}`;
               </button>
               <button type="button" onClick={() => openInfoSection("contact")} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
                 Contact
+              </button>
+              <button type="button" onClick={handleInstallApp} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
+                {isAppInstalled ? "Installed" : "Install App"}
               </button>
             </nav>
 
@@ -1616,7 +1680,10 @@ ${topUsage.trim()}` : ""}`;
             }`}>
               <div className="py-2">
                 <button type="button" onClick={() => scrollToSection(inputSectionRef)} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
-                  Explore Usage
+                  Explore
+                </button>
+                <button type="button" onClick={handleInstallApp} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
+                  {isAppInstalled ? "Installed" : "Install App"}
                 </button>
                 <button type="button" onClick={() => openInfoSection("about")} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
                   About
@@ -2123,7 +2190,7 @@ ${topUsage.trim()}` : ""}`;
 
             <div className="mt-3 max-w-3xl rounded-2xl border border-emerald-200/45 bg-emerald-50/45 px-3 py-2 text-[11px] leading-relaxed text-emerald-950/75">
               <span className="font-extrabold">Preset note:</span>{" "}
-              These are starting estimates only. For better accuracy, review the appliances, wattage, hours, and days after applying a preset.
+              Tap a preset to preview the included appliances first. For better accuracy, review the wattage, hours, and days after using a preset.
             </div>
           </div>
 
@@ -2152,7 +2219,7 @@ ${topUsage.trim()}` : ""}`;
                       <CheckCircle2 size={17} className="text-emerald-700" />
                     ) : (
                       <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-800 ring-1 ring-emerald-100/80">
-                        Use preset
+                        Details
                       </span>
                     )}
                   </span>
@@ -2180,23 +2247,44 @@ ${topUsage.trim()}` : ""}`;
                     {activeHouseholdPreset.icon} {activeHouseholdPreset.name}
                   </h3>
                   <p className="mt-1 text-xs text-gray-500">
-                    Estimated preset usage: ~{calculatePresetKwh(activeHouseholdPreset).toFixed(0)} kWh/month before edits.
+                    Estimated preset usage: <span className="font-bold text-gray-800">~{calculatePresetKwh(activeHouseholdPreset).toFixed(0)} kWh/month</span> before edits.
                   </p>
                 </div>
 
-                <button
-                  onClick={() => setSelectedHouseholdPreset(null)}
-                  className="self-start rounded-full border border-emerald-100/80 bg-white/80 px-3 py-1.5 text-xs font-semibold text-gray-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
-                >
-                  Hide details
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => useHouseholdPresetFromPreview(activeHouseholdPreset, "replace")}
+                    className="cursor-pointer rounded-full bg-emerald-600 px-3.5 py-1.5 text-xs font-extrabold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-md active:scale-[0.98]"
+                  >
+                    Use this preset
+                  </button>
+
+                  {hasExistingAppliances && (
+                    <button
+                      type="button"
+                      onClick={() => applyHouseholdPreset(activeHouseholdPreset, "add")}
+                      className="cursor-pointer rounded-full border border-emerald-100 bg-emerald-50/60 px-3.5 py-1.5 text-xs font-bold text-emerald-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100/70 hover:shadow-md active:scale-[0.98]"
+                    >
+                      Add to existing
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedHouseholdPreset(null)}
+                    className="cursor-pointer rounded-full border border-emerald-100/80 bg-white/80 px-3 py-1.5 text-xs font-semibold text-gray-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                  >
+                    Hide details
+                  </button>
+                </div>
               </div>
 
               <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {activeHouseholdPreset.appliances.map((item) => (
                   <div
                     key={`${activeHouseholdPreset.name}-${item.category}-${item.name}`}
-                    className="rounded-2xl border border-gray-100 bg-[#f7f8f8] px-3 py-2 text-xs text-gray-700"
+                    className="rounded-2xl border border-gray-200/80 bg-white/85 px-3 py-2 text-xs text-gray-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]"
                   >
                     <span className="font-extrabold">{item.quantity || 1}× {item.name}</span>
                     <span className="block text-gray-500">{item.watts}W • {item.hours}h/day • {item.days} days/mo</span>
@@ -2284,7 +2372,7 @@ ${topUsage.trim()}` : ""}`;
             </div>
           </div>
 
-          <div className="mb-2 flex items-end justify-between gap-3">
+          <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-gray-500">
                 Popular appliances
@@ -2293,6 +2381,16 @@ ${topUsage.trim()}` : ""}`;
                 Start with common appliances, then fine-tune the details below.
               </p>
             </div>
+
+            {filteredPresets.length > 10 && showAllPresets && (
+              <button
+                type="button"
+                onClick={() => setShowAllPresets(false)}
+                className="w-fit cursor-pointer rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+              >
+                Show less
+              </button>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-1.5 md:gap-2">
@@ -2316,10 +2414,11 @@ ${topUsage.trim()}` : ""}`;
             <div className="flex flex-wrap items-center gap-2">
               {filteredPresets.length > 10 && (
                 <button
-                  onClick={() => setShowAllPresets(!showAllPresets)}
-                  className="rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                  type="button"
+                  onClick={() => setShowAllPresets((current) => !current)}
+                  className="cursor-pointer rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
                 >
-                  {showAllPresets ? "Show Less" : "Show More"}
+                  {showAllPresets ? "Show less" : "Show more"}
                 </button>
               )}
 
@@ -2502,9 +2601,7 @@ ${topUsage.trim()}` : ""}`;
                 onClick={() => setShowAllAddedAppliances((current) => !current)}
                 className="inline-flex items-center justify-center rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-extrabold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md"
               >
-                {showAllAddedAppliances
-                  ? "Show less appliances"
-                  : `View all appliances (${applianceDisplayEntries.length})`}
+                {showAllAddedAppliances ? "Show fewer appliances" : "Show more appliances"}
               </button>
             </div>
           )}
@@ -2748,44 +2845,17 @@ ${topUsage.trim()}` : ""}`;
         )}
 
         <div className="mb-5 p-5 md:px-5 md:py-4 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="font-black text-xl">Share Your Estimate</h2>
-              <p className="mt-1 text-sm text-gray-600">
-                Send your estimated bill, usage, and highest-usage appliance to someone else.
-              </p>
-            </div>
+          <div className="mb-4">
+            <h2 className="font-black text-xl mb-2">Energy Audit Report</h2>
 
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={shareEstimate}
-                className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-md"
-              >
-                <Share2 size={16} strokeWidth={2.2} />
-                Share estimate
-              </button>
+            <p className="text-sm opacity-70 mb-2">
+              Optionally add your name and address before downloading your report for a more personalized experience.
+            </p>
 
-              <button
-                onClick={copyEstimateLink}
-                className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-md"
-              >
-                <Copy size={16} strokeWidth={2.2} />
-                {shareCopied ? "Copied!" : "Copy link"}
-              </button>
-            </div>
+            <p className="text-xs leading-relaxed text-gray-500">
+              Your name and address are only used to generate the PDF on your device and are not sent to our server.
+            </p>
           </div>
-        </div>
-
-        <div className="mb-5 p-5 md:px-5 md:py-4 rounded-3xl bg-[#f7f8f8] text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
-          <h2 className="font-black text-xl mb-2">Energy Audit Report</h2>
-
-          <p className="text-sm opacity-70 mb-2">
-            Optionally add your name and address before downloading your report for a more personalized experience.
-          </p>
-
-          <p className="mb-4 text-xs leading-relaxed text-gray-500">
-            Your name and address are only used to generate the PDF on your device and are not sent to our server.
-          </p>
 
           <div className="grid md:grid-cols-2 gap-4">
             <label className="block">
@@ -2817,12 +2887,30 @@ ${topUsage.trim()}` : ""}`;
             </label>
           </div>
 
-          <button
-            onClick={downloadPDF}
-            className="mt-4 cursor-pointer px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm transition-all duration-200 hover:shadow-md"
-          >
-            Download Energy Audit Report
-          </button>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+            <button
+              onClick={downloadPDF}
+              className="inline-flex cursor-pointer items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-md"
+            >
+              Download Energy Audit Report
+            </button>
+
+            <button
+              onClick={shareEstimate}
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-emerald-200/70 bg-emerald-50/55 px-4 py-2.5 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md"
+            >
+              <Share2 size={15} strokeWidth={2.2} />
+              Share estimate
+            </button>
+
+            <button
+              onClick={copyEstimateLink}
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-md"
+            >
+              <Copy size={16} strokeWidth={2.2} />
+              {shareCopied ? "Copied!" : "Copy link"}
+            </button>
+          </div>
         </div>
 
 
@@ -2953,6 +3041,60 @@ ${topUsage.trim()}` : ""}`;
           </div>
         )}
 
+          {showInstallHelp && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-md rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-2xl ring-1 ring-white/20">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+                    Install Watts My Bill
+                  </p>
+                  <h3 className="mt-1 text-xl font-black tracking-tight text-gray-950">
+                    Add Watts My Bill to your phone.
+                  </h3>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowInstallHelp(false)}
+                  className="cursor-pointer rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-bold text-gray-600 shadow-sm transition hover:bg-gray-50"
+                  aria-label="Close install instructions"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="space-y-3 text-sm leading-relaxed text-gray-600">
+                {isAppInstalled ? (
+                  <p>Watts My Bill already appears to be installed on this device.</p>
+                ) : (
+                  <>
+                    <p>
+                      If your browser does not show an install prompt, you can still add it from your browser menu.
+                    </p>
+                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3">
+                      <p className="font-bold text-gray-950">Android Chrome / Edge</p>
+                      <p className="mt-1">Tap the browser menu, then choose <span className="font-bold">Install app</span> or <span className="font-bold">Add to Home screen</span>.</p>
+                    </div>
+                    <div className="rounded-2xl border border-emerald-100 bg-white p-3">
+                      <p className="font-bold text-gray-950">iPhone Safari</p>
+                      <p className="mt-1">Tap Share, then choose <span className="font-bold">Add to Home Screen</span>.</p>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowInstallHelp(false)}
+                className="mt-5 w-full cursor-pointer rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        )}
+
           {pendingHouseholdPreset && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
             <div className="w-full max-w-md rounded-3xl bg-[#f7f8f8] p-5 text-black shadow-2xl ring-1 ring-white/20">
@@ -2964,7 +3106,7 @@ ${topUsage.trim()}` : ""}`;
                   You already have appliances listed.
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  Do you want to replace your current appliance list with the {pendingHouseholdPreset.name} preset, or add this preset to your existing list?
+                  Using {pendingHouseholdPreset.name} will replace your current appliance list. You can still edit every appliance afterward.
                 </p>
               </div>
 
@@ -2986,15 +3128,8 @@ ${topUsage.trim()}` : ""}`;
                 </button>
 
                 <button
-                  onClick={() => applyHouseholdPreset(pendingHouseholdPreset, "add")}
-                  className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md active:scale-[0.98]"
-                >
-                  Add to list
-                </button>
-
-                <button
                   onClick={() => setPendingHouseholdPreset(null)}
-                  className="sm:col-span-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-600 shadow-sm transition-all duration-200 hover:bg-gray-50"
+                  className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-600 shadow-sm transition-all duration-200 hover:bg-gray-50"
                 >
                   Cancel
                 </button>
