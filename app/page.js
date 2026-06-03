@@ -1597,10 +1597,10 @@ ${topUsage.trim()}` : ""}`;
             <button
               type="button"
               onClick={() => setShowMobileMenu((current) => !current)}
-              className={`cursor-pointer grid h-11 w-11 shrink-0 place-items-center rounded-2xl border shadow-sm md:hidden ${
+              className={`cursor-pointer grid h-11 w-11 shrink-0 place-items-center rounded-none border border-transparent bg-transparent shadow-none transition md:hidden ${
                 darkMode
-                  ? "border-white/10 bg-white/[0.06] text-white"
-                  : "border-emerald-950/[0.08] bg-white/80 text-slate-900"
+                  ? "text-white hover:text-emerald-200"
+                  : "text-slate-900 hover:text-emerald-700"
               }`}
               aria-label={showMobileMenu ? "Close menu" : "Open menu"}
             >
@@ -1614,28 +1614,28 @@ ${topUsage.trim()}` : ""}`;
                 ? "border-white/10 bg-slate-950/92 text-white"
                 : "border-emerald-950/[0.08] bg-white/95 text-slate-950"
             }`}>
-              <div className={`${darkMode ? "bg-white/[0.025]" : "bg-slate-50"} py-2`}>
-                <button type="button" onClick={() => scrollToSection(inputSectionRef)} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+              <div className="py-2">
+                <button type="button" onClick={() => scrollToSection(inputSectionRef)} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
                   Explore Usage
                 </button>
-                <button type="button" onClick={() => openInfoSection("about")} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+                <button type="button" onClick={() => openInfoSection("about")} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
                   About
                 </button>
-                <button type="button" onClick={() => openInfoSection("disclaimer")} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+                <button type="button" onClick={() => openInfoSection("disclaimer")} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
                   Disclaimer
                 </button>
-                <button type="button" onClick={openSupportPanel} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+                <button type="button" onClick={openSupportPanel} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
                   Support
                 </button>
-                <button type="button" onClick={() => openInfoSection("contact")} className="block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold hover:text-emerald-700">
+                <button type="button" onClick={() => openInfoSection("contact")} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
                   Contact
                 </button>
 
                 <div className={`mt-1 border-t px-5 pt-2 ${darkMode ? "border-white/10" : "border-slate-200"}`}>
-                  <button type="button" onClick={() => openInfoSection("privacy")} className={`block w-full cursor-pointer py-1.5 text-left text-[13px] font-semibold ${darkMode ? "text-white/78 hover:text-white" : "text-slate-600 hover:text-emerald-700"}`}>
+                  <button type="button" onClick={() => openInfoSection("privacy")} className={`block w-full cursor-pointer py-1.5 text-left text-[13px] font-semibold transition-colors ${darkMode ? "text-white/82 hover:text-emerald-200 active:text-emerald-200" : "text-slate-600 hover:text-emerald-700 active:text-emerald-700"}`}>
                     Privacy Policy
                   </button>
-                  <button type="button" onClick={() => openInfoSection("terms")} className={`block w-full cursor-pointer py-1.5 text-left text-[13px] font-semibold ${darkMode ? "text-white/78 hover:text-white" : "text-slate-600 hover:text-emerald-700"}`}>
+                  <button type="button" onClick={() => openInfoSection("terms")} className={`block w-full cursor-pointer py-1.5 text-left text-[13px] font-semibold transition-colors ${darkMode ? "text-white/82 hover:text-emerald-200 active:text-emerald-200" : "text-slate-600 hover:text-emerald-700 active:text-emerald-700"}`}>
                     Terms of Use
                   </button>
                 </div>
