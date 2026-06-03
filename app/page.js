@@ -2827,30 +2827,28 @@ ${topUsage.trim()}` : ""}`;
 
 
 
-        <footer className={`mb-24 rounded-[26px] px-5 py-5 ring-1 md:px-5 md:py-5 ${darkMode ? "bg-white/[0.035] text-white ring-white/[0.08]" : "bg-white/45 text-slate-950 ring-emerald-950/[0.055]"}`}>
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div>
-              <p className="text-lg font-black tracking-tight">Watts My Bill?</p>
-              <p className="mt-1 text-sm font-semibold text-emerald-700">
-                Understand Your Electricity Bill.
-              </p>
-              <p className={`mt-3 max-w-2xl text-sm leading-relaxed ${darkMode ? "text-white/68" : "text-slate-600"}`}>
-                Estimates are based on appliance wattage, usage patterns, and electricity rates. Actual bills may vary.
-              </p>
-            </div>
+        <footer className={`mb-24 px-1 py-6 md:px-0 md:py-8 ${darkMode ? "text-white" : "text-slate-950"}`}>
+          <div>
+            <p className="text-lg font-black tracking-tight">Watts My Bill?</p>
+            <p className="mt-1 text-sm font-semibold text-emerald-700">
+              Understand Your Electricity Bill.
+            </p>
+            <p className={`mt-3 max-w-2xl text-sm leading-relaxed ${darkMode ? "text-white/82" : "text-slate-600"}`}>
+              Estimates are based on appliance wattage, usage patterns, and electricity rates. Actual bills may vary.
+            </p>
+          </div>
 
-            <div className="hidden shrink-0 items-center gap-4 text-xs font-bold md:flex">
-              <button type="button" onClick={() => openInfoSection("privacy")} className={`cursor-pointer transition hover:text-emerald-700 ${darkMode ? "text-white/72 hover:text-white" : "text-slate-500"}`}>
+          <div className={`mt-6 flex flex-col gap-3 border-t pt-4 text-xs font-semibold md:flex-row md:items-center md:justify-between ${darkMode ? "border-white/[0.12] text-white/72" : "border-slate-300/70 text-slate-500"}`}>
+            <p>© 2026 Watts My Bill? All rights reserved.</p>
+
+            <div className="hidden items-center gap-4 md:flex">
+              <button type="button" onClick={() => openInfoSection("privacy")} className={`cursor-pointer transition hover:text-emerald-700 ${darkMode ? "text-white/78 hover:text-white" : "text-slate-500"}`}>
                 Privacy Policy
               </button>
-              <button type="button" onClick={() => openInfoSection("terms")} className={`cursor-pointer transition hover:text-emerald-700 ${darkMode ? "text-white/72 hover:text-white" : "text-slate-500"}`}>
+              <button type="button" onClick={() => openInfoSection("terms")} className={`cursor-pointer transition hover:text-emerald-700 ${darkMode ? "text-white/78 hover:text-white" : "text-slate-500"}`}>
                 Terms of Use
               </button>
             </div>
-          </div>
-
-          <div className={`mt-5 border-t pt-4 text-xs font-semibold ${darkMode ? "border-white/[0.08] text-white/48" : "border-slate-200/80 text-slate-500"}`}>
-            © 2026 Watts My Bill? All rights reserved.
           </div>
         </footer>
 
