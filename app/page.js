@@ -575,6 +575,7 @@ export default function Page() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (!showCountryOptions) return;
       if (!countryDropdownRef.current) return;
 
       if (!countryDropdownRef.current.contains(event.target)) {
@@ -585,11 +586,16 @@ export default function Page() {
         );
 
         if (exactCountry) {
+          const countryChanged = exactCountry.name !== country.name;
+
           setCountry(exactCountry);
           setCountrySearchTerm(exactCountry.name);
-          setCustomRate("");
-          setCustomCountryName("");
-          setCustomCurrency("");
+
+          if (countryChanged) {
+            setCustomRate("");
+            setCustomCountryName("");
+            setCustomCurrency("");
+          }
         } else {
           setCountrySearchTerm(
             country.name === COUNTRY_PLACEHOLDER_NAME ? "" : country.name
@@ -603,7 +609,7 @@ export default function Page() {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [country, countrySearchTerm]);
+  }, [country, countrySearchTerm, showCountryOptions]);
 
   useEffect(() => {
     const didYouKnowTimer = window.setInterval(() => {
@@ -660,12 +666,17 @@ export default function Page() {
   }, [countrySearchTerm, selectableCountries]);
 
   const selectCountry = (selectedCountry) => {
+    const countryChanged = selectedCountry.name !== country.name;
+
     setCountry(selectedCountry);
     setCountrySearchTerm(selectedCountry.name);
     setShowCountryOptions(false);
-    setCustomRate("");
-    setCustomCountryName("");
-    setCustomCurrency("");
+
+    if (countryChanged) {
+      setCustomRate("");
+      setCustomCountryName("");
+      setCustomCurrency("");
+    }
   };
 
   const filteredPresets = PRESETS.filter((item) => {
