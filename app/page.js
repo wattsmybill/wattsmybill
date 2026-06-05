@@ -355,16 +355,15 @@ function Logo({ darkMode = false }) {
   const [logoFailed, setLogoFailed] = useState(false);
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="w-[48px] h-[48px] md:w-[56px] md:h-[56px] flex items-center justify-center overflow-hidden shrink-0">
+    <div className="flex items-center gap-1.5 md:gap-2">
+      <div className="w-[46px] h-[46px] md:w-[54px] md:h-[54px] flex items-center justify-center overflow-hidden shrink-0">
         {logoFailed ? (
           <span aria-hidden="true" className="text-3xl">💡</span>
         ) : (
           <img
             src={LOGO_PATH}
             alt="Watts My Bill? logo"
-            className="w-full h-full object-contain scale-[1.02]"
-            onError={() => setLogoFailed(true)}
+            className="w-full h-full object-contain scale-100"
           />
         )}
       </div>
