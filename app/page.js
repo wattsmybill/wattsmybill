@@ -437,6 +437,7 @@ export default function Page() {
   const [shareCopied, setShareCopied] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [showBackToEstimate, setShowBackToEstimate] = useState(false);
+  const [showLiveEstimateBar, setShowLiveEstimateBar] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState(null);
   const [didYouKnowIndex, setDidYouKnowIndex] = useState(0);
   const [showWattageEducation, setShowWattageEducation] = useState(false);
@@ -454,6 +455,7 @@ export default function Page() {
   const applianceSectionRef = useRef(null);
   const householdPresetSectionRef = useRef(null);
   const quickAddSectionRef = useRef(null);
+  const footerRef = useRef(null);
   const countryDropdownRef = useRef(null);
   const feedbackTimerRef = useRef(null);
   const highlightTimerRef = useRef(null);
@@ -564,13 +566,44 @@ export default function Page() {
 
   useEffect(() => {
     const handleScroll = () => {
+      const footerTop = footerRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
+      const householdPresetRect = householdPresetSectionRef.current?.getBoundingClientRect();
+      const quickAddRect = quickAddSectionRef.current?.getBoundingClientRect();
+      const applianceBuilderRect = applianceSectionRef.current?.getBoundingClientRect();
+      const isNearFooter = footerTop < window.innerHeight - 24;
+      const isMobile = window.innerWidth < 768;
+      const isHouseholdPresetVisibleOnMobile =
+        isMobile &&
+        householdPresetRect &&
+        householdPresetRect.bottom > window.innerHeight * 0.08 &&
+        householdPresetRect.top < window.innerHeight * 0.92;
+      const isQuickAddVisibleOnMobile =
+        isMobile &&
+        quickAddRect &&
+        quickAddRect.bottom > window.innerHeight * 0.08 &&
+        quickAddRect.top < window.innerHeight * 0.92;
+      const hasReachedApplianceBuilderOnMobile =
+        !isMobile ||
+        (applianceBuilderRect && applianceBuilderRect.top < window.innerHeight * 0.46);
+
       setShowBackToEstimate(window.scrollY > 1180);
+      setShowLiveEstimateBar(
+        window.scrollY > 520 &&
+        hasReachedApplianceBuilderOnMobile &&
+        !isNearFooter &&
+        !isHouseholdPresetVisibleOnMobile &&
+        !isQuickAddVisibleOnMobile
+      );
     };
 
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -981,11 +1014,25 @@ export default function Page() {
     .sort((a, b) => b.kwh - a.kwh)
     .slice(0, 5);
 
+  const completedApplianceCount = breakdown.filter((item) => item.kwh > 0).length;
+  const hasValidRateForEstimate = safeNumber(activeRate) > 0;
+
   const dailyAverage = total / 30;
 
   const animatedTotal = useAnimatedNumber(total);
   const animatedTotalKwh = useAnimatedNumber(totalKwh);
   const animatedDailyAverage = useAnimatedNumber(dailyAverage);
+  const liveEstimateDesktopText = hasValidRateForEstimate
+    ? formatCompactCurrency(animatedTotal)
+    : country.name === COUNTRY_PLACEHOLDER_NAME
+      ? "Select country to calculate"
+      : "Add electricity rate";
+
+  const liveEstimateMobileText = hasValidRateForEstimate
+    ? formatCompactCurrency(animatedTotal)
+    : country.name === COUNTRY_PLACEHOLDER_NAME
+      ? "Select country"
+      : "Add rate";
   const possibleSavings = topAppliance
     ? ((safeNumber(topAppliance.watts) *
         safePositiveNumber(topAppliance.quantity) *
@@ -2437,7 +2484,7 @@ ${topUsage.trim()}` : ""}`;
                 onClick={addAppliance}
                 className="rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-sm font-semibold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md"
               >
-                + Add Appliance
+                + Add custom appliance
               </button>
             </div>
 
@@ -2926,7 +2973,7 @@ ${topUsage.trim()}` : ""}`;
 
 
 
-        <footer className={`mb-24 px-1 py-6 md:px-0 md:py-8 ${darkMode ? "text-white" : "text-slate-950"}`}>
+        <footer ref={footerRef} className={`mb-24 px-1 py-6 md:px-0 md:py-8 ${darkMode ? "text-white" : "text-slate-950"}`}>
           <div>
             <p className="text-lg font-black tracking-tight">Watts My Bill?</p>
             <p className="mt-1 text-sm font-semibold text-emerald-700">
@@ -2950,6 +2997,43 @@ ${topUsage.trim()}` : ""}`;
             </div>
           </div>
         </footer>
+
+        {showLiveEstimateBar && completedApplianceCount > 0 && !activeInfoSection && (
+          <div className="fixed inset-x-0 bottom-10 z-[110] flex justify-center px-0 md:bottom-8 md:px-3">
+            <div className={`w-[calc(100%-5.5rem)] max-w-[380px] rounded-[18px] border px-2.5 py-1.5 shadow-[0_10px_24px_rgba(15,23,42,0.085)] backdrop-blur-[26px] transition-all duration-300 md:w-full md:max-w-[620px] md:rounded-[22px] md:px-3.5 md:py-2.5 md:shadow-[0_12px_28px_rgba(15,23,42,0.095)] ${darkMode ? "border-emerald-200/[0.12] bg-emerald-950/64 text-white ring-1 ring-white/[0.05]" : "border-emerald-100/28 bg-[rgba(5,88,70,0.60)] text-white ring-1 ring-white/[0.12]"}`}>
+              <div className="flex items-center justify-between gap-2 md:gap-3">
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(heroSectionRef)}
+                  className="min-w-0 flex-1 cursor-pointer text-left"
+                  aria-label="View live estimate summary"
+                >
+                  <p className="text-[7.5px] font-black uppercase tracking-[0.15em] text-emerald-100/78 md:text-[9.5px] md:text-emerald-100/88">
+                    Live estimate
+                  </p>
+                  <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 md:gap-x-3 md:gap-y-1">
+                    <p className="text-[0.95rem] font-black leading-none tracking-tight text-white md:text-[1.32rem]">
+                      <span className="md:hidden">{liveEstimateMobileText}</span>
+                      <span className="hidden md:inline">{liveEstimateDesktopText}</span>
+                    </p>
+                    <p className="text-[9px] font-semibold text-white/68 md:text-[11.5px] md:text-white/68">
+                      {formatCompactNumber(animatedTotalKwh)} kWh <span className="px-0.5 text-white/32 md:px-1">·</span> {completedApplianceCount} {completedApplianceCount === 1 ? "appliance" : "appliances"}
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(insightsSectionRef)}
+                  className="shrink-0 cursor-pointer rounded-2xl border border-emerald-100/14 bg-emerald-500/62 px-2.5 py-1.5 text-[10px] font-black text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-500/78 md:px-3.5 md:py-2 md:text-xs"
+                >
+                  <span className="md:hidden">Insights</span>
+                  <span className="hidden md:inline">View insights</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {activeInfoSection && (
           <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
