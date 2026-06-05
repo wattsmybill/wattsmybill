@@ -43,6 +43,32 @@ function cleanNonNegativeInput(value, { allowZero = true } = {}) {
   return value;
 }
 
+function cleanCappedNumberInput(value, max, { allowZero = true } = {}) {
+  const cleanedValue = cleanNonNegativeInput(value, { allowZero });
+
+  if (cleanedValue === "") return "";
+
+  const number = Number(cleanedValue);
+
+  if (!Number.isFinite(number)) return "";
+  if (number > max) return String(max);
+
+  return cleanedValue;
+}
+
+function cleanDigitCappedNumberInput(value, maxDigits, { allowZero = true } = {}) {
+  const cleanedValue = cleanNonNegativeInput(value, { allowZero });
+
+  if (cleanedValue === "") return "";
+
+  const [wholePart = "", decimalPart] = String(cleanedValue).split(".");
+  const cappedWholePart = wholePart.slice(0, maxDigits);
+
+  return decimalPart !== undefined
+    ? `${cappedWholePart}.${decimalPart}`
+    : cappedWholePart;
+}
+
 const DID_YOU_KNOW_INSIGHTS = [
   "Cooling appliances usually become the biggest part of a household electricity bill.",
   "Small wattage changes can create noticeable monthly differences over time.",
@@ -769,6 +795,13 @@ export default function Page() {
     if (number >= 1_000_000_000) {
       return `${displayCurrency}${number.toLocaleString(undefined, {
         notation: "compact",
+        maximumFractionDigits: 1
+      })}`;
+    }
+
+    if (number >= 1_000) {
+      return `${displayCurrency}${number.toLocaleString(undefined, {
+        notation: "compact",
         maximumFractionDigits: 2
       })}`;
     }
@@ -779,7 +812,14 @@ export default function Page() {
   const formatCompactNumber = (value, digits = 2) => {
     const number = safeNumber(value);
 
-    if (number >= 1_000_000) {
+    if (number >= 1_000_000_000) {
+      return number.toLocaleString(undefined, {
+        notation: "compact",
+        maximumFractionDigits: 1
+      });
+    }
+
+    if (number >= 1_000) {
       return number.toLocaleString(undefined, {
         notation: "compact",
         maximumFractionDigits: 2
@@ -1135,6 +1175,13 @@ export default function Page() {
     shouldCollapseAppliances && !showAllAddedAppliances
       ? applianceDisplayEntries.slice(0, 4)
       : applianceDisplayEntries;
+
+  const isUnusuallyHighAppliance = (item) =>
+    safeNumber(item.kwh) >= 10000 ||
+    safeNumber(item.cost) >= 10000 ||
+    safePositiveNumber(item.quantity) > 500 ||
+    safeNumber(item.watts) > 100000;
+
 
   const buildShareText = () => {
     const estimatedBill = `${displayCurrency}${safeNumber(total).toLocaleString(undefined, {
@@ -1643,7 +1690,7 @@ ${topUsage.trim()}` : ""}`;
           doc.setFont("helvetica", "normal");
           doc.setFontSize(8);
           doc.setTextColor(90, 90, 90);
-          doc.text(`${item.kwh.toFixed(2)} kWh`, pageWidth - marginX, y, { align: "right" });
+          doc.text(`${formatCompactNumber(item.kwh)} kWh`, pageWidth - marginX, y, { align: "right" });
 
           y += 3.5;
 
@@ -2536,14 +2583,15 @@ ${topUsage.trim()}` : ""}`;
             const wattageGuide = item.name
               ? item.wattageGuide || getWattageGuide(item.name, item.category)
               : "";
+            const showUnusuallyHighWarning = isUnusuallyHighAppliance(item);
 
             return (
               <div
                 key={i}
                 className={`relative overflow-hidden rounded-[18px] border p-3 text-black shadow-sm transition-all duration-500 md:rounded-[20px] md:p-4 ${
                   highlightedIndex === i
-                    ? "border-emerald-300 bg-emerald-50/95 shadow-lg ring-2 ring-emerald-300/70"
-                    : "border-emerald-950/[0.06] bg-[#fbfcfa]/95 shadow-[0_8px_22px_rgba(15,23,42,0.035)] ring-1 ring-white/80 hover:border-emerald-200/80 hover:bg-white/95 hover:shadow-md"
+                    ? "border-emerald-300/95 bg-emerald-50/95 shadow-[0_12px_30px_rgba(5,150,105,0.10)] ring-2 ring-emerald-300/75"
+                    : "border-emerald-950/[0.07] bg-[#fbfcfa]/95 shadow-[0_8px_22px_rgba(15,23,42,0.035)] ring-1 ring-white/80 hover:border-emerald-300/80 hover:bg-white/95 hover:shadow-[0_10px_26px_rgba(5,150,105,0.075)] hover:ring-1 hover:ring-emerald-200/75"
                 }`}
               >
                 <div className="mb-2 flex items-start justify-between gap-3 pr-7 md:mb-3">
@@ -2594,10 +2642,11 @@ ${topUsage.trim()}` : ""}`;
                             className="w-full rounded-2xl border border-slate-200/90 bg-white px-3 py-2.5 text-[15px] shadow-[0_3px_10px_rgba(15,23,42,0.045)] transition focus:border-emerald-400/85 focus:outline-none focus:ring-2 focus:ring-emerald-200/70 md:rounded-xl md:py-2 md:text-sm"
                             type="number"
                             min="1"
+                            max="999999"
                             step="1"
                             placeholder="Qty"
                             value={item.quantity}
-                            onChange={(e) => updateAppliance(i, "quantity", cleanNonNegativeInput(e.target.value, { allowZero: false }))}
+                            onChange={(e) => updateAppliance(i, "quantity", cleanDigitCappedNumberInput(e.target.value, 6, { allowZero: false }))}
                           />
                         </label>
 
@@ -2607,10 +2656,11 @@ ${topUsage.trim()}` : ""}`;
                             className="w-full rounded-2xl border border-slate-200/90 bg-white px-3 py-2.5 text-[15px] shadow-[0_3px_10px_rgba(15,23,42,0.045)] transition focus:border-emerald-400/85 focus:outline-none focus:ring-2 focus:ring-emerald-200/70 md:rounded-xl md:py-2 md:text-sm"
                             type="number"
                             min="0"
+                            max="9999999"
                             step="any"
                             placeholder="W"
                             value={item.watts}
-                            onChange={(e) => updateAppliance(i, "watts", cleanNonNegativeInput(e.target.value))}
+                            onChange={(e) => updateAppliance(i, "watts", cleanDigitCappedNumberInput(e.target.value, 7))}
                           />
                         </label>
 
@@ -2620,10 +2670,11 @@ ${topUsage.trim()}` : ""}`;
                             className="w-full rounded-2xl border border-slate-200/90 bg-white px-3 py-2.5 text-[15px] shadow-[0_3px_10px_rgba(15,23,42,0.045)] transition focus:border-emerald-400/85 focus:outline-none focus:ring-2 focus:ring-emerald-200/70 md:rounded-xl md:py-2 md:text-sm"
                             type="number"
                             min="0"
+                            max="24"
                             step="any"
                             placeholder="Hours"
                             value={item.hours}
-                            onChange={(e) => updateAppliance(i, "hours", cleanNonNegativeInput(e.target.value))}
+                            onChange={(e) => updateAppliance(i, "hours", cleanCappedNumberInput(e.target.value, 24))}
                           />
                         </label>
 
@@ -2633,10 +2684,11 @@ ${topUsage.trim()}` : ""}`;
                             className="w-full rounded-2xl border border-slate-200/90 bg-white px-3 py-2.5 text-[15px] shadow-[0_3px_10px_rgba(15,23,42,0.045)] transition focus:border-emerald-400/85 focus:outline-none focus:ring-2 focus:ring-emerald-200/70 md:rounded-xl md:py-2 md:text-sm"
                             type="number"
                             min="0"
+                            max="31"
                             step="any"
                             placeholder="Days"
                             value={item.days}
-                            onChange={(e) => updateAppliance(i, "days", cleanNonNegativeInput(e.target.value))}
+                            onChange={(e) => updateAppliance(i, "days", cleanCappedNumberInput(e.target.value, 31))}
                           />
                         </label>
                       </div>
@@ -2677,24 +2729,31 @@ ${topUsage.trim()}` : ""}`;
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 items-center gap-3 rounded-[15px] border border-emerald-100/70 bg-emerald-50/35 px-3.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.62)] md:mt-[9px] md:min-h-[66px] md:self-start md:rounded-[16px] md:px-5 md:py-2.5">
-                    <div className="min-w-0 md:text-center">
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500/90 md:text-[10.5px]">Consumption</p>
-                      <h3 className="mt-0.5 text-[0.98rem] font-black leading-tight text-slate-950 md:text-[1.05rem]">
-                        {item.kwh.toFixed(2)} kWh
-                      </h3>
+                  <div className="md:mt-[9px] md:self-start">
+                    <div className="grid grid-cols-2 items-center gap-3 rounded-[15px] border border-emerald-200/75 bg-emerald-50/35 px-3.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.62)] md:min-h-[66px] md:rounded-[16px] md:px-5 md:py-2.5">
+                      <div className="min-w-0 md:text-center">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500/90 md:text-[10.5px]">Consumption</p>
+                        <h3 className={`mt-0.5 whitespace-nowrap font-black leading-tight text-slate-950 ${showUnusuallyHighWarning ? "text-[0.88rem] md:text-[0.92rem]" : "text-[0.98rem] md:text-[1.02rem]"}`}>
+                          {formatCompactNumber(item.kwh)} kWh
+                        </h3>
+                      </div>
+
+                      <div className="min-w-0 border-l border-emerald-200/55 pl-3 text-right md:pl-4 md:text-center">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500/90 md:text-[10.5px]">Estimated cost</p>
+                        <h3 className={`mt-0.5 whitespace-nowrap font-black leading-tight tracking-tight text-emerald-600 ${showUnusuallyHighWarning ? "text-[0.96rem] md:text-[1rem]" : "text-[1.18rem] md:text-[1.2rem]"}`}>
+                          {formatCompactCurrency(item.cost)}
+                        </h3>
+                      </div>
                     </div>
 
-                    <div className="min-w-0 border-l border-emerald-100/45 pl-3 text-right md:pl-4 md:text-center">
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500/90 md:text-[10.5px]">Estimated cost</p>
-                      <h3 className="mt-0.5 text-[1.18rem] font-black leading-tight tracking-tight text-emerald-600 md:text-[1.25rem]">
-                        {displayCurrency}
-                        {safeNumber(item.cost).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        })}
-                      </h3>
-                    </div>
+                    <p
+                      className={`mt-1.5 min-h-[1.7rem] text-[11px] font-semibold leading-snug text-amber-700 transition-opacity ${
+                        showUnusuallyHighWarning ? "opacity-100" : "pointer-events-none opacity-0"
+                      }`}
+                      aria-hidden={!showUnusuallyHighWarning}
+                    >
+                      ⚠ Check this appliance — the estimate looks unusually high.
+                    </p>
                   </div>
                 </div>
 
