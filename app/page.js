@@ -452,6 +452,7 @@ export default function Page() {
   const inputSectionRef = useRef(null);
   const insightsSectionRef = useRef(null);
   const howEstimatesSectionRef = useRef(null);
+  const wattageEducationSectionRef = useRef(null);
   const applianceSectionRef = useRef(null);
   const householdPresetSectionRef = useRef(null);
   const quickAddSectionRef = useRef(null);
@@ -570,6 +571,9 @@ export default function Page() {
       const householdPresetRect = householdPresetSectionRef.current?.getBoundingClientRect();
       const quickAddRect = quickAddSectionRef.current?.getBoundingClientRect();
       const applianceBuilderRect = applianceSectionRef.current?.getBoundingClientRect();
+      const howEstimatesElement = howEstimatesSectionRef.current;
+      const howEstimatesRect = howEstimatesElement?.getBoundingClientRect();
+      const wattageEducationRect = wattageEducationSectionRef.current?.getBoundingClientRect();
       const isNearFooter = footerTop < window.innerHeight - 24;
       const isMobile = window.innerWidth < 768;
       const isHouseholdPresetVisibleOnMobile =
@@ -585,12 +589,16 @@ export default function Page() {
       const hasReachedApplianceBuilderOnMobile =
         !isMobile ||
         (applianceBuilderRect && applianceBuilderRect.top < window.innerHeight * 0.46);
+      const hasReachedLearningArea = isMobile
+        ? Boolean(howEstimatesRect) && howEstimatesRect.top < window.innerHeight * 0.92
+        : Boolean(wattageEducationRect) && wattageEducationRect.top < window.innerHeight * 0.92;
 
       setShowBackToEstimate(window.scrollY > 1180);
       setShowLiveEstimateBar(
         window.scrollY > 520 &&
         hasReachedApplianceBuilderOnMobile &&
         !isNearFooter &&
+        !hasReachedLearningArea &&
         !isHouseholdPresetVisibleOnMobile &&
         !isQuickAddVisibleOnMobile
       );
@@ -2331,7 +2339,7 @@ ${topUsage.trim()}` : ""}`;
                   <button
                     type="button"
                     onClick={() => setSelectedHouseholdPreset(null)}
-                    className="cursor-pointer rounded-full border border-emerald-100/80 bg-white/80 px-3 py-1.5 text-xs font-semibold text-gray-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                    className="cursor-pointer rounded-full border border-emerald-100/80 bg-white/[0.08]0 px-3 py-1.5 text-xs font-semibold text-gray-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
                   >
                     Hide details
                   </button>
@@ -2342,7 +2350,7 @@ ${topUsage.trim()}` : ""}`;
                 {activeHouseholdPreset.appliances.map((item) => (
                   <div
                     key={`${activeHouseholdPreset.name}-${item.category}-${item.name}`}
-                    className="rounded-2xl border border-gray-200/80 bg-white/85 px-3 py-2 text-xs text-gray-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]"
+                    className="rounded-2xl border border-gray-200/80 bg-white/[0.08]5 px-3 py-2 text-xs text-gray-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]"
                   >
                     <span className="font-extrabold">{item.quantity || 1}× {item.name}</span>
                     <span className="block text-gray-500">{item.watts}W • {item.hours}h/day • {item.days} days/mo</span>
@@ -2367,7 +2375,7 @@ ${topUsage.trim()}` : ""}`;
           </button>
         </div>
 
-        <div ref={quickAddSectionRef} className="mb-4 rounded-3xl bg-[#f7f8f8] p-4 md:px-5 md:py-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
+        <div ref={quickAddSectionRef} className="mb-2 rounded-3xl bg-[#f7f8f8] p-4 md:mb-4 md:px-5 md:py-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
           <div className="mb-3.5 flex flex-col gap-3.5 md:flex-row md:items-start md:justify-between">
             <div className="max-w-xl">
               <div className="flex flex-wrap items-center gap-2">
@@ -2444,7 +2452,7 @@ ${topUsage.trim()}` : ""}`;
               <button
                 type="button"
                 onClick={() => setShowAllPresets(false)}
-                className="w-fit cursor-pointer rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                className="w-fit cursor-pointer rounded-full border border-gray-200 bg-white/[0.08]0 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
               >
                 Show less
               </button>
@@ -2474,7 +2482,7 @@ ${topUsage.trim()}` : ""}`;
                 <button
                   type="button"
                   onClick={() => setShowAllPresets((current) => !current)}
-                  className="cursor-pointer rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                  className="cursor-pointer rounded-full border border-gray-200 bg-white/[0.08]0 px-3.5 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
                 >
                   {showAllPresets ? "Show less" : "Show more"}
                 </button>
@@ -2505,7 +2513,24 @@ ${topUsage.trim()}` : ""}`;
           )}
         </div>
 
-        <div ref={applianceSectionRef} className="mb-8 space-y-4 scroll-mt-24">
+        <div ref={applianceSectionRef} className="mb-8 space-y-3.5 scroll-mt-24 md:space-y-4">
+          <div className="flex flex-col gap-2 px-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">
+                Appliance builder
+              </p>
+              <p className={`mt-1 text-sm ${darkMode ? "text-white/70" : "text-slate-600"}`}>
+                Review each appliance, then fine-tune watts, hours, and usage days.
+              </p>
+            </div>
+
+            {completedApplianceCount > 0 && (
+              <div className={`text-xs font-bold ${darkMode ? "text-white/62" : "text-slate-500"}`}>
+                {completedApplianceCount} active {completedApplianceCount === 1 ? "appliance" : "appliances"}
+              </div>
+            )}
+          </div>
+
           {visibleApplianceEntries.map(({ item, index }) => {
             const i = index;
             const wattageGuide = item.name
@@ -2515,138 +2540,164 @@ ${topUsage.trim()}` : ""}`;
             return (
               <div
                 key={i}
-                className={`p-5 rounded-3xl text-black shadow-sm relative transition-all duration-500 ${
+                className={`relative overflow-hidden rounded-[18px] border p-3 text-black shadow-sm transition-all duration-500 md:rounded-[20px] md:p-4 ${
                   highlightedIndex === i
-                    ? "bg-emerald-50 ring-2 ring-emerald-400 shadow-2xl"
-                    : "bg-[#f7f8f8] shadow-sm ring-1 ring-emerald-950/[0.06] hover:shadow-md"
+                    ? "border-emerald-300 bg-emerald-50/95 shadow-lg ring-2 ring-emerald-300/70"
+                    : "border-emerald-950/[0.06] bg-[#fbfcfa]/95 shadow-[0_8px_22px_rgba(15,23,42,0.035)] ring-1 ring-white/80 hover:border-emerald-200/80 hover:bg-white/95 hover:shadow-md"
                 }`}
               >
-              <button
-                onClick={() => removeAppliance(i)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white shadow-sm ring-1 ring-emerald-950/[0.06] hover:bg-red-100 text-gray-500 hover:text-red-600 transition"
-                title="Remove appliance"
-              >
-                ×
-              </button>
+                <div className="mb-2 flex items-start justify-between gap-3 pr-7 md:mb-3">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-emerald-700">
+                        Appliance {i + 1}
+                      </p>
 
-              <div className="grid md:grid-cols-5 gap-3 pr-10">
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Appliance</span>
-                  <input
-                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                    placeholder="Appliance name"
-                    value={item.name}
-                    onChange={(e) => updateAppliance(i, "name", e.target.value)}
-                  />
-                </label>
+                      {item.category && (
+                        <span className="border-l border-emerald-200 pl-2 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-700/80">
+                          {item.category}
+                        </span>
+                      )}
+                    </div>
 
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-gray-500">Quantity</span>
-                  <input
-                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                    type="number"
-                    min="1"
-                    step="1"
-                    placeholder="Qty"
-                    value={item.quantity}
-                    onChange={(e) => updateAppliance(i, "quantity", cleanNonNegativeInput(e.target.value, { allowZero: false }))}
-                  />
-                </label>
-
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-gray-500" title="Appliance power in watts. This is usually printed on the appliance label or adapter.">Appliance power (W)</span>
-                  <input
-                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="W"
-                    value={item.watts}
-                    onChange={(e) => updateAppliance(i, "watts", cleanNonNegativeInput(e.target.value))}
-                  />
-                </label>
-
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-gray-500" title="How many hours you usually use this appliance per day.">Hours / Day</span>
-                  <input
-                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="Hours"
-                    value={item.hours}
-                    onChange={(e) => updateAppliance(i, "hours", cleanNonNegativeInput(e.target.value))}
-                  />
-                </label>
-
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-gray-500" title="How many days per month you usually use this appliance.">Days / Month</span>
-                  <input
-                    className="w-full p-3.5 border border-gray-200 rounded-2xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition"
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="Days"
-                    value={item.days}
-                    onChange={(e) => updateAppliance(i, "days", cleanNonNegativeInput(e.target.value))}
-                  />
-                </label>
-              </div>
-
-              {item.name && (
-                <details className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/50 px-4 py-3 shadow-sm">
-                  <summary className="cursor-pointer text-xs font-semibold text-emerald-800">
-                    Need help finding appliance power?
-                  </summary>
-
-                  <p className="mt-2 text-xs leading-relaxed text-gray-700">
-                    💡 {wattageGuide}
-                  </p>
-
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowWattageGuideImage(true)}
-                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-extrabold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
-                    >
-                      View visual guide
-                    </button>
-
-                    <a
-                      href={`https://www.google.com/search?q=${encodeURIComponent(
-                        `${item.name} watts power consumption`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 hover:underline"
-                    >
-                      🔎 Search actual power for “{item.name}”
-                    </a>
+                    <h3 className="mt-0.5 truncate pr-2 text-[15px] font-black tracking-tight text-slate-950 md:mt-0.5 md:text-lg">
+                      {item.name || "Custom appliance"}
+                    </h3>
                   </div>
-                </details>
-              )}
 
-              <div className="mt-4 flex justify-between items-center">
-                <div>
-                  <p className="text-sm opacity-60">Consumption</p>
-
-                  <h3 className="font-extrabold">
-                    {item.kwh.toFixed(2)} kWh
-                  </h3>
+                  <button
+                    onClick={() => removeAppliance(i)}
+                    className="absolute right-3 top-3 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-200/60 bg-white/55 text-base leading-none text-slate-400/80 shadow-[0_4px_12px_rgba(15,23,42,0.06)] backdrop-blur transition hover:border-red-200/80 hover:bg-red-50/80 hover:text-red-500 md:right-4 md:top-4"
+                    title="Remove appliance"
+                    aria-label="Remove appliance"
+                  >
+                    ×
+                  </button>
                 </div>
 
-                <div className="text-right">
-                  <p className="text-sm opacity-60">Estimated Cost</p>
+                <div className="grid gap-2.5 md:grid-cols-[minmax(0,1fr)_300px] md:items-start md:gap-3">
+                  <div className="min-w-0 space-y-2 md:space-y-2.5">
+                    <div className="grid gap-2.5 md:grid-cols-[minmax(180px,1.35fr)_82px_110px_110px_110px] md:gap-2.5">
+                        <label className="block min-w-0">
+                          <span className="mb-1.5 block text-xs font-bold text-slate-500">Appliance</span>
+                          <input
+                            className="w-full rounded-2xl border border-slate-200/90 bg-white px-3 py-2.5 text-[15px] shadow-[0_3px_10px_rgba(15,23,42,0.045)] transition focus:border-emerald-400/85 focus:outline-none focus:ring-2 focus:ring-emerald-200/70 md:rounded-xl md:py-2 md:text-sm"
+                            placeholder="Appliance name"
+                            value={item.name}
+                            onChange={(e) => updateAppliance(i, "name", e.target.value)}
+                          />
+                        </label>
 
-                  <h3 className="font-black text-2xl text-emerald-600">
-                    {displayCurrency}
-                    {safeNumber(item.cost).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    })}
-                  </h3>
+                        <label className="block min-w-0">
+                          <span className="mb-1.5 block text-xs font-bold text-slate-500">Quantity</span>
+                          <input
+                            className="w-full rounded-2xl border border-slate-200/90 bg-white px-3 py-2.5 text-[15px] shadow-[0_3px_10px_rgba(15,23,42,0.045)] transition focus:border-emerald-400/85 focus:outline-none focus:ring-2 focus:ring-emerald-200/70 md:rounded-xl md:py-2 md:text-sm"
+                            type="number"
+                            min="1"
+                            step="1"
+                            placeholder="Qty"
+                            value={item.quantity}
+                            onChange={(e) => updateAppliance(i, "quantity", cleanNonNegativeInput(e.target.value, { allowZero: false }))}
+                          />
+                        </label>
+
+                        <label className="block min-w-0">
+                          <span className="mb-1.5 block text-xs font-bold text-slate-500" title="Appliance power in watts. This is usually printed on the appliance label or adapter.">Power (W)</span>
+                          <input
+                            className="w-full rounded-2xl border border-slate-200/90 bg-white px-3 py-2.5 text-[15px] shadow-[0_3px_10px_rgba(15,23,42,0.045)] transition focus:border-emerald-400/85 focus:outline-none focus:ring-2 focus:ring-emerald-200/70 md:rounded-xl md:py-2 md:text-sm"
+                            type="number"
+                            min="0"
+                            step="any"
+                            placeholder="W"
+                            value={item.watts}
+                            onChange={(e) => updateAppliance(i, "watts", cleanNonNegativeInput(e.target.value))}
+                          />
+                        </label>
+
+                        <label className="block min-w-0">
+                          <span className="mb-1.5 block text-xs font-bold text-slate-500" title="How many hours you usually use this appliance per day.">Hours / Day</span>
+                          <input
+                            className="w-full rounded-2xl border border-slate-200/90 bg-white px-3 py-2.5 text-[15px] shadow-[0_3px_10px_rgba(15,23,42,0.045)] transition focus:border-emerald-400/85 focus:outline-none focus:ring-2 focus:ring-emerald-200/70 md:rounded-xl md:py-2 md:text-sm"
+                            type="number"
+                            min="0"
+                            step="any"
+                            placeholder="Hours"
+                            value={item.hours}
+                            onChange={(e) => updateAppliance(i, "hours", cleanNonNegativeInput(e.target.value))}
+                          />
+                        </label>
+
+                        <label className="block min-w-0">
+                          <span className="mb-1.5 block text-xs font-bold text-slate-500" title="How many days per month you usually use this appliance.">Days / Month</span>
+                          <input
+                            className="w-full rounded-2xl border border-slate-200/90 bg-white px-3 py-2.5 text-[15px] shadow-[0_3px_10px_rgba(15,23,42,0.045)] transition focus:border-emerald-400/85 focus:outline-none focus:ring-2 focus:ring-emerald-200/70 md:rounded-xl md:py-2 md:text-sm"
+                            type="number"
+                            min="0"
+                            step="any"
+                            placeholder="Days"
+                            value={item.days}
+                            onChange={(e) => updateAppliance(i, "days", cleanNonNegativeInput(e.target.value))}
+                          />
+                        </label>
+                      </div>
+
+                    {item.name && (
+                      <details className="pt-1 md:pt-1.5">
+                        <summary className="inline-flex cursor-pointer items-center text-xs font-semibold text-emerald-800/95 transition hover:text-emerald-700 hover:underline">
+                          Need help finding appliance power?
+                        </summary>
+
+                        <div className="mt-1.5 space-y-2">
+                          <p className="text-xs leading-relaxed text-slate-600/95">
+                            💡 {wattageGuide}
+                          </p>
+
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setShowWattageGuideImage(true)}
+                              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-emerald-200/80 bg-white px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-[0_2px_8px_rgba(15,23,42,0.035)] transition hover:bg-emerald-50"
+                            >
+                              View visual guide
+                            </button>
+
+                            <a
+                              href={`https://www.google.com/search?q=${encodeURIComponent(
+                                `${item.name} watts power consumption`
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center rounded-lg border border-emerald-100/80 bg-white/65 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50 hover:underline"
+                            >
+                              🔎 Search actual power for “{item.name}”
+                            </a>
+                          </div>
+                        </div>
+                      </details>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 items-center gap-3 rounded-[15px] border border-emerald-100/70 bg-emerald-50/35 px-3.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.62)] md:mt-[9px] md:min-h-[66px] md:self-start md:rounded-[16px] md:px-5 md:py-2.5">
+                    <div className="min-w-0 md:text-center">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500/90 md:text-[10.5px]">Consumption</p>
+                      <h3 className="mt-0.5 text-[0.98rem] font-black leading-tight text-slate-950 md:text-[1.05rem]">
+                        {item.kwh.toFixed(2)} kWh
+                      </h3>
+                    </div>
+
+                    <div className="min-w-0 border-l border-emerald-100/45 pl-3 text-right md:pl-4 md:text-center">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500/90 md:text-[10.5px]">Estimated cost</p>
+                      <h3 className="mt-0.5 text-[1.18rem] font-black leading-tight tracking-tight text-emerald-600 md:text-[1.25rem]">
+                        {displayCurrency}
+                        {safeNumber(item.cost).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })}
+                      </h3>
+                    </div>
+                  </div>
                 </div>
-              </div>
+
               </div>
             );
           })}
@@ -2657,7 +2708,7 @@ ${topUsage.trim()}` : ""}`;
               <button
                 type="button"
                 onClick={() => setShowAllAddedAppliances((current) => !current)}
-                className="inline-flex items-center justify-center rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-extrabold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md"
+                className="inline-flex items-center justify-center rounded-2xl border border-emerald-200 bg-white px-4 py-2 text-sm font-extrabold text-emerald-800 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md"
               >
                 {showAllAddedAppliances ? "Show fewer appliances" : "Show more appliances"}
               </button>
@@ -2726,7 +2777,7 @@ ${topUsage.trim()}` : ""}`;
           </div>
         </section>
 
-        <section className="mb-5 rounded-3xl bg-[#f7fbf8] p-4 md:p-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
+        <section ref={wattageEducationSectionRef} className="mb-5 rounded-3xl bg-[#f7fbf8] p-4 md:p-5 text-black shadow-sm ring-1 ring-emerald-950/[0.06]">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-4xl">
               <p className="text-xs font-black uppercase tracking-wide text-emerald-700">
@@ -2836,12 +2887,12 @@ ${topUsage.trim()}` : ""}`;
                 <p className="mt-1 text-xs text-gray-500">if reduced by 1 hour/day</p>
               </div>
 
-              <div className="rounded-2xl border border-gray-100 bg-white/85 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+              <div className="rounded-2xl border border-gray-100 bg-white/[0.08]5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
                 <p className="text-xs font-semibold text-gray-500">Usage pattern</p>
                 <p className="mt-1 text-sm font-semibold leading-snug text-gray-800">{usagePatternInsight}</p>
               </div>
 
-              <div className="rounded-2xl border border-gray-100 bg-white/85 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+              <div className="rounded-2xl border border-gray-100 bg-white/[0.08]5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
                 <p className="text-xs font-semibold text-gray-500">Quick action</p>
                 <p className="mt-1 text-sm font-semibold leading-snug text-gray-800">{savingsTip}</p>
               </div>
@@ -2854,7 +2905,7 @@ ${topUsage.trim()}` : ""}`;
           )}
 
           {safeNumber(actualBill) > 0 && topAppliance?.name && (
-            <div className="mt-3 rounded-2xl border border-gray-200 bg-white/80 p-4">
+            <div className="mt-3 rounded-2xl border border-gray-200 bg-white/[0.08]0 p-4">
               <p className="text-xs font-semibold text-gray-500">Bill check</p>
               <p className="mt-1 text-sm leading-relaxed text-gray-700">{billComparisonInsight}</p>
             </div>
@@ -3308,7 +3359,7 @@ ${topUsage.trim()}` : ""}`;
               block: "start"
             })
           }
-          className="fixed bottom-[calc(env(safe-area-inset-bottom)+0.9rem)] right-3 z-[70] inline-flex items-center gap-1 rounded-full border border-emerald-200/25 bg-white/55 px-2.5 py-1.5 text-[10px] font-bold text-emerald-900/65 shadow-[0_6px_16px_rgba(15,23,42,0.06)] ring-1 ring-slate-900/[0.025] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/86 hover:text-emerald-950 md:right-5 md:px-3 md:text-[11px]"
+          className={`fixed bottom-[calc(env(safe-area-inset-bottom)+0.9rem)] right-3 z-[70] inline-flex items-center gap-1 rounded-full border border-emerald-200/25 bg-white/55 px-2.5 py-1.5 text-[10px] font-bold text-emerald-900/65 shadow-[0_6px_16px_rgba(15,23,42,0.06)] ring-1 ring-slate-900/[0.025] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/80 hover:text-emerald-950 md:right-5 md:px-3 md:text-[11px] ${showLiveEstimateBar ? "max-md:hidden" : ""}`}
           aria-label="Back to top"
         >
           <ArrowUp size={13} strokeWidth={2.4} />
