@@ -355,7 +355,7 @@ function Logo({ darkMode = false }) {
   const [logoFailed, setLogoFailed] = useState(false);
 
   return (
-    <div className="flex items-center gap-1.5 md:gap-2">
+    <div className="flex items-center gap-1 md:gap-1.5">
       <div className="w-[46px] h-[46px] md:w-[54px] md:h-[54px] flex items-center justify-center overflow-hidden shrink-0">
         {logoFailed ? (
           <span aria-hidden="true" className="text-3xl">💡</span>
@@ -369,11 +369,11 @@ function Logo({ darkMode = false }) {
       </div>
 
       <div className="min-w-0">
-        <h1 className={`m-0 font-extrabold text-[1.6rem] min-[390px]:text-[1.7rem] sm:text-[2rem] md:text-[2.25rem] tracking-tight leading-none drop-shadow-none ${darkMode ? "text-white" : "text-gray-950"}`}>
+        <h1 className={`m-0 font-bold text-[1.55rem] min-[390px]:text-[1.65rem] sm:text-[1.92rem] md:text-[2.12rem] tracking-[-0.035em] leading-none drop-shadow-none ${darkMode ? "text-white" : "text-gray-950"}`}>
           Watts My Bill?
         </h1>
 
-        <div className={`text-xs md:text-sm mt-1 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
+        <div className={`text-xs md:text-sm mt-1 ${darkMode ? "text-gray-300/90" : "text-gray-600/90"}`}>
           Understand Your Electricity Bill
         </div>
       </div>
