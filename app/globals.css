@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #eef3f1;
+  --foreground: #0f172a;
 }
 
 @theme inline {
@@ -12,17 +12,218 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  scrollbar-color: #94a3b8 #eef3f1;
+  scrollbar-width: thin;
+}
+
+html::-webkit-scrollbar {
+  width: 12px;
+}
+
+html::-webkit-scrollbar-track {
+  background: #eef3f1;
+}
+
+html::-webkit-scrollbar-thumb {
+  border: 3px solid #eef3f1;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+html:has(.wmb-dashboard-dark),
+body:has(.wmb-dashboard-dark),
+html:has(.learning-shell.is-dark),
+body:has(.learning-shell.is-dark) {
+  background: #06142b;
+}
+
+html:has(.wmb-dashboard-dark),
+html:has(.learning-shell.is-dark) {
+  scrollbar-color: #52657d #06142b;
+}
+
+html:has(.wmb-dashboard-dark)::-webkit-scrollbar-track,
+html:has(.learning-shell.is-dark)::-webkit-scrollbar-track {
+  background: #06142b;
+}
+
+html:has(.wmb-dashboard-dark)::-webkit-scrollbar-thumb,
+html:has(.learning-shell.is-dark)::-webkit-scrollbar-thumb {
+  border-color: #06142b;
+  background: #52657d;
+}
+
+body {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+button,
+input,
+select {
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.wmb-hero-card h2,
+.wmb-hero-card [class*="font-black"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Learning surfaces use an independent, persistent reading theme. */
+.learning-shell {
+  min-height: 100vh;
+  background: #eef3f1;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.learning-shell.is-dark {
+  color-scheme: dark;
+  background: #06142b;
+}
+
+.learning-shell.is-dark > .min-h-screen,
+.learning-shell.is-dark .bg-\[\#eef3f1\] {
+  background-color: #06142b !important;
+  color: #f8fafc !important;
+}
+
+.learning-shell.is-dark header,
+.learning-shell.is-dark footer,
+.learning-shell.is-dark .bg-white,
+.learning-shell.is-dark .bg-white\/90,
+.learning-shell.is-dark .bg-\[\#f7f8f8\] {
+  background-color: #0b1b31 !important;
+  color: #f8fafc !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+.learning-shell.is-dark .bg-slate-50,
+.learning-shell.is-dark .bg-slate-100 {
+  background-color: #10233c !important;
+}
+
+.learning-shell.is-dark .bg-emerald-50,
+.learning-shell.is-dark .bg-emerald-50\/45,
+.learning-shell.is-dark .bg-emerald-50\/50,
+.learning-shell.is-dark .bg-emerald-50\/55,
+.learning-shell.is-dark .bg-emerald-50\/60,
+.learning-shell.is-dark .bg-emerald-50\/65 {
+  background-color: rgba(16, 185, 129, 0.09) !important;
+}
+
+.learning-shell.is-dark .text-slate-950,
+.learning-shell.is-dark .text-slate-900,
+.learning-shell.is-dark .text-slate-800,
+.learning-shell.is-dark .text-slate-700 {
+  color: #f8fafc !important;
+}
+
+.learning-shell.is-dark .text-slate-600,
+.learning-shell.is-dark .text-slate-500 {
+  color: #b9c5d6 !important;
+}
+
+.learning-shell.is-dark .text-slate-400,
+.learning-shell.is-dark .text-slate-300,
+.learning-shell.is-dark .text-slate-200 {
+  color: #cbd5e1 !important;
+}
+
+.learning-shell.is-dark .text-emerald-950 {
+  color: #d1fae5 !important;
+}
+
+.learning-shell.is-dark .text-emerald-950\/80,
+.learning-shell.is-dark .text-emerald-900 {
+  color: #a7f3d0 !important;
+}
+
+.learning-shell.is-dark .text-emerald-500,
+.learning-shell.is-dark .text-emerald-600,
+.learning-shell.is-dark .text-emerald-700,
+.learning-shell.is-dark .text-emerald-800 {
+  color: #6ee7b7 !important;
+}
+
+/* Bright emerald actions need dark ink, even inside the dark reading theme. */
+.learning-shell.is-dark .bg-emerald-300.text-emerald-950,
+.learning-shell.is-dark .bg-emerald-400.text-emerald-950,
+.learning-shell.is-dark .rate-default-pill {
+  color: #022c22 !important;
+}
+
+.learning-shell.is-dark .border-slate-100,
+.learning-shell.is-dark .border-slate-200,
+.learning-shell.is-dark .border-emerald-100,
+.learning-shell.is-dark .border-emerald-950\/10 {
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+.learning-shell.is-dark input,
+.learning-shell.is-dark select {
+  background: #0d2038 !important;
+  color: #f8fafc !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
+}
+
+.learning-shell.is-dark input::placeholder {
+  color: #7f8fa6;
+}
+
+.learning-shell.is-dark .learning-theme-toggle {
+  background: rgba(255, 255, 255, 0.065) !important;
+  border-color: rgba(110, 231, 183, 0.18) !important;
+  color: #a7f3d0 !important;
+}
+
+.learning-shell.is-dark .rate-default-pill {
+  background: #34d399 !important;
+  border-color: #34d399 !important;
+  color: #022c22 !important;
+  box-shadow: 0 5px 12px rgba(2, 8, 23, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
+}
+
+/* Article callouts use an editorial inset treatment, not oversized outlined pills. */
+.learning-key-points,
+.learning-formula {
+  border-radius: 0 14px 14px 0;
+}
+
+.learning-shell.is-dark .learning-key-points {
+  border-color: #34d399 !important;
+  background: #10233c !important;
+  box-shadow: 0 10px 24px rgba(2, 8, 23, 0.18) !important;
+}
+
+.learning-shell.is-dark .learning-formula {
+  border-color: #34d399 !important;
+  background: #0d2038 !important;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(16, 185, 129, 0.42);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Watts My Bill — calm premium emerald hero */
@@ -93,6 +294,126 @@ body {
   border: 1px solid rgba(187, 247, 208, 0.075);
   background: rgba(4, 58, 51, 0.24);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.022), 0 5px 12px rgba(15, 23, 42, 0.055);
+}
+
+/* Optional bill inputs stay light in both themes so the editable workspace is consistent. */
+.wmb-light-panel {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(6, 78, 59, 0.10) !important;
+  box-shadow: 0 8px 24px rgba(2, 8, 23, 0.08) !important;
+}
+
+.wmb-meta-pill {
+  display: inline-flex;
+  min-height: 20px;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  color: #475569;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wmb-rate-status-pill {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  border: 1px solid #a7f3d0;
+  border-radius: 999px;
+  background: #ecfdf5;
+  padding: 4px 10px;
+  color: #065f46;
+  font-size: 10.5px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.wmb-dashboard-dark .wmb-rate-status-pill {
+  border-color: rgba(110, 231, 183, 0.28);
+  background: rgba(16, 185, 129, 0.13);
+  color: #a7f3d0;
+}
+
+/* A light workspace must not inherit washed-out dark-theme utilities. */
+.wmb-dashboard-dark .wmb-light-panel .text-slate-300,
+.wmb-dashboard-dark .wmb-light-panel .text-slate-400 {
+  color: #64748b !important;
+}
+
+.wmb-dashboard-dark .wmb-light-panel .text-emerald-200 {
+  color: #047857 !important;
+}
+
+.wmb-dashboard-dark .wmb-light-panel .border-white\/\[0\.08\] {
+  border-color: #e2e8f0 !important;
+}
+
+.wmb-dashboard-dark .wmb-light-panel .bg-white\/\[0\.06\],
+.wmb-dashboard-dark .wmb-light-panel .bg-white\/\[0\.07\],
+.wmb-dashboard-dark .wmb-light-panel .bg-white\/\[0\.08\] {
+  background-color: #f1f5f9 !important;
+}
+
+/* Supporting dashboard panels follow the surrounding calculator theme. */
+.wmb-theme-panel {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(6, 78, 59, 0.08) !important;
+}
+
+.wmb-dashboard-dark .wmb-theme-panel {
+  background: #0b1b31 !important;
+  color: #f8fafc !important;
+  border-color: rgba(110, 231, 183, 0.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 10px 28px rgba(2, 8, 23, 0.14);
+}
+
+.wmb-dashboard-dark .wmb-theme-panel .text-slate-950,
+.wmb-dashboard-dark .wmb-theme-panel .text-slate-900,
+.wmb-dashboard-dark .wmb-theme-panel .text-slate-800,
+.wmb-dashboard-dark .wmb-theme-panel .text-slate-700 {
+  color: #f8fafc !important;
+}
+
+.wmb-dashboard-dark .wmb-theme-panel .text-slate-600,
+.wmb-dashboard-dark .wmb-theme-panel .text-slate-500,
+.wmb-dashboard-dark .wmb-theme-panel .text-slate-400,
+.wmb-dashboard-dark .wmb-theme-panel .text-slate-300,
+.wmb-dashboard-dark .wmb-theme-panel .text-slate-200 {
+  color: #b9c5d6 !important;
+}
+
+.wmb-dashboard-dark .wmb-theme-panel .text-emerald-700,
+.wmb-dashboard-dark .wmb-theme-panel .text-emerald-800 {
+  color: #6ee7b7 !important;
+}
+
+.wmb-dashboard-dark .wmb-theme-panel .bg-slate-50,
+.wmb-dashboard-dark .wmb-theme-panel .bg-slate-100,
+.wmb-dashboard-dark .wmb-theme-panel .bg-white\/80,
+.wmb-dashboard-dark .wmb-theme-panel .bg-white\/\[0\.07\],
+.wmb-dashboard-dark .wmb-theme-panel .bg-white\/\[0\.08\],
+.wmb-dashboard-dark .wmb-theme-panel .bg-white\/\[0\.06\] {
+  background-color: #10233c !important;
+}
+
+.wmb-dashboard-dark .wmb-theme-panel .bg-emerald-50,
+.wmb-dashboard-dark .wmb-theme-panel .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+.wmb-dashboard-dark .wmb-theme-panel .border-slate-100,
+.wmb-dashboard-dark .wmb-theme-panel .border-slate-200,
+.wmb-dashboard-dark .wmb-theme-panel .border-emerald-100,
+.wmb-dashboard-dark .wmb-theme-panel .border-emerald-200,
+.wmb-dashboard-dark .wmb-theme-panel .border-emerald-950\/\[0\.07\] {
+  border-color: rgba(148, 163, 184, 0.16) !important;
 }
 
 /* Biggest energy user card helper */

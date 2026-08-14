@@ -1,17 +1,23 @@
 {
-  "name": "energy-check",
+  "name": "watts-my-bill",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "qa": "npm run lint && npm run validate:tariff && npm run validate:content && npm run build && npm run validate:build",
+    "validate:tariff": "node scripts/validate-tariff.mjs",
+    "validate:content": "node scripts/validate-content.mjs",
+    "validate:build": "node scripts/validate-build.mjs",
+    "seo:notify": "node scripts/submit-indexnow.mjs"
   },
   "dependencies": {
     "jspdf": "^4.2.1",
     "lucide-react": "^1.16.0",
-    "next": "16.2.6",
+    "next": "^16.3.1",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -20,7 +26,10 @@
     "@types/node": "25.9.1",
     "@types/react": "19.2.15",
     "eslint": "^9",
-    "eslint-config-next": "16.2.6",
+    "eslint-config-next": "^16.3.1",
     "tailwindcss": "^4"
+  },
+  "overrides": {
+    "dompurify": "3.4.13"
   }
 }

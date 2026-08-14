@@ -4,6 +4,6 @@ export default function robots() {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://wattsmybill.app/sitemap.xml",
+    sitemap: "https://www.wattsmybill.app/sitemap.xml",
   };
 }

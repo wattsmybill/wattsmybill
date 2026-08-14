@@ -1,11 +1,11 @@
 {
   "name": "Watts My Bill?",
   "short_name": "Watts My Bill",
-  "description": "Your friendly tool for understanding electricity bills.",
+  "description": "Estimate appliance electricity use, understand bill changes, and learn how rates and household energy costs work worldwide.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "theme_color": "#006b5c",
+  "theme_color": "#073f36",
   "background_color": "#06142b",
   "icons": [
     {

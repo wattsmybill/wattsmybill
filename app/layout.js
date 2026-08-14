@@ -16,7 +16,7 @@ const siteUrl = "https://www.wattsmybill.app";
 const siteName = "Watts My Bill?";
 const appName = "Watts My Bill";
 const siteDescription =
-  "Estimate your monthly electricity bill by adding appliances, usage hours, and electricity rates. Watts My Bill helps you understand your energy cost.";
+  "Estimate and understand your electricity bill using appliance usage, your local rate, fixed charges, and practical worldwide electricity guides.";
 
 const ogImage = `${siteUrl}/og-image-final.jpg`;
 const logoUrl = `${siteUrl}/android-chrome-512x512.png`;
@@ -24,7 +24,6 @@ const logoUrl = `${siteUrl}/android-chrome-512x512.png`;
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#eef3f1" },
     { media: "(prefers-color-scheme: dark)", color: "#06142b" },
@@ -168,6 +167,16 @@ export const metadata = {
 const jsonLd = [
   {
     "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
+    name: siteName,
+    alternateName: [appName, "WattsMyBill"],
+    url: siteUrl,
+    inLanguage: "en",
+    publisher: { "@id": `${siteUrl}/#organization` },
+  },
+  {
+    "@context": "https://schema.org",
     "@type": "WebApplication",
     "@id": `${siteUrl}/#webapp`,
     name: siteName,
@@ -178,7 +187,7 @@ const jsonLd = [
     inLanguage: "en",
     isAccessibleForFree: true,
     description:
-      "A free electricity bill estimator that helps users estimate appliance energy costs using wattage, hours, quantity, electricity rates, and household presets.",
+      "A free electricity bill estimator and learning hub that helps users understand appliance energy costs, local electricity rates, fixed charges, and household usage.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -187,6 +196,7 @@ const jsonLd = [
     publisher: {
       "@id": `${siteUrl}/#organization`,
     },
+    isPartOf: { "@id": `${siteUrl}/#website` },
   },
   {
     "@context": "https://schema.org",
