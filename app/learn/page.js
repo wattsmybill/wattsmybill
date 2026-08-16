@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Calculator, Search, SearchCheck, X } from "lucide-react";
+import { ArrowRight, BookOpen, Calculator, Plug, Search, SearchCheck, X } from "lucide-react";
 import LearnHeader from "./LearnHeader";
 import LearningThemeShell from "./LearningThemeShell";
 import { ARTICLES } from "./articles";
+import { searchArticles } from "./searchIndex";
+import { COUNTRIES } from "../data/countries";
+import { PRESETS } from "../data/appliances";
+
+const RATE_SOURCE_COUNT = COUNTRIES.filter(
+  (country) => !country.isPlaceholder && country.name !== "Other Country"
+).length;
 
 const TOPIC_FILTERS = [
   { id: "all", label: "All guides", categories: [] },
@@ -43,16 +50,28 @@ const collectionJsonLd = {
 export default function LearnPage() {
   const [query, setQuery] = useState("");
   const [activeTopic, setActiveTopic] = useState("all");
-  const normalizedQuery = query.trim().toLowerCase();
+  const normalizedQuery = query.trim();
   const selectedTopic = TOPIC_FILTERS.find((topic) => topic.id === activeTopic) || TOPIC_FILTERS[0];
-  const filteredArticles = ARTICLES.filter((article) => {
-    if (selectedTopic.categories.length > 0 && !selectedTopic.categories.includes(article.category)) return false;
-    if (!normalizedQuery) return true;
-    const searchableText = [article.title, article.description, article.category, ...article.takeaways]
-      .join(" ")
-      .toLowerCase();
-    return normalizedQuery.split(/\s+/).every((term) => searchableText.includes(term));
-  });
+
+  const filteredArticles = useMemo(() => {
+    const inTopic = ARTICLES.filter(
+      (article) => selectedTopic.categories.length === 0 || selectedTopic.categories.includes(article.category)
+    );
+    return normalizedQuery ? searchArticles(inTopic, normalizedQuery) : inTopic;
+  }, [normalizedQuery, selectedTopic]);
+
+  // When no guide answers the question, the catalogue often can. Somebody
+  // typing "pool pump" wants to know what a pool pump costs to run, so offer
+  // the calculator rather than an apology and an email address.
+  const applianceSuggestions = useMemo(() => {
+    if (!normalizedQuery || filteredArticles.length > 0) return [];
+    const terms = normalizedQuery.toLowerCase().split(/\s+/).filter((term) => term.length > 2);
+    if (terms.length === 0) return [];
+    return PRESETS.filter((preset) => {
+      const name = preset.name.toLowerCase();
+      return terms.some((term) => name.includes(term));
+    }).slice(0, 4);
+  }, [normalizedQuery, filteredArticles]);
 
   return (
     <LearningThemeShell>
@@ -60,7 +79,7 @@ export default function LearnPage() {
       <LearnHeader />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }} />
 
-      <main>
+      <main id="main-content">
         <section className="mx-auto max-w-6xl px-5 pb-10 pt-10 sm:px-7 sm:pt-14">
           <div className="overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#043a33_0%,#087256_68%,#10956c_100%)] px-6 py-9 text-white shadow-sm sm:px-9 sm:py-11">
             <div>
@@ -158,10 +177,31 @@ export default function LearnPage() {
           {filteredArticles.length === 0 && (
             <div className="rounded-[26px] border border-emerald-950/[0.07] bg-white px-6 py-10 text-center shadow-sm">
               <Search className="mx-auto text-emerald-700" size={24} />
-              <h3 className="mt-3 text-xl font-black">That answer is not in the Hub yet.</h3>
-              <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">Try a shorter phrase, choose a topic above, or return to the complete guide list.</p>
+              <h3 className="mt-3 text-xl font-black">No guide covers that yet.</h3>
+
+              {applianceSuggestions.length > 0 ? (
+                <>
+                  <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">
+                    The calculator can still cost it. Add it to an estimate and see what it uses.
+                  </p>
+                  <div className="mt-5 flex flex-wrap justify-center gap-2">
+                    {applianceSuggestions.map((preset) => (
+                      <Link
+                        key={preset.name}
+                        href={`/?appliance=${encodeURIComponent(preset.name)}#calculator`}
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full bg-emerald-700 px-4 py-2.5 text-xs font-black text-white transition hover:bg-emerald-800"
+                      >
+                        <Plug size={14} aria-hidden="true" /> Cost a {preset.name.toLowerCase()}
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-600">Try a shorter phrase, choose a topic above, or return to the complete guide list.</p>
+              )}
+
               <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <button type="button" onClick={() => { setQuery(""); setActiveTopic("all"); }} className="rounded-full bg-emerald-700 px-4 py-2.5 text-xs font-black text-white hover:bg-emerald-800">View all guides</button>
+                <button type="button" onClick={() => { setQuery(""); setActiveTopic("all"); }} className="rounded-full border border-emerald-200 bg-white px-4 py-2.5 text-xs font-black text-emerald-800 hover:bg-emerald-50">View all guides</button>
                 <a href={`mailto:hello@wattsmybill.app?subject=${encodeURIComponent("Learning Hub question")}&body=${encodeURIComponent(`I would like Watts My Bill? to explain: ${query.trim()}`)}`} className="rounded-full border border-emerald-200 bg-white px-4 py-2.5 text-xs font-black text-emerald-800 hover:bg-emerald-50">Suggest this question</a>
               </div>
             </div>
@@ -174,7 +214,7 @@ export default function LearnPage() {
               <p className="text-xs font-black uppercase tracking-[0.15em] text-emerald-700">Popular paths</p>
               <h2 id="popular-paths-heading" className="mt-2 text-2xl font-black tracking-tight">Start where you are.</h2>
             </div>
-            <Link href="/rates" className="text-xs font-black text-emerald-700 underline decoration-emerald-200 underline-offset-4 hover:text-emerald-900">Browse 28 official rate sources</Link>
+            <Link href="/rates" className="text-xs font-black text-emerald-700 underline decoration-emerald-200 underline-offset-4 hover:text-emerald-900">Browse {RATE_SOURCE_COUNT} official rate sources</Link>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
           {[

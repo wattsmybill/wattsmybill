@@ -10,6 +10,8 @@ import { PRESETS } from "./data/appliances";
 import { HOUSEHOLD_PRESETS } from "./data/householdPresets";
 import { getRateReference } from "./data/rateReferences";
 import { calculateTariffEstimate } from "./lib/tariff";
+import { readTheme, writeTheme } from "./lib/theme";
+import { buildShareUrl, readSetupFromUrl } from "./lib/shareState";
 
 const DEFAULT_APPLIANCE = {
   name: "",
@@ -23,6 +25,8 @@ const LOGO_PATH = "/logo.png";
 const PROVIDER_RATE_GUIDE_PATH = "/provider-rate-guide.png";
 const WATTAGE_GUIDE_PATH = "/wattage-guide.png";
 const COUNTRY_PLACEHOLDER_NAME = "Select your country";
+/** Holds the visitor's own estimate while a shared link is being viewed. */
+const PRIOR_SESSION_KEY = "watts-my-bill-prior-session";
 
 function safeNumber(value, fallback = 0) {
   const number = Number(value);
@@ -505,6 +509,9 @@ export default function Page() {
   const [highlightedIndex, setHighlightedIndex] = useState(null);
   const [shareCopied, setShareCopied] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
+  // Set when a link replaced an estimate the visitor had already built, so the
+  // replacement can be undone.
+  const [replacedOwnEstimate, setReplacedOwnEstimate] = useState(false);
   const [showBackToEstimate, setShowBackToEstimate] = useState(false);
   const [showLiveEstimateBar, setShowLiveEstimateBar] = useState(false);
   const [didYouKnowIndex, setDidYouKnowIndex] = useState(0);
@@ -618,7 +625,8 @@ export default function Page() {
           setCustomCurrency(parsed.customCurrency || "");
           setReportName(parsed.reportName || "");
           setReportAddress(parsed.reportAddress || "");
-          setDarkMode(parsed.darkMode || false);
+          // darkMode is deliberately not restored here — the theme is shared
+          // with the Learning Hub and is resolved from THEME_KEY below.
           setSearchTerm(parsed.searchTerm || "");
           setSelectedCategory(parsed.selectedCategory || "All");
           setShowAllPresets(parsed.showAllPresets || false);
@@ -650,6 +658,7 @@ export default function Page() {
       } catch {
         localStorage.removeItem("watts-my-bill-data");
         localStorage.removeItem("watts-my-bill-scenarios");
+        localStorage.removeItem(PRIOR_SESSION_KEY);
       }
 
       setHasLoaded(true);
@@ -657,6 +666,105 @@ export default function Page() {
 
     return () => window.cancelAnimationFrame(restoreFrame);
   }, []);
+
+  // The theme belongs to the visitor, not to a route. The root layout has
+  // already stamped it on <html>; adopt that, then keep the two in step so
+  // walking into the Learning Hub doesn't turn the lights back on.
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setDarkMode(readTheme() === "dark"));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoaded) return;
+    writeTheme(darkMode ? "dark" : "light");
+  }, [darkMode, hasLoaded]);
+
+  // A link that carries a setup — a shared estimate, a rate chosen in the Rate
+  // Library, an appliance picked from a guide — is applied once the saved
+  // session has been restored, so the link wins over whatever was here before.
+  // Read from window rather than useSearchParams: this page is prerendered, and
+  // that hook would force the whole tree to render on the client instead.
+  const urlSetupApplied = useRef(false);
+
+  useEffect(() => {
+    if (!hasLoaded || urlSetupApplied.current) return;
+
+    const setup = readSetupFromUrl(window.location.search);
+    if (!setup) {
+      urlSetupApplied.current = true;
+      return;
+    }
+
+    // A shared link overwrites whatever is on screen, and the save effect then
+    // writes that over the visitor's stored session — so someone who opens a
+    // friend's estimate would lose their own with no way back. Keep a copy
+    // first and offer to put it back.
+    let priorSession = null;
+    try {
+      const raw = localStorage.getItem(PRIOR_SESSION_KEY) || localStorage.getItem("watts-my-bill-data");
+      const parsed = raw ? JSON.parse(raw) : null;
+      const hasRealWork = parsed?.appliances?.some((item) => item?.name || item?.watts);
+      if (hasRealWork) {
+        priorSession = parsed;
+        localStorage.setItem(PRIOR_SESSION_KEY, JSON.stringify(parsed));
+      }
+    } catch {
+      priorSession = null;
+    }
+
+    const applyFrame = window.requestAnimationFrame(() => {
+      urlSetupApplied.current = true;
+      if (priorSession) setReplacedOwnEstimate(true);
+
+      if (setup.country) {
+        const match = COUNTRIES.find(
+          (item) => item.name.toLowerCase() === setup.country.toLowerCase()
+        );
+        if (match) {
+          setCountry(match);
+          setCountrySearchTerm(match.name === COUNTRY_PLACEHOLDER_NAME ? "" : match.name);
+        }
+      }
+
+      if (setup.customRate) setCustomRate(setup.customRate);
+      if (setup.billingDays) setBillingDays(setup.billingDays);
+      if (setup.fixedCharge) setFixedCharge(setup.fixedCharge);
+      if (setup.actualBill) setActualBill(setup.actualBill);
+      if (setup.billedKwh) setBilledKwh(setup.billedKwh);
+
+      if (setup.appliances?.length) {
+        setAppliances(setup.appliances.map((item) => ({ ...DEFAULT_APPLIANCE, ...item })));
+      }
+
+      // A single named appliance arrives from the Learning Hub when someone
+      // searched for something the guides don't cover but the catalogue does.
+      if (setup.appliance) {
+        const preset = PRESETS.find(
+          (item) => item.name.toLowerCase() === setup.appliance.toLowerCase()
+        );
+        if (preset) {
+          setAppliances((current) => {
+            const existing = current.filter((item) => item.name || item.watts);
+            return [
+              ...existing,
+              {
+                ...DEFAULT_APPLIANCE,
+                name: preset.name,
+                watts: String(preset.watts),
+                hours: String(preset.hours),
+                days: String(preset.days),
+              },
+            ];
+          });
+        }
+      }
+
+      inputSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    return () => window.cancelAnimationFrame(applyFrame);
+  }, [hasLoaded]);
 
   useEffect(() => {
     if (!hasLoaded) return;
@@ -1056,6 +1164,36 @@ export default function Page() {
         : null
     : null;
 
+  /**
+   * What to actually tell someone whose rate looks wrong.
+   *
+   * The thresholds above are relative to the country default, so they already
+   * behave for currencies of very different magnitude — ₫2,050 or Rp1,450 per
+   * kWh are normal, not alarming. The advice did not follow: telling a
+   * Vietnamese or Indonesian user to check "cents or full currency units" is
+   * meaningless, because those currencies are not used with a subunit. Name the
+   * country's own typical figure instead, and only mention subunits where a
+   * hundredfold slip is genuinely the likely mistake.
+   */
+  const rateWarningMessage = (() => {
+    if (!rateWarningType) return "";
+
+    const ratio = customRateValue / indicativeRateValue;
+    const typical = `${displayCurrency}${indicativeRateValue.toLocaleString(undefined, {
+      maximumFractionDigits: indicativeRateValue >= 100 ? 0 : 2,
+    })}`;
+    const opening = `That rate looks ${rateWarningType} for ${country.name}, where bills are typically around ${typical} per kWh.`;
+
+    // A ~100x slip in a currency that is quoted in small units is almost always
+    // cents entered as whole units, or the reverse.
+    const subunitLikely = indicativeRateValue < 10 && (ratio > 40 || ratio < 1 / 40);
+    if (subunitLikely) {
+      return `${opening} Check whether your bill shows the price in cents rather than whole ${displayCurrency ? "units" : "currency units"} per kWh.`;
+    }
+
+    return `${opening} Check you have used the price per kWh from your own bill, in your own currency, rather than a total or a converted figure.`;
+  })();
+
   const isBlankAppliance = (item) =>
     !String(item.name || "").trim() &&
     !String(item.watts || "").trim() &&
@@ -1086,6 +1224,11 @@ export default function Page() {
 
     localStorage.removeItem("watts-my-bill-data");
     localStorage.removeItem("watts-my-bill-scenarios");
+    // Clearing means clearing: without this, a stash kept from an earlier
+    // shared link would later offer to restore an estimate the visitor had
+    // deliberately deleted.
+    localStorage.removeItem(PRIOR_SESSION_KEY);
+    setReplacedOwnEstimate(false);
     setSavedScenarios([]);
     setCountry(COUNTRIES[0]);
     setCountrySearchTerm(
@@ -1714,8 +1857,75 @@ Total usage: ${totalKwh.toFixed(
 ${topUsage.trim()}` : ""}`;
   };
 
+  /**
+   * The shareable address for the current estimate. This used to be
+   * `window.location.href` — the bare homepage — so "copy a link to this setup"
+   * handed the recipient a number they had no way to check and an empty
+   * calculator. The setup now travels with the link.
+   */
+  /**
+   * Puts back the estimate a shared link displaced.
+   *
+   * The query string is cleared at the same time, otherwise a refresh would
+   * silently re-apply the shared setup and undo the undo.
+   */
+  const restoreOwnEstimate = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(PRIOR_SESSION_KEY) || "null");
+      if (!parsed) return;
+
+      setAppliances(
+        parsed.appliances?.length
+          ? parsed.appliances.map((item) => ({ ...DEFAULT_APPLIANCE, ...item }))
+          : [DEFAULT_APPLIANCE]
+      );
+      setCustomRate(parsed.customRate || "");
+      setBillingDays(parsed.billingDays || "30");
+      setFixedCharge(parsed.fixedCharge || "");
+      setActualBill(parsed.actualBill || "");
+      setBilledKwh(parsed.billedKwh || "");
+
+      const foundCountry = parsed.country?.name
+        ? COUNTRIES.find((item) => item.name === parsed.country.name)
+        : null;
+      if (foundCountry) {
+        setCountry(foundCountry);
+        setCountrySearchTerm(foundCountry.name === COUNTRY_PLACEHOLDER_NAME ? "" : foundCountry.name);
+      }
+
+      localStorage.removeItem(PRIOR_SESSION_KEY);
+      window.history.replaceState(null, "", `${window.location.pathname}#calculator`);
+      setReplacedOwnEstimate(false);
+    } catch {
+      setReplacedOwnEstimate(false);
+    }
+  };
+
+  /** Dismisses the notice and keeps the shared estimate. */
+  const keepSharedEstimate = () => {
+    try {
+      localStorage.removeItem(PRIOR_SESSION_KEY);
+    } catch {
+      // Nothing to clean up if storage is unavailable.
+    }
+    setReplacedOwnEstimate(false);
+  };
+
+  const buildEstimateLink = () => {
+    if (typeof window === "undefined") return "https://wattsmybill.app";
+    return buildShareUrl(window.location.origin, {
+      appliances,
+      country: country?.isPlaceholder ? "" : country?.name,
+      customRate,
+      billingDays,
+      fixedCharge,
+      actualBill,
+      billedKwh,
+    });
+  };
+
   const copyEstimateLink = async () => {
-    const link = typeof window !== "undefined" ? window.location.href : "https://wattsmybill.app";
+    const link = buildEstimateLink();
     const textToCopy = `${buildShareText()}\n${link}`;
 
     try {
@@ -1729,7 +1939,7 @@ ${topUsage.trim()}` : ""}`;
   };
 
   const shareEstimate = async () => {
-    const link = typeof window !== "undefined" ? window.location.href : "https://wattsmybill.app";
+    const link = buildEstimateLink();
     const shareData = {
       title: "Watts My Bill?",
       text: buildShareText(),
@@ -2949,6 +3159,41 @@ ${topUsage.trim()}` : ""}`;
           </span>
         </div>
 
+        {replacedOwnEstimate && (
+          <div
+            role="status"
+            className={`mb-4 flex flex-col gap-3 rounded-2xl border px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between ${
+              darkMode
+                ? "border-amber-200/25 bg-amber-200/10 text-amber-100"
+                : "border-amber-200/70 bg-amber-50/70 text-amber-900"
+            }`}
+          >
+            <p className="text-xs font-semibold leading-5">
+              You&rsquo;re looking at a shared estimate. Your own is saved and can be brought back.
+            </p>
+            <div className="flex shrink-0 gap-2">
+              <button
+                type="button"
+                onClick={restoreOwnEstimate}
+                className={`cursor-pointer rounded-full px-3.5 py-2 text-xs font-black transition ${
+                  darkMode ? "bg-amber-200/20 text-amber-50 hover:bg-amber-200/30" : "bg-amber-200/80 text-amber-950 hover:bg-amber-200"
+                }`}
+              >
+                Restore mine
+              </button>
+              <button
+                type="button"
+                onClick={keepSharedEstimate}
+                className={`cursor-pointer rounded-full px-3.5 py-2 text-xs font-bold transition ${
+                  darkMode ? "text-amber-100/80 hover:text-amber-50" : "text-amber-900/80 hover:text-amber-950"
+                }`}
+              >
+                Keep this one
+              </button>
+            </div>
+          </div>
+        )}
+
         <div id="calculator" ref={inputSectionRef} className="grid scroll-mt-6 md:grid-cols-2 gap-4 mb-6">
           <div ref={countryDropdownRef} className="relative">
             <label className="block">
@@ -3068,8 +3313,8 @@ ${topUsage.trim()}` : ""}`;
             </div>
 
             {rateWarningType && (
-              <p className="mt-2 rounded-2xl border border-amber-200/70 bg-amber-50/70 px-3 py-2 text-xs font-medium text-amber-800">
-                This rate seems unusually {rateWarningType}. Check whether your bill shows cents or full currency units per kWh.
+              <p className={`mt-2 rounded-2xl border px-3 py-2 text-xs font-medium ${darkMode ? "border-amber-200/25 bg-amber-200/10 text-amber-100" : "border-amber-200/70 bg-amber-50/70 text-amber-800"}`}>
+                {rateWarningMessage}
               </p>
             )}
           </div>

@@ -44,6 +44,7 @@ const checkPage = ({ path, label, canonical, structuredTypes = [] }) => {
 checkPage({ path: join(appOutput, "index.html"), label: "home page", canonical: siteUrl, structuredTypes: ["WebApplication"] });
 checkPage({ path: join(appOutput, "learn.html"), label: "Learning Hub", canonical: `${siteUrl}/learn`, structuredTypes: ["CollectionPage", "ItemList"] });
 checkPage({ path: join(appOutput, "rates.html"), label: "Rate Library", canonical: `${siteUrl}/rates`, structuredTypes: ["CollectionPage", "ItemList"] });
+checkPage({ path: join(appOutput, "history.html"), label: "bill history", canonical: `${siteUrl}/history`, structuredTypes: ["WebApplication"] });
 checkPage({ path: join(appOutput, "methodology.html"), label: "methodology page", canonical: `${siteUrl}/methodology`, structuredTypes: ["AboutPage"] });
 
 for (const article of ARTICLES) {
@@ -56,7 +57,7 @@ for (const article of ARTICLES) {
 }
 
 const sitemap = readRequired(join(appOutput, "sitemap.xml.body"), "sitemap");
-for (const url of [siteUrl, `${siteUrl}/learn`, `${siteUrl}/rates`, `${siteUrl}/methodology`, ...ARTICLES.map((article) => `${siteUrl}/learn/${article.slug}`)]) {
+for (const url of [siteUrl, `${siteUrl}/learn`, `${siteUrl}/rates`, `${siteUrl}/history`, `${siteUrl}/methodology`, ...ARTICLES.map((article) => `${siteUrl}/learn/${article.slug}`)]) {
   if (!sitemap.includes(`<loc>${url}</loc>`)) errors.push(`Missing sitemap URL: ${url}`);
 }
 
@@ -65,11 +66,12 @@ for (const favicon of ["/favicon.ico", "/favicon-32x32.png", "/android-chrome-19
   if (!home.includes(favicon)) errors.push(`Missing favicon declaration: ${favicon}`);
 }
 
-const knownRoutes = new Set(["/", "/learn", "/rates", "/methodology", ...ARTICLES.map((article) => `/learn/${article.slug}`)]);
+const knownRoutes = new Set(["/", "/learn", "/rates", "/history", "/methodology", ...ARTICLES.map((article) => `/learn/${article.slug}`)]);
 const builtHtml = [
   join(appOutput, "index.html"),
   join(appOutput, "learn.html"),
   join(appOutput, "rates.html"),
+  join(appOutput, "history.html"),
   join(appOutput, "methodology.html"),
   ...ARTICLES.map((article) => join(appOutput, "learn", `${article.slug}.html`)),
 ];
@@ -89,5 +91,5 @@ if (errors.length) {
   console.error(errors.join("\n"));
   process.exitCode = 1;
 } else {
-  console.log(`Build valid: ${ARTICLES.length + 4} public HTML pages, ${ARTICLES.length + 4} sitemap URLs, internal links, canonical/social metadata, structured data, and favicon declarations.`);
+  console.log(`Build valid: ${ARTICLES.length + 5} public HTML pages, ${ARTICLES.length + 5} sitemap URLs, internal links, canonical/social metadata, structured data, and favicon declarations.`);
 }

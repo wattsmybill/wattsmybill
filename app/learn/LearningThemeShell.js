@@ -2,25 +2,29 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
+import { readTheme, writeTheme } from "../lib/theme";
 
 const LearningThemeContext = createContext(null);
-const THEME_KEY = "watts-my-bill-learning-theme";
 
 export default function LearningThemeShell({ children }) {
+  // The bootstrap script in the root layout has already stamped the resolved
+  // theme on <html>, so state starts from that rather than guessing light and
+  // correcting after paint.
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    const restoreFrame = window.requestAnimationFrame(() => {
-      const savedTheme = localStorage.getItem(THEME_KEY);
-      if (savedTheme === "dark") setDark(true);
-    });
-    return () => window.cancelAnimationFrame(restoreFrame);
+    // Deferred a frame to keep the effect free of a synchronous setState. The
+    // page does not flash while we wait: the root layout has already applied
+    // the theme to <html>, and the stylesheet keys off that attribute rather
+    // than the class this state drives.
+    const frame = window.requestAnimationFrame(() => setDark(readTheme() === "dark"));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const toggleTheme = () => {
     setDark((current) => {
       const next = !current;
-      localStorage.setItem(THEME_KEY, next ? "dark" : "light");
+      writeTheme(next ? "dark" : "light");
       return next;
     });
   };
@@ -43,7 +47,7 @@ export function LearningThemeToggle() {
       type="button"
       onClick={theme.toggleTheme}
       className="learning-theme-toggle grid h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-full border border-emerald-950/10 bg-white text-slate-700 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700"
-      aria-label={theme.dark ? "Switch Learning Hub to light mode" : "Switch Learning Hub to dark mode"}
+      aria-label={theme.dark ? "Switch to light mode" : "Switch to dark mode"}
       title={theme.dark ? "Light mode" : "Dark mode"}
     >
       {theme.dark ? <Sun size={16} strokeWidth={2.3} /> : <Moon size={16} strokeWidth={2.3} />}

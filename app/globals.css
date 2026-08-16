@@ -37,25 +37,24 @@ html::-webkit-scrollbar-thumb {
   background: #94a3b8;
 }
 
-html:has(.wmb-dashboard-dark),
-body:has(.wmb-dashboard-dark),
-html:has(.learning-shell.is-dark),
-body:has(.learning-shell.is-dark) {
+/* Keyed off the attribute the root layout stamps on <html> before first paint,
+   rather than a class a React component adds after hydration. :has() on the
+   rendered tree could only ever match once the tree existed, which is why dark
+   readers used to get a white flash on every navigation. */
+html[data-wmb-theme="dark"],
+html[data-wmb-theme="dark"] body {
   background: #06142b;
 }
 
-html:has(.wmb-dashboard-dark),
-html:has(.learning-shell.is-dark) {
+html[data-wmb-theme="dark"] {
   scrollbar-color: #52657d #06142b;
 }
 
-html:has(.wmb-dashboard-dark)::-webkit-scrollbar-track,
-html:has(.learning-shell.is-dark)::-webkit-scrollbar-track {
+html[data-wmb-theme="dark"]::-webkit-scrollbar-track {
   background: #06142b;
 }
 
-html:has(.wmb-dashboard-dark)::-webkit-scrollbar-thumb,
-html:has(.learning-shell.is-dark)::-webkit-scrollbar-thumb {
+html[data-wmb-theme="dark"]::-webkit-scrollbar-thumb {
   border-color: #06142b;
   background: #52657d;
 }
@@ -79,114 +78,145 @@ select {
   font-variant-numeric: tabular-nums;
 }
 
-/* Learning surfaces use an independent, persistent reading theme. */
+/* Bill-history chart. Colours live here as custom properties so the same SVG
+   serves both themes; dark mode is stepped deliberately rather than inverted,
+   because emerald-700 on navy loses the bars into the background. */
+.wmb-chart {
+  --chart-bar: #34a382;
+  --chart-bar-latest: #047857;
+  --chart-grid: rgba(2, 44, 34, 0.1);
+  --chart-axis: #64748b;
+  --chart-value: #0f172a;
+}
+
+[data-wmb-theme="dark"] .wmb-chart {
+  --chart-bar: #2f7f68;
+  --chart-bar-latest: #4ade9f;
+  --chart-grid: rgba(226, 240, 235, 0.12);
+  --chart-axis: #93a7b8;
+  --chart-value: #f1f5f9;
+}
+
+.wmb-chart-bar { fill: var(--chart-bar); }
+.wmb-chart-bar-latest { fill: var(--chart-bar-latest); }
+.wmb-chart-grid { stroke: var(--chart-grid); }
+.wmb-chart-axis { fill: var(--chart-axis); font-weight: 600; }
+.wmb-chart-value { fill: var(--chart-value); font-weight: 800; }
+
+.wmb-chart svg rect[role="button"] { cursor: pointer; outline: none; }
+.wmb-chart svg rect[role="button"]:focus-visible {
+  outline: 2px solid var(--chart-bar-latest);
+  outline-offset: -2px;
+}
+
+/* Learning surfaces share the product-wide theme, resolved on <html>. */
 .learning-shell {
   min-height: 100vh;
   background: #eef3f1;
   transition: background-color 180ms ease, color 180ms ease;
 }
 
-.learning-shell.is-dark {
+[data-wmb-theme="dark"] .learning-shell {
   color-scheme: dark;
   background: #06142b;
 }
 
-.learning-shell.is-dark > .min-h-screen,
-.learning-shell.is-dark .bg-\[\#eef3f1\] {
+[data-wmb-theme="dark"] .learning-shell > .min-h-screen,
+[data-wmb-theme="dark"] .learning-shell .bg-\[\#eef3f1\] {
   background-color: #06142b !important;
   color: #f8fafc !important;
 }
 
-.learning-shell.is-dark header,
-.learning-shell.is-dark footer,
-.learning-shell.is-dark .bg-white,
-.learning-shell.is-dark .bg-white\/90,
-.learning-shell.is-dark .bg-\[\#f7f8f8\] {
+[data-wmb-theme="dark"] .learning-shell header,
+[data-wmb-theme="dark"] .learning-shell footer,
+[data-wmb-theme="dark"] .learning-shell .bg-white,
+[data-wmb-theme="dark"] .learning-shell .bg-white\/90,
+[data-wmb-theme="dark"] .learning-shell .bg-\[\#f7f8f8\] {
   background-color: #0b1b31 !important;
   color: #f8fafc !important;
   border-color: rgba(148, 163, 184, 0.16) !important;
 }
 
-.learning-shell.is-dark .bg-slate-50,
-.learning-shell.is-dark .bg-slate-100 {
+[data-wmb-theme="dark"] .learning-shell .bg-slate-50,
+[data-wmb-theme="dark"] .learning-shell .bg-slate-100 {
   background-color: #10233c !important;
 }
 
-.learning-shell.is-dark .bg-emerald-50,
-.learning-shell.is-dark .bg-emerald-50\/45,
-.learning-shell.is-dark .bg-emerald-50\/50,
-.learning-shell.is-dark .bg-emerald-50\/55,
-.learning-shell.is-dark .bg-emerald-50\/60,
-.learning-shell.is-dark .bg-emerald-50\/65 {
+[data-wmb-theme="dark"] .learning-shell .bg-emerald-50,
+[data-wmb-theme="dark"] .learning-shell .bg-emerald-50\/45,
+[data-wmb-theme="dark"] .learning-shell .bg-emerald-50\/50,
+[data-wmb-theme="dark"] .learning-shell .bg-emerald-50\/55,
+[data-wmb-theme="dark"] .learning-shell .bg-emerald-50\/60,
+[data-wmb-theme="dark"] .learning-shell .bg-emerald-50\/65 {
   background-color: rgba(16, 185, 129, 0.09) !important;
 }
 
-.learning-shell.is-dark .text-slate-950,
-.learning-shell.is-dark .text-slate-900,
-.learning-shell.is-dark .text-slate-800,
-.learning-shell.is-dark .text-slate-700 {
+[data-wmb-theme="dark"] .learning-shell .text-slate-950,
+[data-wmb-theme="dark"] .learning-shell .text-slate-900,
+[data-wmb-theme="dark"] .learning-shell .text-slate-800,
+[data-wmb-theme="dark"] .learning-shell .text-slate-700 {
   color: #f8fafc !important;
 }
 
-.learning-shell.is-dark .text-slate-600,
-.learning-shell.is-dark .text-slate-500 {
+[data-wmb-theme="dark"] .learning-shell .text-slate-600,
+[data-wmb-theme="dark"] .learning-shell .text-slate-500 {
   color: #b9c5d6 !important;
 }
 
-.learning-shell.is-dark .text-slate-400,
-.learning-shell.is-dark .text-slate-300,
-.learning-shell.is-dark .text-slate-200 {
+[data-wmb-theme="dark"] .learning-shell .text-slate-400,
+[data-wmb-theme="dark"] .learning-shell .text-slate-300,
+[data-wmb-theme="dark"] .learning-shell .text-slate-200 {
   color: #cbd5e1 !important;
 }
 
-.learning-shell.is-dark .text-emerald-950 {
+[data-wmb-theme="dark"] .learning-shell .text-emerald-950 {
   color: #d1fae5 !important;
 }
 
-.learning-shell.is-dark .text-emerald-950\/80,
-.learning-shell.is-dark .text-emerald-900 {
+[data-wmb-theme="dark"] .learning-shell .text-emerald-950\/80,
+[data-wmb-theme="dark"] .learning-shell .text-emerald-900 {
   color: #a7f3d0 !important;
 }
 
-.learning-shell.is-dark .text-emerald-500,
-.learning-shell.is-dark .text-emerald-600,
-.learning-shell.is-dark .text-emerald-700,
-.learning-shell.is-dark .text-emerald-800 {
+[data-wmb-theme="dark"] .learning-shell .text-emerald-500,
+[data-wmb-theme="dark"] .learning-shell .text-emerald-600,
+[data-wmb-theme="dark"] .learning-shell .text-emerald-700,
+[data-wmb-theme="dark"] .learning-shell .text-emerald-800 {
   color: #6ee7b7 !important;
 }
 
 /* Bright emerald actions need dark ink, even inside the dark reading theme. */
-.learning-shell.is-dark .bg-emerald-300.text-emerald-950,
-.learning-shell.is-dark .bg-emerald-400.text-emerald-950,
-.learning-shell.is-dark .rate-default-pill {
+[data-wmb-theme="dark"] .learning-shell .bg-emerald-300.text-emerald-950,
+[data-wmb-theme="dark"] .learning-shell .bg-emerald-400.text-emerald-950,
+[data-wmb-theme="dark"] .learning-shell .rate-default-pill {
   color: #022c22 !important;
 }
 
-.learning-shell.is-dark .border-slate-100,
-.learning-shell.is-dark .border-slate-200,
-.learning-shell.is-dark .border-emerald-100,
-.learning-shell.is-dark .border-emerald-950\/10 {
+[data-wmb-theme="dark"] .learning-shell .border-slate-100,
+[data-wmb-theme="dark"] .learning-shell .border-slate-200,
+[data-wmb-theme="dark"] .learning-shell .border-emerald-100,
+[data-wmb-theme="dark"] .learning-shell .border-emerald-950\/10 {
   border-color: rgba(148, 163, 184, 0.16) !important;
 }
 
-.learning-shell.is-dark input,
-.learning-shell.is-dark select {
+[data-wmb-theme="dark"] .learning-shell input,
+[data-wmb-theme="dark"] .learning-shell select {
   background: #0d2038 !important;
   color: #f8fafc !important;
   border-color: rgba(148, 163, 184, 0.22) !important;
 }
 
-.learning-shell.is-dark input::placeholder {
+[data-wmb-theme="dark"] .learning-shell input::placeholder {
   color: #7f8fa6;
 }
 
-.learning-shell.is-dark .learning-theme-toggle {
+[data-wmb-theme="dark"] .learning-shell .learning-theme-toggle {
   background: rgba(255, 255, 255, 0.065) !important;
   border-color: rgba(110, 231, 183, 0.18) !important;
   color: #a7f3d0 !important;
 }
 
-.learning-shell.is-dark .rate-default-pill {
+[data-wmb-theme="dark"] .learning-shell .rate-default-pill {
   background: #34d399 !important;
   border-color: #34d399 !important;
   color: #022c22 !important;
@@ -199,13 +229,13 @@ select {
   border-radius: 0 14px 14px 0;
 }
 
-.learning-shell.is-dark .learning-key-points {
+[data-wmb-theme="dark"] .learning-shell .learning-key-points {
   border-color: #34d399 !important;
   background: #10233c !important;
   box-shadow: 0 10px 24px rgba(2, 8, 23, 0.18) !important;
 }
 
-.learning-shell.is-dark .learning-formula {
+[data-wmb-theme="dark"] .learning-shell .learning-formula {
   border-color: #34d399 !important;
   background: #0d2038 !important;
 }
@@ -414,6 +444,138 @@ select {
 .wmb-dashboard-dark .wmb-theme-panel .border-emerald-200,
 .wmb-dashboard-dark .wmb-theme-panel .border-emerald-950\/\[0\.07\] {
   border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Installed-app launch screen.
+
+   The splash the operating system paints when the icon is tapped is a static
+   image built from the manifest, and no web API can animate it. What this does
+   is take over the moment the page paints, on the manifest's exact
+   background_color, so the handoff from that static logo into a moving one is
+   invisible. The effect is one continuous animation: the logo appears, a dot
+   orbits it, and the dot settles into the position the logo's own dot occupies.
+
+   Hidden outside an installed app, so browser visitors never wait behind it and
+   it costs nothing on the web. Dismissal is driven by CSS rather than script:
+   a failed or blocked bundle can then never leave a permanent overlay.
+--------------------------------------------------------------------------- */
+#wmb-splash {
+  display: none;
+}
+
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+  #wmb-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.75rem;
+    /* Must stay identical to manifest background_color. */
+    background: #06142b;
+    animation: wmb-splash-out 400ms ease 1900ms forwards;
+  }
+}
+
+/* iOS reports standalone through navigator, not always the media query. */
+html.wmb-standalone #wmb-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem;
+  background: #06142b;
+  animation: wmb-splash-out 400ms ease 1900ms forwards;
+}
+
+/* The mark.
+   Geometry traced from android-chrome-512x512.png and verified against the
+   rendered pixels: the hook is a circle centred (248.5, 190.5) r=107.5 with a
+   32-wide stroke, swept 230° from the 3 o'clock position round to 130°, then a
+   tail falling to (212, 360). The bolt is a 40-wide polyline leaving the hook's
+   end, and the dot is r=24 at (251.5, 432). Changing any of these means
+   re-tracing, not guessing. */
+.wmb-splash-mark {
+  /* Sized by height; the viewBox is cropped to the artwork, so the width
+     follows its 296:428 proportions rather than a square tile. */
+  height: 150px;
+  width: auto;
+  overflow: visible;
+}
+
+.wmb-splash-mark path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Slightly lifted from the value that worked over the icon's teal tile — the
+   same ghost reads dimmer against the darker navy now behind it. */
+.wmb-mark-ghost path,
+.wmb-mark-ghost circle {
+  opacity: 0.2;
+}
+
+.wmb-mark-ghost path:first-of-type { stroke: #eaeaea; stroke-width: 32; }
+.wmb-mark-ghost .wmb-mark-bolt-shape { stroke: #eeb412; stroke-width: 40; }
+.wmb-mark-ghost circle { fill: #eeb412; }
+
+/* pathLength normalises both paths to 100 units, so these dash figures are
+   exact without anyone having to measure a bezier by hand. */
+.wmb-mark-arc {
+  stroke: #eaeaea;
+  stroke-width: 32;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: wmb-mark-draw 720ms cubic-bezier(0.65, 0, 0.35, 1) 160ms forwards;
+}
+
+.wmb-mark-bolt {
+  stroke: #eeb412;
+  stroke-width: 40;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: wmb-mark-draw 380ms cubic-bezier(0.5, 0, 0.4, 1) 860ms forwards;
+}
+
+.wmb-mark-dot {
+  fill: #eeb412;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wmb-mark-dot-in 340ms cubic-bezier(0.34, 1.56, 0.64, 1) 1220ms forwards;
+}
+
+@keyframes wmb-mark-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes wmb-mark-dot-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes wmb-splash-out {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+
+/* Reduced motion still gets the launch screen and the finished mark; it simply
+   arrives complete instead of drawing itself. */
+@media (prefers-reduced-motion: reduce) {
+  .wmb-mark-arc,
+  .wmb-mark-bolt,
+  .wmb-mark-dot {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+  }
+  .wmb-mark-ghost { display: none; }
 }
 
 /* Biggest energy user card helper */

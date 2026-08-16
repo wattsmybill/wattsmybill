@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Search, ShieldCheck, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Search, ShieldCheck, X } from "lucide-react";
 
 export default function RateLibrary({ entries }) {
   const [query, setQuery] = useState("");
@@ -60,11 +60,21 @@ export default function RateLibrary({ entries }) {
               <p className="mt-1 text-sm font-black leading-5 text-slate-900">{entry.authority}</p>
               <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{entry.coverage}</p>
 
-              <div className="mt-4 flex items-end justify-between gap-3 border-t border-slate-100 pt-3">
-                <p className="text-[11px] font-semibold text-slate-500">Source checked {entry.checked}</p>
-                <a href={entry.url} target="_blank" rel="noreferrer" aria-label={`Open ${entry.label} for ${entry.name}`} className="inline-flex items-center gap-1 text-xs font-black text-emerald-700 hover:text-emerald-900">
-                  {entry.label} <ArrowUpRight size={14} aria-hidden="true" />
-                </a>
+              {/* Every card used to offer exactly one action, and it led off
+                  the site. Someone browsing rates wants to use one. */}
+              <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-3">
+                <Link
+                  href={`/?country=${encodeURIComponent(entry.name)}#calculator`}
+                  className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2.5 text-xs font-black text-white transition hover:bg-emerald-800"
+                >
+                  Use this rate <ArrowRight size={14} aria-hidden="true" />
+                </Link>
+                <div className="flex items-end justify-between gap-3">
+                  <p className="text-[11px] font-semibold text-slate-500">Source checked {entry.checked}</p>
+                  <a href={entry.url} target="_blank" rel="noreferrer" aria-label={`Open ${entry.label} for ${entry.name}`} className="inline-flex items-center gap-1 text-xs font-black text-emerald-700 hover:text-emerald-900">
+                    {entry.label} <ArrowUpRight size={14} aria-hidden="true" />
+                  </a>
+                </div>
               </div>
             </article>
           ))}

@@ -28,6 +28,12 @@ export default function sitemap() {
       priority: 0.8,
     },
     {
+      url: "https://www.wattsmybill.app/history",
+      lastModified: new Date("2026-08-16"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: "https://www.wattsmybill.app/methodology",
       lastModified: new Date("2026-08-14"),
       changeFrequency: "monthly",

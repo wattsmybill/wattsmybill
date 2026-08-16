@@ -17,7 +17,7 @@ The experience should feel calm, credible, compact, and premium. It should expla
 - Added progressive disclosure for optional bill inputs and Bill Detective.
 - Created a searchable, filterable Learning Hub with 14 original guides.
 - Added source-linked article pages, table-of-contents navigation, related reading, breadcrumbs, and structured data.
-- Added official government, regulator, or utility rate context for all 28 named countries currently available in the selector.
+- Added official government, regulator, or utility rate context for every named country in the selector (35 as of August 2026). The Hub now derives this count from the country data instead of repeating a number in copy, which is how it drifted to a stale 28.
 - Added a searchable Rate Library that separates calculator defaults from official tariff context.
 - Published an open methodology covering calculations, sourcing, privacy, limitations, and corrections.
 - Added clearer language distinguishing indicative defaults from live tariffs.

@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { THEME_BOOTSTRAP_SCRIPT } from "./lib/theme";
+import { LAUNCH_SCREEN_SCRIPT } from "./lib/launchScreen";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -225,8 +227,24 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // The bootstrap script below sets data-wmb-theme and color-scheme on this
+      // element before React hydrates, which is the whole point of it. React
+      // must be told those attributes are expected to differ from the server
+      // render rather than treating them as a mismatch.
+      suppressHydrationWarning
     >
       <head>
+        {/* Resolves the theme before first paint. Must stay ahead of the React
+            bundle: restoring it after hydration is what made every Learning Hub
+            navigation flash white for dark-mode readers. */}
+        <script
+          id="watts-my-bill-theme-bootstrap"
+          dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }}
+        />
+        <script
+          id="watts-my-bill-launch-screen"
+          dangerouslySetInnerHTML={{ __html: LAUNCH_SCREEN_SCRIPT }}
+        />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="Watts My Bill" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -239,6 +257,48 @@ export default function RootLayout({ children }) {
       </head>
 
       <body className="min-h-full flex flex-col">
+        {/* Launch screen for the installed app. Plain markup rather than a
+            component so it is in the very first HTML the device paints — a
+            React-rendered version could only appear after hydration, which is
+            exactly the gap it exists to cover. Styles and dismissal live in
+            globals.css; see the launch-screen block there. */}
+        <div id="wmb-splash" aria-hidden="true">
+          {/* The mark is drawn rather than shown as an image, so its own lines
+              can animate: the white hook draws first, the bolt follows out of
+              where the hook ends, and the dot lands last. Geometry was traced
+              from android-chrome-512x512.png, so this is the real logo and not
+              an approximation of it — see the launch-screen notes in
+              globals.css before editing any coordinate here.
+
+              A dim copy of the finished mark sits underneath. The system splash
+              has just shown the complete logo, and starting from an empty frame
+              would read as the app resetting; drawing bright lines over a ghost
+              reads as the logo coming up to power instead. */}
+          {/* The viewBox crops to the artwork itself rather than the icon's
+              square tile: the strokes only occupy x 125–381, y 67–455 of the
+              original 512 grid, so without the tile behind them the full square
+              would leave the mark stranded in empty space. */}
+          <svg className="wmb-splash-mark" viewBox="105 47 296 428" role="presentation">
+            <g className="wmb-mark-ghost">
+              <path d="M212 360 C214 324 196 292 179.4 272.8 A107.5 107.5 0 1 1 356 190.5" />
+              <path className="wmb-mark-bolt-shape" d="M356 197 L300 270 L362 283 L288 370" />
+              <circle cx="251.5" cy="432" r="24" />
+            </g>
+
+            <path
+              className="wmb-mark-arc"
+              pathLength="100"
+              d="M212 360 C214 324 196 292 179.4 272.8 A107.5 107.5 0 1 1 356 190.5"
+            />
+            <path
+              className="wmb-mark-bolt"
+              pathLength="100"
+              d="M356 197 L300 270 L362 283 L288 370"
+            />
+            <circle className="wmb-mark-dot" cx="251.5" cy="432" r="24" />
+          </svg>
+        </div>
+
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-BVVJPKW2ZT"
           strategy="afterInteractive"

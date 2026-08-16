@@ -105,7 +105,7 @@ export default async function ArticlePage({ params }) {
       <LearnHeader />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <main className="mx-auto max-w-6xl px-5 pb-16 pt-8 sm:px-7 sm:pt-12">
+      <main id="main-content" className="mx-auto max-w-6xl px-5 pb-16 pt-8 sm:px-7 sm:pt-12">
         <Link href="/learn" className="inline-flex items-center gap-2 text-sm font-black text-emerald-700 hover:text-emerald-900">
           <ArrowLeft size={16} /> Back to Learning Hub
         </Link>

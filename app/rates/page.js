@@ -51,10 +51,9 @@ export default function RatesPage() {
     <LearningThemeShell>
     <div className="min-h-screen bg-[#eef3f1] text-slate-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <a href="#rate-library" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-black">Skip to rate library</a>
-      <LearnHeader />
+      <LearnHeader skipTo="#main-content" />
 
-      <main id="rate-library" className="mx-auto max-w-6xl px-4 pb-16 pt-5 sm:px-6 sm:pt-8">
+      <main id="main-content" className="mx-auto max-w-6xl px-4 pb-16 pt-5 sm:px-6 sm:pt-8">
         <section className="overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#043a33_0%,#087157_62%,#11936b_100%)] px-5 py-7 text-white shadow-[0_18px_44px_rgba(5,84,66,0.16)] sm:px-8 sm:py-9">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-200">Worldwide rate library</p>
