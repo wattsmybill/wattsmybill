@@ -41,6 +41,15 @@ The tariff validator checks simple, time-of-use, shoulder, progressive-tier, sta
 - Every named country in the selector links to official government, regulator, or utility context and includes a coverage caveat.
 - Guides cite first-party or authoritative sources and show their update date.
 
+## Installed-app icons and launch screen
+
+The manifest declares two sets of icons on purpose, and they are not interchangeable:
+
+- `purpose: "maskable"` — `android-chrome-*.png`, the teal-tiled mark. This is the home-screen icon and should stay recognisable as the brand.
+- `purpose: "any"` — `splash-icon-*.png`, the untiled mark dimmed on `#06142b`. Chrome draws the PWA splash from an `any` icon, and this file is deliberately identical to the first frame of the launch animation. The operating system paints that splash before any of our code runs and it cannot be removed or animated; matching it to the animation's opening frame is what stops the logo appearing twice, in two different forms, on launch.
+
+The launch animation itself lives in `app/layout.js` (markup) and the launch-screen block of `app/globals.css` (timings and geometry). Its paths were traced from the real icon. If the mark ever changes, regenerate `splash-icon-*.png` to match or the splash and the animation will drift apart.
+
 ## Search notification
 
 After a production deployment containing new or updated URLs is live, notify participating IndexNow search engines once:
