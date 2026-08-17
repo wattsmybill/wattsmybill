@@ -62,7 +62,7 @@ export default function MethodologyPage() {
       <LearnHeader />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <main id="main-content" className="mx-auto max-w-5xl px-5 pb-16 pt-7 sm:px-7 sm:pt-10">
-        <section className="rounded-[2rem] bg-[linear-gradient(135deg,#043a33_0%,#087157_64%,#11936b_100%)] px-6 py-8 text-white shadow-[0_18px_44px_rgba(5,84,66,0.15)] sm:px-9 sm:py-10">
+        <section className="rounded-[2rem] bg-[linear-gradient(135deg,#043a33_0%,#087157_64%,#0a7454_100%)] px-6 py-8 text-white shadow-[0_18px_44px_rgba(5,84,66,0.15)] sm:px-9 sm:py-10">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-200">Open methodology</p>
           <h1 className="mt-2 max-w-3xl text-3xl font-black tracking-[-0.04em] sm:text-4xl">Useful estimates need visible assumptions.</h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-emerald-50/90 sm:text-base">Watts My Bill is an educational estimator, not a utility billing engine. This page explains what the numbers mean, where guidance comes from, and where the tool should stop.</p>

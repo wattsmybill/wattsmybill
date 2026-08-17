@@ -8,9 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "qa": "npm run lint && npm run validate:tariff && npm run validate:content && npm run build && npm run validate:build",
+    "qa": "npm run lint && npm run validate:tariff && npm run validate:content && npm run validate:contrast && npm run build && npm run validate:build",
     "validate:tariff": "node scripts/validate-tariff.mjs",
     "validate:content": "node scripts/validate-content.mjs",
+    "validate:contrast": "node scripts/validate-contrast.mjs",
     "validate:build": "node scripts/validate-build.mjs",
     "seo:notify": "node scripts/submit-indexnow.mjs"
   },

@@ -81,13 +81,13 @@ export default function LearnPage() {
 
       <main id="main-content">
         <section className="mx-auto max-w-6xl px-5 pb-10 pt-10 sm:px-7 sm:pt-14">
-          <div className="overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#043a33_0%,#087256_68%,#10956c_100%)] px-6 py-9 text-white shadow-sm sm:px-9 sm:py-11">
+          <div className="overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#043a33_0%,#087256_68%,#0a7454_100%)] px-6 py-9 text-white shadow-sm sm:px-9 sm:py-11">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-200">Watts My Bill? Learning Hub</p>
               <h1 className="mt-3 text-4xl font-black tracking-[-0.04em] sm:text-5xl">
                 Answers for everyday electricity questions.
               </h1>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-white/82">
+              <p className="mt-4 max-w-3xl text-base leading-7 text-emerald-50/95">
                 No jargon. No judgement. Start with whatever brought you here, from a changing bill to an appliance you want to understand.
               </p>
 
@@ -123,7 +123,11 @@ export default function LearnPage() {
                 {[[ARTICLES.length, "practical guides"], ["Global", "local differences"], ["Official", "source links"]].map(([value, label]) => (
                   <div key={label} className="border-r border-white/12 pr-3 last:border-0 last:pl-4 sm:px-4 sm:first:pl-0">
                     <p className="text-sm font-black text-white">{value}</p>
-                    <p className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-emerald-100/65">{label}</p>
+                    {/* These labels sit low in the hero, where the gradient is
+                        at its lightest, and are only 10px — so they carry the
+                        least opacity the contrast budget allows, not the least
+                        that looked pleasant. */}
+                    <p className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-emerald-50/90">{label}</p>
                   </div>
                 ))}
               </div>
