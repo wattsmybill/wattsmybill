@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ARTICLES } from "../app/learn/articles.js";
+import { urlList as indexNowUrls } from "./submit-indexnow.mjs";
 
 const appOutput = join(process.cwd(), ".next", "server", "app");
 const siteUrl = "https://www.wattsmybill.app";
@@ -84,6 +85,15 @@ for (const file of builtHtml) {
     const pathname = href.split("#")[0].split("?")[0] || "/";
     const publicFile = join(process.cwd(), "public", pathname.slice(1));
     if (!knownRoutes.has(pathname) && !existsSync(publicFile)) errors.push(`Broken internal link in ${file}: ${href}`);
+  }
+}
+
+// The IndexNow list has to cover every public route, or a new page ships and is
+// never announced to search engines. This drifted once already.
+for (const route of knownRoutes) {
+  const expected = route === "/" ? siteUrl : `${siteUrl}${route}`;
+  if (!indexNowUrls.includes(expected)) {
+    errors.push(`Missing from IndexNow submission list (scripts/submit-indexnow.mjs): ${expected}`);
   }
 }
 
