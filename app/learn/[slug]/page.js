@@ -85,7 +85,7 @@ export default async function ArticlePage({ params }) {
       publisher: {
         "@type": "Organization",
         name: "Watts My Bill?",
-        logo: { "@type": "ImageObject", url: `${siteUrl}/android-chrome-512x512.png` },
+        logo: { "@type": "ImageObject", url: `${siteUrl}/icon-512-v2.png` },
       },
     },
     {

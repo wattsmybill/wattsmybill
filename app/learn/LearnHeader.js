@@ -40,7 +40,7 @@ export default function LearnHeader({ skipTo = "#main-content" }) {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-4 sm:px-7">
         <Link href="/" className="flex items-center gap-3" aria-label="Watts My Bill home">
           <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl sm:h-[46px] sm:w-[46px]">
-            <Image src="/logo.png" alt="" width={46} height={47} className="h-auto w-full rounded-xl" />
+            <Image src="/logo-v2.png" alt="" width={46} height={47} className="h-auto w-full rounded-xl" />
           </span>
           <div>
             <p className="text-sm font-black tracking-tight text-slate-950 sm:text-base">Watts My Bill?</p>

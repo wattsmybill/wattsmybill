@@ -21,7 +21,7 @@ const DEFAULT_APPLIANCE = {
   days: ""
 };
 
-const LOGO_PATH = "/logo.png";
+const LOGO_PATH = "/logo-v2.png";
 const PROVIDER_RATE_GUIDE_PATH = "/provider-rate-guide.png";
 const WATTAGE_GUIDE_PATH = "/wattage-guide.png";
 const COUNTRY_PLACEHOLDER_NAME = "Select your country";

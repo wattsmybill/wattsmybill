@@ -21,7 +21,7 @@ const siteDescription =
   "Estimate and understand your electricity bill using appliance usage, your local rate, fixed charges, and practical worldwide electricity guides.";
 
 const ogImage = `${siteUrl}/og-image-final.jpg`;
-const logoUrl = `${siteUrl}/android-chrome-512x512.png`;
+const logoUrl = `${siteUrl}/icon-512-v2.png`;
 
 export const viewport = {
   width: "device-width",
@@ -116,44 +116,49 @@ export const metadata = {
     images: [ogImage],
   },
 
+  // Icon filenames carry a version suffix deliberately. Vercel serves files from
+  // public/ with max-age=14400, so replacing the bytes at a stable URL left
+  // browsers showing the previous artwork for hours — and an installed PWA kept
+  // whatever it had at install time indefinitely. Changing the URL is the only
+  // thing a cache cannot ignore. Bump the suffix whenever the artwork changes.
   icons: {
     icon: [
       {
-        url: "/favicon.ico",
+        url: "/favicon-v2.ico",
         sizes: "16x16 32x32 48x48",
         type: "image/x-icon",
       },
       {
-        url: "/favicon-32x32.png",
+        url: "/favicon-32x32-v2.png",
         sizes: "32x32",
         type: "image/png",
       },
       {
-        url: "/favicon-16x16.png",
+        url: "/favicon-16x16-v2.png",
         sizes: "16x16",
         type: "image/png",
       },
       {
-        url: "/android-chrome-192x192.png",
+        url: "/icon-192-v2.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
-        url: "/android-chrome-512x512.png",
+        url: "/icon-512-v2.png",
         sizes: "512x512",
         type: "image/png",
       },
     ],
     shortcut: [
       {
-        url: "/favicon.ico",
+        url: "/favicon-v2.ico",
         sizes: "16x16 32x32 48x48",
         type: "image/x-icon",
       },
     ],
     apple: [
       {
-        url: "/apple-touch-icon.png",
+        url: "/apple-touch-icon-v2.png",
         sizes: "180x180",
         type: "image/png",
       },
@@ -266,7 +271,7 @@ export default function RootLayout({ children }) {
           {/* The mark is drawn rather than shown as an image, so its own lines
               can animate: the white hook draws first, the bolt follows out of
               where the hook ends, and the dot lands last. Geometry was traced
-              from android-chrome-512x512.png, so this is the real logo and not
+              from the app icon artwork, so this is the real logo and not
               an approximation of it — see the launch-screen notes in
               globals.css before editing any coordinate here.
 

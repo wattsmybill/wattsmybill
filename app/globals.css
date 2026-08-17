@@ -495,7 +495,7 @@ html.wmb-standalone #wmb-splash {
 }
 
 /* The mark.
-   Geometry traced from android-chrome-512x512.png and verified against the
+   Geometry traced from the app icon (now icon-512-v2.png) and verified against the
    rendered pixels: the hook is a circle centred (248.5, 190.5) r=107.5 with a
    32-wide stroke, swept 230° from the 3 o'clock position round to 130°, then a
    tail falling to (212, 360). The bolt is a 40-wide polyline leaving the hook's

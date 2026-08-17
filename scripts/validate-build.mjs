@@ -63,7 +63,7 @@ for (const url of [siteUrl, `${siteUrl}/learn`, `${siteUrl}/rates`, `${siteUrl}/
 }
 
 const home = readRequired(join(appOutput, "index.html"), "home page");
-for (const favicon of ["/favicon.ico", "/favicon-32x32.png", "/android-chrome-192x192.png", "/android-chrome-512x512.png", "/apple-touch-icon.png"]) {
+for (const favicon of ["/favicon-v2.ico", "/favicon-32x32-v2.png", "/icon-192-v2.png", "/icon-512-v2.png", "/apple-touch-icon-v2.png"]) {
   if (!home.includes(favicon)) errors.push(`Missing favicon declaration: ${favicon}`);
 }
 
