@@ -604,6 +604,76 @@ html.wmb-standalone #wmb-splash {
   .wmb-mark-tile { animation: none !important; opacity: 0; }
 }
 
+/* ---------------------------------------------------------------------------
+   Bottom navigation (small screens and the installed app).
+
+   Written here rather than as utility classes because it has to sit above every
+   surface in both themes, respect the home-indicator inset on phones, and keep
+   its own colours whether it lands on the calculator (which themes itself
+   inline) or a Learning Hub route (which themes via [data-wmb-theme]).
+--------------------------------------------------------------------------- */
+.wmb-bottom-tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 120;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(2, 44, 34, 0.1);
+  /* Clears the iOS home indicator instead of sitting under it. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+[data-wmb-theme="dark"] .wmb-bottom-tabs {
+  background: rgba(11, 27, 49, 0.94);
+  border-top-color: rgba(148, 163, 184, 0.16);
+}
+
+.wmb-bottom-tabs ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.wmb-bottom-tabs a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  /* Comfortably past the 44px minimum touch target. */
+  min-height: 56px;
+  padding: 7px 4px 9px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #5b6b73;
+  text-decoration: none;
+  transition: color 140ms ease;
+}
+
+[data-wmb-theme="dark"] .wmb-bottom-tabs a { color: #94a8b8; }
+
+.wmb-bottom-tabs a[data-current] { color: #047857; }
+[data-wmb-theme="dark"] .wmb-bottom-tabs a[data-current] { color: #6ee7b7; }
+
+/* Keeps page content clear of the bar, including the safe-area inset. */
+@media (max-width: 767px) {
+  body { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
+
+  /* The live-estimate bar and the back-to-top pill were already anchored to the
+     bottom of the viewport, so they have to be lifted above the new bar rather
+     than left underneath it. Tagged in the markup instead of matched on their
+     utility classes, which are long and would silently stop matching if either
+     element were restyled. */
+  .wmb-above-tabs {
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
 /* Biggest energy user card helper */
 .line-clamp-2 {
   display: -webkit-box;

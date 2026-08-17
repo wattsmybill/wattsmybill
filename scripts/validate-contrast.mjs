@@ -64,6 +64,8 @@ const INK = {
   amber100: "#fef3c7",
   amber900: "#78350f",
   rose300: "#fda4af",
+  tabInactive: "#5b6b73",
+  tabInactiveDark: "#94a8b8",
 
   // Values written straight into globals.css for the dark reading theme.
   darkBody: "#f8fafc",
@@ -161,6 +163,12 @@ const PAIRS = [
   // --- amber warnings, both themes ---
   ["Amber warning on light", INK.amber900, "#fefce8", "text"],
   ["Amber warning on dark", INK.amber100, over("#fde68a", 0.1, S.pageDark), "text"],
+
+  // --- bottom tab bar (10.5px labels, so held to the text threshold) ---
+  ["Tab label, light", INK.tabInactive, over(INK.white, 0.92, S.pageLight), "text"],
+  ["Tab label active, light", INK.emerald700, over(INK.white, 0.92, S.pageLight), "text"],
+  ["Tab label, dark", INK.tabInactiveDark, over(S.cardDark, 0.94, S.pageDark), "text"],
+  ["Tab label active, dark", INK.emerald300, over(S.cardDark, 0.94, S.pageDark), "text"],
 
   // --- chart ---
   ["Chart axis, light", INK.chartAxisLight, S.card, "text"],

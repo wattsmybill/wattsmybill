@@ -2740,6 +2740,12 @@ ${topUsage.trim()}` : ""}`;
               </div>
             </div>
 
+            {/* The result panel only appears once there is a result. An empty
+                session used to meet a full dashboard with the numbers removed —
+                usage mix, top appliance, cost per day, annual outlook and a
+                carousel — the furniture of an answer before anyone had asked a
+                question. */}
+            {totalKwh > 0 && (
             <div className="rounded-[22px] border border-white/[0.1] bg-emerald-950/25 p-3 backdrop-blur-sm sm:p-4 md:flex md:flex-col md:justify-between" role="region" aria-roledescription="carousel" aria-label="Estimate infographics">
               <div>
                 <div className="flex items-center justify-between gap-3">
@@ -2842,6 +2848,7 @@ ${topUsage.trim()}` : ""}`;
                 <div className="min-w-0 pl-2"><p className="text-[8.5px] font-black uppercase tracking-[0.1em] text-white/50">{hasValidRateForEstimate ? "Year outlook" : "Bill period"}</p><p className="mt-1 truncate text-xs font-black text-white" title={hasValidRateForEstimate ? "Projected at the same usage and rate" : undefined}>{hasValidRateForEstimate ? formatCompactCurrency(total * (365 / billPeriodDays)) : `${billPeriodDays} days`}</p></div>
               </div>
             </div>
+            )}
           </div>
         </section>
 
@@ -4631,7 +4638,7 @@ ${topUsage.trim()}` : ""}`;
         </footer>
 
         {showLiveEstimateBar && completedApplianceCount > 0 && !activeInfoSection && !showBillDetective && (
-          <div className="fixed inset-x-0 bottom-10 z-[110] flex justify-center px-0 md:bottom-8 md:px-3">
+          <div className="wmb-above-tabs fixed inset-x-0 bottom-10 z-[110] flex justify-center px-0 md:bottom-8 md:px-3">
             <div className={`w-[calc(100%-5.5rem)] max-w-[380px] rounded-[18px] border px-2.5 py-1.5 shadow-[0_10px_24px_rgba(15,23,42,0.085)] backdrop-blur-[26px] transition-all duration-300 md:w-full md:max-w-[620px] md:rounded-[22px] md:px-3.5 md:py-2.5 md:shadow-[0_12px_28px_rgba(15,23,42,0.095)] ${darkMode ? "border-emerald-200/[0.12] bg-emerald-950/64 text-white ring-1 ring-white/[0.05]" : "border-emerald-100/28 bg-[rgba(5,88,70,0.60)] text-white ring-1 ring-white/[0.12]"}`}>
               <div className="flex items-center justify-between gap-2 md:gap-3">
                 <button
@@ -4950,7 +4957,7 @@ ${topUsage.trim()}` : ""}`;
               block: "start"
             })
           }
-          className={`fixed bottom-[calc(env(safe-area-inset-bottom)+0.9rem)] right-3 z-[70] inline-flex items-center gap-1 rounded-full border border-emerald-200/25 bg-white/55 px-2.5 py-1.5 text-[10px] font-bold text-emerald-900/65 shadow-[0_6px_16px_rgba(15,23,42,0.06)] ring-1 ring-slate-900/[0.025] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/80 hover:text-emerald-950 md:right-5 md:px-3 md:text-[11px] ${showLiveEstimateBar ? "max-md:hidden" : ""}`}
+          className={`wmb-above-tabs fixed bottom-[calc(env(safe-area-inset-bottom)+0.9rem)] right-3 z-[70] inline-flex items-center gap-1 rounded-full border border-emerald-200/25 bg-white/55 px-2.5 py-1.5 text-[10px] font-bold text-emerald-900/65 shadow-[0_6px_16px_rgba(15,23,42,0.06)] ring-1 ring-slate-900/[0.025] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/80 hover:text-emerald-950 md:right-5 md:px-3 md:text-[11px] ${showLiveEstimateBar ? "max-md:hidden" : ""}`}
           aria-label="Back to top"
         >
           <ArrowUp size={13} strokeWidth={2.4} />

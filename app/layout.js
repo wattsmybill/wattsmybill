@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import { THEME_BOOTSTRAP_SCRIPT } from "./lib/theme";
 import { LAUNCH_SCREEN_SCRIPT } from "./lib/launchScreen";
+import BottomTabs from "./components/BottomTabs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -340,6 +341,8 @@ export default function RootLayout({ children }) {
         </Script>
 
         {children}
+
+        <BottomTabs />
       </body>
     </html>
   );
