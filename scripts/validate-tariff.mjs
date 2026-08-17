@@ -32,6 +32,23 @@ const tiered = calculateTariffEstimate({
 closeTo(tiered.allocation.tierOneKwh, 100, "First-tier allocation");
 closeTo(tiered.allocation.tierTwoKwh, 150, "Next-tier allocation");
 closeTo(tiered.total, 40, "Progressive tier total");
+assert.equal(tiered.tierProrated, false, "A 30-day bill should not be flagged as prorated");
+
+// A quarterly bill earns three months of the monthly allowance, not one.
+// Unprorated, 650 kWh over 90 days billed 100 cheap units and 550 expensive
+// ones instead of 300 and 350 — an overcharge of 20 at these rates.
+const quarterlyTiered = calculateTariffEstimate({
+  totalKwh: 650,
+  billingDays: 90,
+  mode: "tiered",
+  tierLimit: 100,
+  tierOneRate: 0.1,
+  tierTwoRate: 0.2,
+});
+closeTo(quarterlyTiered.allocation.tierOneKwh, 300, "Quarterly first-tier allocation");
+closeTo(quarterlyTiered.allocation.tierTwoKwh, 350, "Quarterly next-tier allocation");
+closeTo(quarterlyTiered.total, 100, "Quarterly progressive tier total");
+assert.equal(quarterlyTiered.tierProrated, true, "A 90-day bill should be flagged as prorated");
 
 const threePeriod = calculateTariffEstimate({
   totalKwh: 200,

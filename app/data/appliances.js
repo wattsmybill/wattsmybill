@@ -4,7 +4,7 @@ export const PRESETS = [
   { category: "Cooling", name: "Electric Fan", watts: 75, hours: 8, days: 30 },
   { category: "Cooling", name: "Ceiling Fan", watts: 60, hours: 8, days: 30 },
 
-  { category: "Kitchen", name: "Refrigerator", watts: 150, hours: 24, days: 30 },
+  { category: "Kitchen", name: "Refrigerator", watts: 150, hours: 24, days: 30, duty: 0.35 },
   { category: "Kitchen", name: "Microwave", watts: 1200, hours: 0.25, days: 15 },
   { category: "Kitchen", name: "Rice Cooker", watts: 700, hours: 1, days: 30 },
 
@@ -33,7 +33,7 @@ export const PRESETS = [
   { category: "Cooling", name: "Split type aircon 2.5 HP (inverter)", watts: 1800, hours: 8, days: 25 },
   { category: "Cooling", name: "Floor standing aircon 3.0 HP", watts: 3000, hours: 8, days: 25 },
 
-  { category: "Kitchen", name: "Freezer", watts: 250, hours: 24, days: 30 },
+  { category: "Kitchen", name: "Freezer", watts: 250, hours: 24, days: 30, duty: 0.4 },
   { category: "Kitchen", name: "Oven", watts: 2000, hours: 1, days: 8 },
   { category: "Kitchen", name: "Electric Stove", watts: 2000, hours: 1, days: 20 },
   { category: "Kitchen", name: "Electric Range", watts: 2500, hours: 1, days: 20 },

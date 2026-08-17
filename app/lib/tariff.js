@@ -33,9 +33,16 @@ export function calculateTariffEstimate({
   const peakKwh = kwh * (peakShareValue / 100);
   const shoulderKwh = kwh * (shoulderShareValue / 100);
   const offPeakKwh = Math.max(0, kwh - peakKwh - shoulderKwh);
+  // Tier thresholds are published per month, but kwh here covers the whole
+  // billing period. Applying the raw limit to a quarterly bill would grant one
+  // month of cheap units and charge the remainder at the top rate, overcharging
+  // exactly the quarterly-billed households the tier model exists to serve.
   const tierLimitValue = nonNegative(tierLimit);
-  const tierOneKwh = Math.min(kwh, tierLimitValue);
-  const tierTwoKwh = Math.max(0, kwh - tierLimitValue);
+  const tierMonths = days > 0 ? days / 30 : 1;
+  const scaledTierLimit = tierLimitValue * tierMonths;
+  const tierProrated = tierLimitValue > 0 && days > 0 && (days < 28 || days > 31);
+  const tierOneKwh = Math.min(kwh, scaledTierLimit);
+  const tierTwoKwh = Math.max(0, kwh - scaledTierLimit);
 
   const simpleUsageCost = kwh * nonNegative(simpleRate);
   const timeOfUseCost = peakKwh * nonNegative(peakRate) + shoulderKwh * nonNegative(shoulderRate) + offPeakKwh * nonNegative(offPeakRate);
@@ -62,6 +69,9 @@ export function calculateTariffEstimate({
     taxAmount,
     total,
     effectiveEnergyRate: kwh > 0 ? usageCost / kwh : 0,
+    /** True when the monthly tier allowance was scaled to a non-monthly bill. */
+    tierProrated,
+    scaledTierLimit,
     allocation: {
       peakKwh,
       shoulderKwh,

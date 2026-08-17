@@ -367,9 +367,11 @@ export default function BillHistory() {
                 )}
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
-                {change.largest.amount === 0
-                  ? "Usage, price and fixed charges all held steady."
-                  : `Mostly ${change.largest.sentenceLabel}.`}
+                {!change.explainable
+                  ? "Add the kWh used on both bills and this will show whether it was usage, the price per unit, or fixed charges."
+                  : change.largest.amount === 0
+                    ? "Usage, price and fixed charges all held steady."
+                    : `Mostly ${change.largest.sentenceLabel}.`}
                 {!change.comparablePeriods && " These two bills cover different numbers of days, so compare the daily figures below rather than the totals."}
               </p>
 

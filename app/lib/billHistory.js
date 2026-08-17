@@ -75,10 +75,21 @@ export function prepareEntries(entries = []) {
 export function explainChange(previous, current) {
   if (!previous || !current) return null;
 
+  const total = current.total - previous.total;
+
+  // The split is derived from usage and price per unit, so without a kWh figure
+  // on both bills there is nothing to divide the change between. Returning the
+  // change with `explainable: false` lets the caller report what happened while
+  // staying silent on why — the alternative was naming a cause at random, which
+  // it did: three components of zero, and "mostly how much you used" printed
+  // with full confidence.
+  if (!(previous.kwh > 0) || !(current.kwh > 0)) {
+    return { total, parts: [], largest: null, explainable: false, missing: "usage", comparablePeriods: true };
+  }
+
   const usage = (current.kwh - previous.kwh) * previous.effectiveRate;
   const rate = (current.effectiveRate - previous.effectiveRate) * current.kwh;
   const fixed = current.fixedCharge - previous.fixedCharge;
-  const total = current.total - previous.total;
 
   // sentenceLabel is carried separately rather than lower-casing label at the
   // call site, which turned "kWh" into "kwh".
@@ -90,10 +101,17 @@ export function explainChange(previous, current) {
 
   const largest = [...parts].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))[0];
 
+  // The three parts are an identity: they must reconcile to the change they
+  // claim to explain. If rounding or clamped inputs ever break that, the
+  // explanation is withheld rather than shown alongside a total it contradicts.
+  const reconciles = Math.abs(parts.reduce((sum, part) => sum + part.amount, 0) - total) < 0.01;
+
   return {
     total,
     parts,
     largest,
+    explainable: reconciles,
+    missing: reconciles ? null : "reconciliation",
     // Comparing a 30-day bill with a 92-day one on totals alone is misleading,
     // so the caller can warn rather than quietly mislead.
     comparablePeriods: Math.abs(current.days - previous.days) <= 3,

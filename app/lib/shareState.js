@@ -48,12 +48,15 @@ export function encodeSetup({ appliances = [], country, customRate, billingDays,
     a: appliances
       .filter((item) => item?.name || item?.watts)
       .slice(0, 20)
+      // Positional, and duty is appended last so links made before it existed
+      // still decode — a missing sixth value simply means "always on".
       .map((item) => [
         String(item.name || "").slice(0, 40),
         Number(item.watts) || 0,
         Number(item.hours) || 0,
         Number(item.days) || 0,
         Number(item.quantity) || 1,
+        Number(item.duty) > 0 && Number(item.duty) <= 1 ? Number(item.duty) : 1,
       ]),
   };
 
@@ -86,12 +89,13 @@ export function decodeSetup(token) {
       result.appliances = payload.a
         .filter((row) => Array.isArray(row))
         .slice(0, 20)
-        .map(([name, watts, hours, days, quantity]) => ({
+        .map(([name, watts, hours, days, quantity, duty]) => ({
           name: String(name || "").slice(0, 40),
           watts: watts ? String(watts) : "",
           hours: hours ? String(hours) : "",
           days: days ? String(days) : "",
           quantity: Math.min(Math.max(Number(quantity) || 1, 1), 99),
+          duty: Number(duty) > 0 && Number(duty) <= 1 ? Number(duty) : 1,
         }));
     }
 

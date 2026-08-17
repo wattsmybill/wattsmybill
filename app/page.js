@@ -18,8 +18,38 @@ const DEFAULT_APPLIANCE = {
   watts: "",
   quantity: 1,
   hours: "",
-  days: ""
+  days: "",
+  // Fraction of its "hours" an appliance actually draws power. A fridge is
+  // plugged in around the clock but its compressor runs roughly a third of the
+  // time, so watts x hours-plugged-in overstated it by about three times and
+  // routinely crowned it the household's biggest energy user. Anything that
+  // genuinely draws continuously — a router, a camera — stays at 1.
+  duty: 1,
 };
+
+/** Duty is a fraction of 1; anything outside that is treated as "always on". */
+function safeDuty(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 && number <= 1 ? number : 1;
+}
+
+/** Duty factors keyed by appliance name, taken from the catalogue. */
+const DUTY_BY_NAME = new Map(
+  PRESETS.filter((preset) => preset.duty).map((preset) => [preset.name.toLowerCase(), preset.duty])
+);
+
+/**
+ * Resolves an appliance's duty factor.
+ *
+ * Looking it up by name rather than requiring every row to carry the field
+ * means household presets, hand-typed entries and sessions saved before duty
+ * existed all get the same treatment, without the factor having to be
+ * duplicated into each data file where it could silently fall out of step.
+ */
+function resolveDuty(item) {
+  if (Number.isFinite(Number(item?.duty))) return safeDuty(item.duty);
+  return DUTY_BY_NAME.get(String(item?.name || "").trim().toLowerCase()) ?? 1;
+}
 
 const LOGO_PATH = "/logo-v2.png";
 const PROVIDER_RATE_GUIDE_PATH = "/provider-rate-guide.png";
@@ -96,7 +126,7 @@ function calculatePresetKwh(preset) {
     const hours = safeNumber(item.hours);
     const days = safeNumber(item.days);
 
-    return sum + (watts * quantity * hours * days) / 1000;
+    return sum + (watts * quantity * hours * days * resolveDuty(item)) / 1000;
   }, 0);
 }
 
@@ -754,6 +784,7 @@ export default function Page() {
                 watts: String(preset.watts),
                 hours: String(preset.hours),
                 days: String(preset.days),
+                duty: resolveDuty(preset),
               },
             ];
           });
@@ -1305,6 +1336,7 @@ export default function Page() {
       quantity: 1,
       hours: preset.hours,
       days: preset.days,
+      duty: resolveDuty(preset),
       wattageGuide: preset.wattageGuide || getWattageGuide(preset.name, preset.category)
     };
 
@@ -1394,7 +1426,7 @@ export default function Page() {
       const hours = safeNumber(a.hours);
       const days = safeNumber(a.days);
 
-      const monthlyKwh = (watts * quantity * hours * days) / 1000;
+      const monthlyKwh = (watts * quantity * hours * days * resolveDuty(a)) / 1000;
       const kwh = monthlyKwh * billingPeriodMultiplier;
 
       return { ...a, quantity, kwh };
@@ -1410,6 +1442,8 @@ export default function Page() {
     taxAmount,
     total: calculatedTotal,
     effectiveEnergyRate: calculatedEffectiveEstimateRate,
+    tierProrated,
+    scaledTierLimit,
   } = calculateTariffEstimate({
     totalKwh,
     billingDays: billPeriodDays,
@@ -3379,6 +3413,16 @@ ${topUsage.trim()}` : ""}`;
 
             {isAdvancedRateIncomplete && <p role="status" className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs font-bold leading-5 text-amber-900">{safeNumber(peakShare) + safeNumber(shoulderShare) > 100 ? "Peak and shoulder shares must total 100% or less." : safeNumber(shoulderShare) > 0 && safeNumber(shoulderRate) <= 0 ? "Add a shoulder rate for the shoulder usage share." : "Add both peak and off-peak rates to avoid treating a missing price as zero."}</p>}
 
+            {/* Prorating a monthly allowance is the right arithmetic, but it is
+                not what the bill literally says, so it is stated rather than
+                done quietly. */}
+            {tariffMode === "tiered" && tierProrated && (
+              <p role="status" className={`mt-3 rounded-2xl border px-3.5 py-2.5 text-xs font-semibold leading-5 ${darkMode ? "border-emerald-200/20 bg-emerald-200/10 text-emerald-100" : "border-emerald-200/70 bg-emerald-50/70 text-emerald-900"}`}>
+                Tier allowances are monthly, and this bill covers {billPeriodDays} days — so the first tier has been
+                scaled to {scaledTierLimit.toLocaleString(undefined, { maximumFractionDigits: 0 })} kWh for this period.
+              </p>
+            )}
+
             <div className={`mt-4 grid gap-3 border-t pt-4 sm:grid-cols-2 lg:grid-cols-4 ${darkMode ? "border-white/[0.08]" : "border-slate-100"}`}>
               <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Daily supply charge</span><input type="number" min="0" step="any" value={dailySupplyCharge} onChange={(event) => setDailySupplyCharge(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} / day`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
               <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Tax</span><div className="relative"><input type="number" min="0" max="100" value={taxPercent} onChange={(event) => setTaxPercent(cleanCappedNumberInput(event.target.value, 100))} placeholder="Optional" className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-10 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">%</span></div></label>
@@ -3845,7 +3889,14 @@ ${topUsage.trim()}` : ""}`;
                     className="rounded-2xl border border-gray-200/80 bg-white/85 px-3 py-2 text-xs text-gray-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]"
                   >
                     <span className="font-extrabold">{item.quantity || 1}× {item.name}</span>
-                    <span className="block text-gray-500">{item.watts}W • {item.hours}h/day • {item.days} days/mo</span>
+                    {/* The duty factor is shown, not applied invisibly: without
+                        it the figures on this line would not multiply out to the
+                        kWh beside them. */}
+                    <span className="block text-gray-500">
+                      {item.watts}W • {item.hours}h/day
+                      {resolveDuty(item) < 1 ? ` • runs ~${Math.round(resolveDuty(item) * 100)}% of that` : ""}
+                      {" • "}{item.days} days/mo
+                    </span>
                   </div>
                 ))}
               </div>
