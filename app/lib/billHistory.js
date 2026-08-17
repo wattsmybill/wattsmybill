@@ -18,23 +18,43 @@ const toNumber = (value) => {
   return Number.isFinite(number) && number >= 0 ? number : 0;
 };
 
-/** Adds the figures that are derived rather than entered. */
+/**
+ * Adds the figures that are derived rather than entered.
+ *
+ * `credits` covers anything that reduced the bill without reducing the price of
+ * energy — solar export payments, rebates, account adjustments. A bill total is
+ * net of those, so without adding them back the implied price per kWh reads far
+ * lower than the household actually pays, and a solar export large enough to
+ * cover the energy charge drove it to zero entirely.
+ */
 export function deriveEntry(entry) {
   const total = toNumber(entry.total);
   const kwh = toNumber(entry.kwh);
-  const fixedCharge = Math.min(toNumber(entry.fixedCharge), total);
+  const credits = toNumber(entry.credits);
+  const grossBeforeCredits = total + credits;
+  const enteredFixed = toNumber(entry.fixedCharge);
+  const fixedCharge = Math.min(enteredFixed, grossBeforeCredits);
   const days = Math.max(toNumber(entry.days) || 30, 1);
-  const energyCost = Math.max(total - fixedCharge, 0);
+  const rawEnergyCost = grossBeforeCredits - fixedCharge;
+  const energyCost = Math.max(rawEnergyCost, 0);
+  // A fixed charge larger than the whole bill is a typo, not a tariff. Clamping
+  // it keeps the arithmetic safe, but explaining a change from figures the user
+  // did not enter would be worse than admitting they do not add up.
+  const fixedClamped = enteredFixed > grossBeforeCredits + 0.005;
 
   return {
     ...entry,
     total,
     kwh,
+    credits,
     fixedCharge,
     days,
     energyCost,
+    // False when the entered figures had to be clamped to stay sensible — the
+    // caller should not build an explanation on numbers the user did not enter.
+    figuresConsistent: rawEnergyCost >= 0 && !fixedClamped,
     // The rate the household actually paid for energy, which is rarely the
-    // headline rate once fixed charges are stripped out.
+    // headline rate once fixed charges are stripped out and credits added back.
     effectiveRate: kwh > 0 ? energyCost / kwh : 0,
     dailyKwh: kwh / days,
     dailyCost: total / days,
@@ -87,9 +107,17 @@ export function explainChange(previous, current) {
     return { total, parts: [], largest: null, explainable: false, missing: "usage", comparablePeriods: true };
   }
 
+  if (!previous.figuresConsistent || !current.figuresConsistent) {
+    return { total, parts: [], largest: null, explainable: false, missing: "consistency", comparablePeriods: true };
+  }
+
   const usage = (current.kwh - previous.kwh) * previous.effectiveRate;
   const rate = (current.effectiveRate - previous.effectiveRate) * current.kwh;
   const fixed = current.fixedCharge - previous.fixedCharge;
+  // Credits reduce the bill, so a larger credit is a downward force on it. The
+  // sign is flipped here to keep every part reading in the same direction:
+  // positive pushed the bill up, negative pulled it down.
+  const credit = -(current.credits - previous.credits);
 
   // sentenceLabel is carried separately rather than lower-casing label at the
   // call site, which turned "kWh" into "kwh".
@@ -98,6 +126,12 @@ export function explainChange(previous, current) {
     { key: "rate", label: "The price per kWh", sentenceLabel: "the price you paid per kWh", amount: rate },
     { key: "fixed", label: "Fixed daily charges", sentenceLabel: "fixed daily charges", amount: fixed },
   ];
+
+  // Only shown when a credit actually moved, so solar households get the
+  // explanation and everyone else keeps three tiles instead of four.
+  if (Math.abs(credit) > 0.005) {
+    parts.push({ key: "credit", label: "Credits and rebates", sentenceLabel: "a change in credits", amount: credit });
+  }
 
   const largest = [...parts].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))[0];
 
@@ -135,8 +169,8 @@ export function loadHistory() {
 export function saveHistory(entries) {
   if (typeof localStorage === "undefined") return;
   try {
-    const payload = entries.map(({ id, period, total, kwh, fixedCharge, days, currency, note }) => ({
-      id, period, total, kwh, fixedCharge, days, currency, note,
+    const payload = entries.map(({ id, period, total, kwh, fixedCharge, credits, days, currency, note }) => ({
+      id, period, total, kwh, fixedCharge, credits, days, currency, note,
     }));
     localStorage.setItem(HISTORY_KEY, JSON.stringify(payload.slice(-MAX_ENTRIES)));
   } catch {

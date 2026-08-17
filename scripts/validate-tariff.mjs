@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { calculateTariffEstimate } from "../app/lib/tariff.js";
+import { deriveEntry, explainChange } from "../app/lib/billHistory.js";
 
 function closeTo(actual, expected, message) {
   assert.ok(Math.abs(actual - expected) < 0.000001, `${message}: expected ${expected}, received ${actual}`);
@@ -92,4 +93,51 @@ const oversizedCredit = calculateTariffEstimate({
 closeTo(oversizedCredit.preTaxTotal, 0, "Credit floor");
 closeTo(oversizedCredit.total, 0, "Non-negative final total");
 
-console.log("Tariff validation passed: simple, time-of-use, tiers, charges, tax, solar credit, and non-negative totals.");
+/* ---------------------------------------------------------------------------
+   Bill history: the split between usage, price, fixed charges and credits is an
+   identity, not an estimate. If it ever stops summing to the change it claims
+   to explain, the page is contradicting itself in public — and that failure is
+   invisible in the UI, because the numbers still render.
+--------------------------------------------------------------------------- */
+const entry = (values) => deriveEntry({ period: "2026-01", days: 30, ...values });
+
+const reconciles = (label, before, after) => {
+  const change = explainChange(entry(before), entry(after));
+  assert.ok(change.explainable, `${label}: expected an explainable change`);
+  const sum = change.parts.reduce((total, part) => total + part.amount, 0);
+  closeTo(sum, change.total, `${label}: parts must sum to the total change`);
+};
+
+reconciles(
+  "Usage and price only",
+  { total: 186.4, kwh: 470, fixedCharge: 30 },
+  { total: 210.5, kwh: 495, fixedCharge: 31 }
+);
+
+// A bill total is net of solar export, so without adding the credit back the
+// implied price per kWh collapses and the split stops adding up.
+reconciles(
+  "Solar credit",
+  { total: 180, kwh: 450, fixedCharge: 30, credits: 20 },
+  { total: 150, kwh: 460, fixedCharge: 30, credits: 70 }
+);
+
+const solar = entry({ total: 150, kwh: 460, fixedCharge: 30, credits: 70 });
+closeTo(solar.energyCost, 190, "Credits are added back before the energy charge");
+closeTo(solar.effectiveRate, 190 / 460, "Price per kWh ignores credits");
+
+// Anything the app cannot honestly explain must say so rather than guess.
+const noUsage = explainChange(
+  entry({ total: 200, kwh: 0, fixedCharge: 30 }),
+  entry({ total: 260, kwh: 0, fixedCharge: 30 })
+);
+assert.equal(noUsage.explainable, false, "A change with no kWh must not be attributed");
+closeTo(noUsage.total, 60, "The change itself is still reported");
+
+const typo = explainChange(
+  entry({ total: 200, kwh: 500, fixedCharge: 30 }),
+  entry({ total: 20, kwh: 500, fixedCharge: 300 })
+);
+assert.equal(typo.explainable, false, "A fixed charge larger than the bill must not be explained");
+
+console.log("Tariff validation passed: simple, time-of-use, tiers, charges, tax, solar credit, non-negative totals, and bill-change reconciliation.");

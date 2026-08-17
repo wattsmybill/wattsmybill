@@ -12,7 +12,7 @@ import {
   saveHistory,
 } from "../lib/billHistory";
 
-const EMPTY_FORM = { period: "", total: "", kwh: "", fixedCharge: "", days: "30" };
+const EMPTY_FORM = { period: "", total: "", kwh: "", fixedCharge: "", credits: "", days: "30" };
 
 function currentPeriod() {
   const now = new Date();
@@ -232,6 +232,7 @@ export default function BillHistory() {
       total: Number(form.total) || 0,
       kwh: Number(form.kwh) || 0,
       fixedCharge: Number(form.fixedCharge) || 0,
+      credits: Number(form.credits) || 0,
       days: Number(form.days) || 30,
       currency,
     };
@@ -250,11 +251,15 @@ export default function BillHistory() {
   const fillFromCalculator = () => {
     try {
       const saved = JSON.parse(localStorage.getItem("watts-my-bill-data") || "{}");
+      // The calculator already records solar export, so it carries over as a
+      // credit rather than being asked for twice.
+      const exportCredit = (Number(saved.solarExportKwh) || 0) * (Number(saved.solarExportRate) || 0);
       const filled = {
         period: form.period || currentPeriod(),
         total: saved.actualBill || "",
         kwh: saved.billedKwh || "",
         fixedCharge: saved.fixedCharge || "",
+        credits: exportCredit > 0 ? String(Number(exportCredit.toFixed(2))) : "",
         days: saved.billingDays || "30",
       };
       if (!filled.total && !filled.kwh) {
@@ -319,6 +324,11 @@ export default function BillHistory() {
             <input id="bill-fixed" type="number" min="0" step="0.01" placeholder="32.00" className={`${inputClass} mt-1.5`} {...field("fixedCharge")} />
           </div>
           <div>
+            <label className={labelClass} htmlFor="bill-credits">Credits</label>
+            <input id="bill-credits" type="number" min="0" step="0.01" placeholder="0.00" className={`${inputClass} mt-1.5`} {...field("credits")} />
+            <p className="mt-1 text-[11px] leading-4 text-slate-500">Solar export, rebates or adjustments.</p>
+          </div>
+          <div>
             <label className={labelClass} htmlFor="bill-days">Billing days</label>
             <input id="bill-days" type="number" min="1" max="366" step="1" className={`${inputClass} mt-1.5`} {...field("days")} />
           </div>
@@ -367,7 +377,9 @@ export default function BillHistory() {
                 )}
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
-                {!change.explainable
+                {change.missing === "consistency"
+                  ? "These figures don't add up — the fixed charge is larger than the bill itself, so the change can't be broken down until that's corrected."
+                  : !change.explainable
                   ? "Add the kWh used on both bills and this will show whether it was usage, the price per unit, or fixed charges."
                   : change.largest.amount === 0
                     ? "Usage, price and fixed charges all held steady."
@@ -375,7 +387,7 @@ export default function BillHistory() {
                 {!change.comparablePeriods && " These two bills cover different numbers of days, so compare the daily figures below rather than the totals."}
               </p>
 
-              <ul className="mt-5 grid gap-3 sm:grid-cols-3">
+              <ul className={`mt-5 grid gap-3 ${change.parts.length > 3 ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-3"}`}>
                 {change.parts.map((part) => {
                   const rising = part.amount > 0.005;
                   const falling = part.amount < -0.005;
