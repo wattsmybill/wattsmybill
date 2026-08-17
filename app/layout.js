@@ -274,11 +274,29 @@ export default function RootLayout({ children }) {
               has just shown the complete logo, and starting from an empty frame
               would read as the app resetting; drawing bright lines over a ghost
               reads as the logo coming up to power instead. */}
-          {/* The viewBox crops to the artwork itself rather than the icon's
-              square tile: the strokes only occupy x 125–381, y 67–455 of the
-              original 512 grid, so without the tile behind them the full square
-              would leave the mark stranded in empty space. */}
-          <svg className="wmb-splash-mark" viewBox="105 47 296 428" role="presentation">
+          {/* The tile is here to match the system splash, which always shows the
+              tiled icon: Chrome draws that splash from the *maskable* icon and
+              ignores any "any" icon offered alongside it, so the handoff can
+              only be smoothed from this side. It starts identical to what the
+              splash just showed, then dissolves away while the mark draws,
+              finishing on the untiled logo. */}
+          <svg className="wmb-splash-mark" viewBox="0 0 512 512" role="presentation">
+            <defs>
+              <radialGradient id="wmbSplashTile" cx="50%" cy="44%" r="66%">
+                <stop offset="0%" stopColor="#12a49a" />
+                <stop offset="55%" stopColor="#0c7571" />
+                <stop offset="100%" stopColor="#102f33" />
+              </radialGradient>
+            </defs>
+
+            <rect
+              className="wmb-mark-tile"
+              width="512"
+              height="512"
+              rx="115"
+              fill="url(#wmbSplashTile)"
+            />
+
             <g className="wmb-mark-ghost">
               <path d="M212 360 C214 324 196 292 179.4 272.8 A107.5 107.5 0 1 1 356 190.5" />
               <path className="wmb-mark-bolt-shape" d="M356 197 L300 270 L362 283 L288 370" />

@@ -502,11 +502,19 @@ html.wmb-standalone #wmb-splash {
    end, and the dot is r=24 at (251.5, 432). Changing any of these means
    re-tracing, not guessing. */
 .wmb-splash-mark {
-  /* Sized by height; the viewBox is cropped to the artwork, so the width
-     follows its 296:428 proportions rather than a square tile. */
-  height: 150px;
-  width: auto;
+  /* Roughly the size Android draws its splash icon at, so the tile beneath the
+     mark lands close to where the system just had it. */
+  width: 140px;
+  height: 140px;
   overflow: visible;
+  /* Grows slightly as the tile dissolves, so losing the tile reads as the mark
+     stepping forward rather than the artwork simply shrinking. */
+  animation: wmb-mark-grow 700ms cubic-bezier(0.22, 1, 0.36, 1) 1000ms forwards;
+}
+
+/* Starts as the exact frame the system splash was showing, then goes. */
+.wmb-mark-tile {
+  animation: wmb-tile-out 600ms ease 1000ms forwards;
 }
 
 .wmb-splash-mark path {
@@ -515,11 +523,14 @@ html.wmb-standalone #wmb-splash {
   stroke-linejoin: round;
 }
 
-/* Slightly lifted from the value that worked over the icon's teal tile — the
-   same ghost reads dimmer against the darker navy now behind it. */
-.wmb-mark-ghost path,
-.wmb-mark-ghost circle {
-  opacity: 0.2;
+/* The ghost starts at full strength, so the very first frame is the finished
+   logo on its tile — pixel-for-pixel what the system splash was already
+   showing. It then dims to a faint underlay as the bright stroke draws over
+   it. The two cross-fade, so total brightness stays roughly constant and the
+   logo never appears to blink off before redrawing. */
+.wmb-mark-ghost {
+  opacity: 1;
+  animation: wmb-ghost-dim 560ms ease 140ms forwards;
 }
 
 .wmb-mark-ghost path:first-of-type { stroke: #eaeaea; stroke-width: 32; }
@@ -556,6 +567,18 @@ html.wmb-standalone #wmb-splash {
   to { stroke-dashoffset: 0; }
 }
 
+@keyframes wmb-ghost-dim {
+  to { opacity: 0.2; }
+}
+
+@keyframes wmb-tile-out {
+  to { opacity: 0; }
+}
+
+@keyframes wmb-mark-grow {
+  to { transform: scale(1.16); }
+}
+
 @keyframes wmb-mark-dot-in {
   0% { opacity: 0; transform: scale(0.3); }
   100% { opacity: 1; transform: scale(1); }
@@ -570,12 +593,15 @@ html.wmb-standalone #wmb-splash {
 @media (prefers-reduced-motion: reduce) {
   .wmb-mark-arc,
   .wmb-mark-bolt,
-  .wmb-mark-dot {
+  .wmb-mark-dot,
+  .wmb-splash-mark {
     animation: none !important;
     stroke-dashoffset: 0 !important;
     opacity: 1 !important;
   }
   .wmb-mark-ghost { display: none; }
+  /* Settle on the finished state: untiled mark, no dissolve to watch. */
+  .wmb-mark-tile { animation: none !important; opacity: 0; }
 }
 
 /* Biggest energy user card helper */

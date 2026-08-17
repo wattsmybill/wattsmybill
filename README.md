@@ -41,14 +41,15 @@ The tariff validator checks simple, time-of-use, shoulder, progressive-tier, sta
 - Every named country in the selector links to official government, regulator, or utility context and includes a coverage caveat.
 - Guides cite first-party or authoritative sources and show their update date.
 
-## Installed-app icons and launch screen
+## Installed-app launch screen
 
-The manifest declares two sets of icons on purpose, and they are not interchangeable:
+Android paints its own splash when the installed app is opened, built from the manifest's `background_color` and the app icon. It happens before any of our code runs, so it cannot be removed, shortened, or animated.
 
-- `purpose: "maskable"` — `android-chrome-*.png`, the teal-tiled mark. This is the home-screen icon and should stay recognisable as the brand.
-- `purpose: "any"` — `splash-icon-*.png`, the untiled mark dimmed on `#06142b`. Chrome draws the PWA splash from an `any` icon, and this file is deliberately identical to the first frame of the launch animation. The operating system paints that splash before any of our code runs and it cannot be removed or animated; matching it to the animation's opening frame is what stops the logo appearing twice, in two different forms, on launch.
+**Chrome draws that splash from the `maskable` icon.** Supplying a separate `purpose: "any"` icon does not change it — this was tried on a real device and had no effect, so the manifest deliberately keeps both icons as `any maskable` rather than carrying a second set that nothing uses.
 
-The launch animation itself lives in `app/layout.js` (markup) and the launch-screen block of `app/globals.css` (timings and geometry). Its paths were traced from the real icon. If the mark ever changes, regenerate `splash-icon-*.png` to match or the splash and the animation will drift apart.
+Because the tiled icon on the splash is therefore fixed, the launch animation is what adapts to it. It opens on the same teal tile the splash just showed, so there is no visible handoff, then dissolves the tile away while the mark draws itself and finishes on the untiled logo.
+
+The animation lives in `app/layout.js` (markup) and the launch-screen block of `app/globals.css` (timings and geometry). Its paths were traced from `android-chrome-512x512.png` and match the real logo; if the icon artwork ever changes, re-trace them or the two will drift apart.
 
 ## Search notification
 
