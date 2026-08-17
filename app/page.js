@@ -3180,16 +3180,6 @@ ${topUsage.trim()}` : ""}`;
 
         </div>}
 
-        <div className={`relative z-10 mt-1 mb-5 px-1 text-[14px] leading-relaxed ${
-          darkMode ? "text-slate-100/94" : "text-slate-800"
-        }`}>
-          <span className={darkMode ? "font-black text-emerald-300" : "font-black text-emerald-700"}>
-            Did you know?
-          </span>{" "}
-          <span key={didYouKnowIndex} className="inline font-medium leading-relaxed">
-            {currentMicroInsight}
-          </span>
-        </div>
 
         {replacedOwnEstimate && (
           <div
@@ -3352,94 +3342,6 @@ ${topUsage.trim()}` : ""}`;
           </div>
         </div>
 
-        <section className="wmb-light-panel mb-4 overflow-hidden rounded-3xl border border-emerald-950/[0.07] bg-white text-slate-950 shadow-sm" aria-labelledby="advanced-tariff-heading">
-          <button
-            type="button"
-            onClick={() => setShowAdvancedTariff((current) => !current)}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 p-4 text-left sm:px-5"
-            aria-expanded={showAdvancedTariff}
-            aria-controls="advanced-tariff-content"
-          >
-            <div className="flex min-w-0 items-start gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-50 text-emerald-700"><SlidersHorizontal size={16} /></span>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 id="advanced-tariff-heading" className="text-base font-black tracking-tight">Advanced electricity pricing</h2>
-                  <span className="wmb-meta-pill">Optional</span>
-                </div>
-                <p className="mt-1 text-xs leading-5 text-slate-600">Use time-of-use, tiered prices, supply charges, tax, or solar export credit.</p>
-              </div>
-            </div>
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-50 text-emerald-700 transition">
-              <ChevronDown size={18} className={`transition-transform duration-200 ${showAdvancedTariff ? "rotate-180" : ""}`} />
-            </span>
-          </button>
-
-          {showAdvancedTariff && <div id="advanced-tariff-content" className="border-t border-slate-200 p-4 sm:p-5">
-            <div className="inline-flex w-full rounded-2xl bg-slate-100 p-1 sm:w-auto" role="group" aria-label="Electricity pricing type">
-              {[
-                { id: "simple", label: "Single rate" },
-                { id: "timeOfUse", label: "Time-of-use" },
-                { id: "tiered", label: "Tiered" },
-              ].map((mode) => <button
-                key={mode.id}
-                type="button"
-                onClick={() => setTariffMode(mode.id)}
-                className={`flex-1 cursor-pointer rounded-xl px-3 py-2 text-[11px] font-black transition sm:flex-none ${tariffMode === mode.id ? "bg-emerald-700 text-white shadow-sm" : "text-slate-600 hover:bg-white hover:text-slate-950"}`}
-              >{mode.label}</button>)}
-            </div>
-
-            {tariffMode === "simple" && <p className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-3.5 py-3 text-xs leading-5 text-slate-700">The main electricity-rate field above is used for every kWh. Add the bill items below only if they apply.</p>}
-
-            {tariffMode === "timeOfUse" && <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Peak rate / kWh</span><input type="number" min="0" step="any" value={peakRate} onChange={(event) => setPeakRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} peak`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Off-peak rate / kWh</span><input type="number" min="0" step="any" value={offPeakRate} onChange={(event) => setOffPeakRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} off-peak`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Usage during peak</span><div className="relative"><input type="number" min="0" max="100" value={peakShare} onChange={(event) => setPeakShare(cleanCappedNumberInput(event.target.value, 100))} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-10 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">%</span></div></label>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Shoulder rate / kWh</span><input type="number" min="0" step="any" value={shoulderRate} onChange={(event) => setShoulderRate(cleanNonNegativeInput(event.target.value))} placeholder="Optional" className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Usage during shoulder</span><div className="relative"><input type="number" min="0" max="100" value={shoulderShare} onChange={(event) => setShoulderShare(cleanCappedNumberInput(event.target.value, 100))} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-10 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">%</span></div></label>
-            </div>}
-
-            {tariffMode === "timeOfUse" && <p className={`mt-2 text-[11px] leading-5 ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Enter peak and optional shoulder shares from your bill or meter. The remaining usage is assigned to off-peak.</p>}
-
-            {tariffMode === "tiered" && <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>First tier ends at</span><div className="relative"><input type="number" min="0" value={tierLimit} onChange={(event) => setTierLimit(cleanNonNegativeInput(event.target.value))} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-12 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">kWh</span></div></label>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>First-tier rate</span><input type="number" min="0" step="any" value={tierOneRate} onChange={(event) => setTierOneRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} / kWh`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Next-tier rate</span><input type="number" min="0" step="any" value={tierTwoRate} onChange={(event) => setTierTwoRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} / kWh`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
-            </div>}
-
-            {tariffMode === "tiered" && <p className={`mt-2 text-[11px] leading-5 ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Only the kWh above the first-tier threshold is charged at the next-tier rate.</p>}
-
-            {isAdvancedRateIncomplete && <p role="status" className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs font-bold leading-5 text-amber-900">{safeNumber(peakShare) + safeNumber(shoulderShare) > 100 ? "Peak and shoulder shares must total 100% or less." : safeNumber(shoulderShare) > 0 && safeNumber(shoulderRate) <= 0 ? "Add a shoulder rate for the shoulder usage share." : "Add both peak and off-peak rates to avoid treating a missing price as zero."}</p>}
-
-            {/* Prorating a monthly allowance is the right arithmetic, but it is
-                not what the bill literally says, so it is stated rather than
-                done quietly. */}
-            {tariffMode === "tiered" && tierProrated && (
-              <p role="status" className={`mt-3 rounded-2xl border px-3.5 py-2.5 text-xs font-semibold leading-5 ${darkMode ? "border-emerald-200/20 bg-emerald-200/10 text-emerald-100" : "border-emerald-200/70 bg-emerald-50/70 text-emerald-900"}`}>
-                Tier allowances are monthly, and this bill covers {billPeriodDays} days — so the first tier has been
-                scaled to {scaledTierLimit.toLocaleString(undefined, { maximumFractionDigits: 0 })} kWh for this period.
-              </p>
-            )}
-
-            <div className={`mt-4 grid gap-3 border-t pt-4 sm:grid-cols-2 lg:grid-cols-4 ${darkMode ? "border-white/[0.08]" : "border-slate-100"}`}>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Daily supply charge</span><input type="number" min="0" step="any" value={dailySupplyCharge} onChange={(event) => setDailySupplyCharge(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} / day`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Tax</span><div className="relative"><input type="number" min="0" max="100" value={taxPercent} onChange={(event) => setTaxPercent(cleanCappedNumberInput(event.target.value, 100))} placeholder="Optional" className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-10 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">%</span></div></label>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Solar exported</span><div className="relative"><input type="number" min="0" step="any" value={solarExportKwh} onChange={(event) => setSolarExportKwh(cleanNonNegativeInput(event.target.value))} placeholder="Optional" className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-12 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">kWh</span></div></label>
-              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Export credit / kWh</span><input type="number" min="0" step="any" value={solarExportRate} onChange={(event) => setSolarExportRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} credit`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
-            </div>
-
-            <p className={`mt-2 text-[11px] leading-5 ${darkMode ? "text-slate-300" : "text-slate-500"}`}>For solar, use exported grid kWh from your bill. Electricity used directly in the home is not export.</p>
-
-            {totalKwh > 0 && hasValidRateForEstimate && <div className={`mt-4 grid gap-2 rounded-2xl border p-3 sm:grid-cols-4 ${darkMode ? "border-emerald-300/10 bg-emerald-300/[0.05]" : "border-emerald-100 bg-emerald-50/55"}`}>
-              {[
-                ["Energy", formatCompactCurrency(usageCost)],
-                ["Supply + fixed", formatCompactCurrency(supplyChargeAmount + fixedChargeAmount)],
-                ["Solar credit", solarCreditAmount > 0 ? `-${formatCompactCurrency(solarCreditAmount)}` : formatCompactCurrency(0)],
-                ["Tax", formatCompactCurrency(taxAmount)],
-              ].map(([label, value]) => <div key={label}><p className={`text-[9px] font-black uppercase tracking-[0.1em] ${darkMode ? "text-slate-400" : "text-slate-500"}`}>{label}</p><p className="mt-1 text-sm font-black">{value}</p></div>)}
-            </div>}
-          </div>}
-        </section>
 
         {isOtherCountry && (
           <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -3465,280 +3367,6 @@ ${topUsage.trim()}` : ""}`;
           </div>
         )}
 
-        <section className="wmb-light-panel mb-4 overflow-hidden rounded-3xl border border-emerald-950/[0.07] bg-white text-slate-950 shadow-sm" aria-labelledby="bill-details-heading">
-          <button
-            type="button"
-            onClick={() => setShowBillDetails((current) => !current)}
-            className="flex w-full cursor-pointer items-center justify-between gap-4 p-4 text-left sm:px-5"
-            aria-expanded={showBillDetails}
-            aria-controls="bill-details-content"
-          >
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 id="bill-details-heading" className="text-base font-black tracking-tight">Bill details</h2>
-                <span className="wmb-meta-pill">Optional</span>
-              </div>
-              <p className="mt-1 text-xs leading-5 text-slate-500">Use details from your bill for a more precise estimate.</p>
-            </div>
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-50 text-emerald-700 transition">
-              <ChevronDown size={18} className={`transition-transform duration-200 ${showBillDetails ? "rotate-180" : ""}`} />
-            </span>
-          </button>
-
-          {showBillDetails && <div id="bill-details-content" className="border-t border-slate-100 p-4 sm:p-5">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <label className="block">
-              <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">Current bill total</span>
-              <input
-                type="number"
-                min="0"
-                className="w-full rounded-2xl border border-gray-200 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                placeholder={`${displayCurrency || "Currency"} total`}
-                value={actualBill}
-                onChange={(event) => setActualBill(cleanNonNegativeInput(event.target.value))}
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">Billing period days</span>
-              <input
-                type="number"
-                min="1"
-                max="366"
-                className="w-full rounded-2xl border border-gray-200 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                value={billingDays}
-                onChange={(event) => setBillingDays(cleanCappedNumberInput(event.target.value, 366, { allowZero: false }))}
-              />
-            </label>
-
-            <label className="block">
-              <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">Fixed charges for period</span>
-              <input
-                type="number"
-                min="0"
-                step="any"
-                className="w-full rounded-2xl border border-gray-200 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                placeholder={`${displayCurrency || "Currency"} total`}
-                value={fixedCharge}
-                onChange={(event) => setFixedCharge(cleanNonNegativeInput(event.target.value))}
-              />
-              <p className="mt-1.5 text-[11px] leading-4 text-slate-500">Supply, standing, service, or other known fixed charges.</p>
-            </label>
-
-            <div>
-              <label className="block">
-                <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">kWh shown on your bill</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="any"
-                  className="w-full rounded-2xl border border-gray-200 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                  placeholder="Billed energy use"
-                  value={billedKwh}
-                  onChange={(event) => setBilledKwh(cleanNonNegativeInput(event.target.value))}
-                />
-              </label>
-
-              {effectiveRate > 0 ? (
-                <div className="mt-2 flex items-center justify-between gap-3 rounded-xl bg-emerald-50 px-3 py-2">
-                  <p className="text-xs font-bold text-emerald-800">
-                    Effective rate: {displayCurrency}{effectiveRate.toLocaleString(undefined, { maximumFractionDigits: 4 })}/kWh
-                  </p>
-                  <button type="button" onClick={applyEffectiveRate} className="shrink-0 text-xs font-black text-emerald-700 underline underline-offset-4">
-                    Use rate
-                  </button>
-                </div>
-              ) : (
-                <p className="mt-1.5 text-[11px] leading-4 text-slate-500">Add your bill total and billed kWh to calculate an effective usage rate.</p>
-              )}
-            </div>
-          </div>
-
-          {fixedChargeAmount > 0 && (
-            <div className="mt-4 grid gap-2 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600 sm:grid-cols-3">
-              <p>Usage estimate: <span className="font-black">{formatCurrency(usageCost)}</span></p>
-              <p>Fixed charges: <span className="font-black">{formatCurrency(fixedChargeAmount)}</span></p>
-              <p>Combined estimate: <span className="font-black text-emerald-700">{formatCurrency(total)}</span></p>
-            </div>
-          )}
-          </div>}
-        </section>
-
-        <section className="wmb-light-panel mb-4 overflow-hidden rounded-3xl border border-emerald-950/[0.07] bg-white text-slate-950 shadow-sm" aria-labelledby="bill-detective-heading">
-          <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-            <div className="flex min-w-0 items-start gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
-                <SearchCheck size={22} strokeWidth={2.3} />
-              </span>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-[11px] font-black uppercase tracking-[0.14em] text-emerald-700">Explain a bill change</p>
-                  <span className="wmb-meta-pill">Beta</span>
-                </div>
-                <h2 id="bill-detective-heading" className="mt-1 text-xl font-black tracking-tight">Bill Detective</h2>
-                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-                  Compare two bills fairly and estimate whether usage, the effective rate, or fixed charges drove the change.
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowBillDetective((current) => !current)}
-              aria-expanded={showBillDetective}
-              aria-controls="bill-detective-content"
-              className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-black text-emerald-800 transition hover:bg-emerald-100 sm:w-auto"
-            >
-              {showBillDetective ? "Hide comparison" : "Compare two bills"}
-              <ChevronDown size={16} className={`transition-transform ${showBillDetective ? "rotate-180" : ""}`} />
-            </button>
-          </div>
-
-          {showBillDetective && (
-            <div id="bill-detective-content" className="border-t border-emerald-950/[0.07] px-5 pb-6 pt-5 md:px-6">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-emerald-100 bg-white/80 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">{usesDashboardEstimateForDetective ? "Current estimate" : "Current bill"}</p>
-                    <span className={`rounded-full px-2 py-1 text-[10px] font-black ${hasCurrentDetectiveInputs ? "bg-emerald-50 text-emerald-700" : "text-slate-400"}`}>
-                      {usesDashboardEstimateForDetective ? "From dashboard" : hasCurrentDetectiveInputs ? "Bill details" : "Add details above"}
-                    </span>
-                  </div>
-                  <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <p className="text-slate-500">Total</p>
-                      <p className="mt-0.5 font-black">{currentBillValue > 0 ? formatCurrency(currentBillValue) : "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500">Usage</p>
-                      <p className="mt-0.5 font-black">{currentKwhValue > 0 ? `${formatCompactNumber(currentKwhValue)} kWh` : "—"}</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500">Period</p>
-                      <p className="mt-0.5 font-black">{billPeriodDays} days</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500">Effective rate</p>
-                      <p className="mt-0.5 font-black">{currentDetectiveEffectiveRate > 0 ? `${displayCurrency}${currentDetectiveEffectiveRate.toLocaleString(undefined, { maximumFractionDigits: 4 })}/kWh` : "—"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-emerald-100 bg-white/80 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">Previous bill</p>
-                    <span className={`text-[11px] font-bold ${hasPreviousDetectiveInputs ? "text-emerald-700" : "text-slate-400"}`}>
-                      {hasPreviousDetectiveInputs ? "Ready" : "Enter below"}
-                    </span>
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.08em] text-slate-500">Bill total</span>
-                      <input
-                        type="number"
-                        min="0"
-                        step="any"
-                        aria-label="Previous bill total"
-                        className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-black shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                        placeholder={`${displayCurrency || "Currency"} total`}
-                        value={previousBill}
-                        onChange={(event) => setPreviousBill(cleanNonNegativeInput(event.target.value))}
-                      />
-                    </label>
-                    <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.08em] text-slate-500">Billed kWh</span>
-                      <input
-                        type="number"
-                        min="0"
-                        step="any"
-                        aria-label="Previous billed kWh"
-                        className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-black shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                        placeholder="Energy use"
-                        value={previousBilledKwh}
-                        onChange={(event) => setPreviousBilledKwh(cleanNonNegativeInput(event.target.value))}
-                      />
-                    </label>
-                    <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.08em] text-slate-500">Period days</span>
-                      <input
-                        type="number"
-                        min="1"
-                        max="366"
-                        aria-label="Previous billing period days"
-                        className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-black shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                        value={previousBillingDays}
-                        onChange={(event) => setPreviousBillingDays(cleanCappedNumberInput(event.target.value, 366, { allowZero: false }))}
-                      />
-                    </label>
-                    <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.08em] text-slate-500">Fixed charges</span>
-                      <input
-                        type="number"
-                        min="0"
-                        step="any"
-                        aria-label="Previous fixed charges"
-                        className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-black shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                        placeholder="Optional"
-                        value={previousFixedCharge}
-                        onChange={(event) => setPreviousFixedCharge(cleanNonNegativeInput(event.target.value))}
-                      />
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {!hasValidDetectiveCharges && hasCurrentDetectiveInputs && hasPreviousDetectiveInputs && (
-                <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold leading-5 text-amber-800">
-                  A fixed-charge value cannot be equal to or greater than its bill total. Check the current and previous fixed charges.
-                </p>
-              )}
-
-              <div className={`mt-4 rounded-[24px] border p-5 ${isBillDetectiveReady ? "border-emerald-200 bg-emerald-50/70" : "border-slate-200 bg-slate-50"}`}>
-                <div className="flex items-start gap-3">
-                  <BarChart3 className={`mt-0.5 shrink-0 ${isBillDetectiveReady ? "text-emerald-700" : "text-slate-400"}`} size={20} />
-                  <div>
-                    <p className={`text-[11px] font-black uppercase tracking-[0.12em] ${isBillDetectiveReady ? "text-emerald-700" : "text-slate-500"}`}>Detective result</p>
-                    <h3 className="mt-1 text-lg font-black leading-snug">{billDetectiveSummary}</h3>
-                    {isBillDetectiveReady && (
-                      <p className="mt-2 text-xs leading-5 text-slate-600">
-                        Comparison uses 30-day equivalents so different billing-period lengths do not distort the result.{usesDashboardEstimateForDetective ? " The current side comes from your calculator estimate, not a provider bill." : ""}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {isBillDetectiveReady && (
-                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                    {detectiveDrivers.map((driver) => {
-                      const isPrimary = driver.key === primaryDetectiveDriver.key;
-                      return (
-                        <div key={driver.key} className={`rounded-2xl border p-4 ${isPrimary ? "border-emerald-300 bg-white" : "border-emerald-100 bg-white/75"}`}>
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-[10px] font-black uppercase tracking-[0.1em] text-slate-500">{driver.label}</p>
-                            {isPrimary && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.08em] text-emerald-800">Main driver</span>}
-                          </div>
-                          <p className={`mt-2 text-xl font-black ${driver.impact > 0 ? "text-rose-600" : driver.impact < 0 ? "text-emerald-700" : ""}`}>
-                            {formatSignedCurrency(driver.impact)}
-                          </p>
-                          <p className="mt-1 text-[11px] text-slate-500">estimated 30-day contribution</p>
-                          {driver.key === "usage" && <p className="mt-2 text-xs font-bold">Daily usage {formatSignedPercent(usageChangePercent)}</p>}
-                          {driver.key === "rate" && <p className="mt-2 text-xs font-bold">Effective rate {formatSignedPercent(rateChangePercent)}</p>}
-                          {driver.key === "fixed" && <p className="mt-2 text-xs font-bold">Fixed cost {formatSignedCurrency(fixedImpact)}</p>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {isBillDetectiveReady && (
-                  <p className="mt-4 text-[11px] leading-5 text-slate-500">
-                    The three contributions add up to the normalized bill change. The effective rate is blended and may include variable taxes or adjustments. This is a diagnostic estimate, not a provider audit.
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-        </section>
 
         <div className="mb-4 mt-7 rounded-3xl bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] md:mt-0 md:flex md:items-center md:justify-between md:gap-5">
           <div>
@@ -4270,6 +3898,386 @@ ${topUsage.trim()}` : ""}`;
           )}
 
 
+        {/* Everything that refines an estimate now sits after the estimate
+            exists. These three panels used to stand between the rate field and
+            the appliance list, so the path to a first number ran through tariff
+            modelling, bill reconciliation and a diagnostic tool. */}
+        <div className="mb-3 mt-8 px-1">
+          <p className={`text-[11px] font-black uppercase tracking-[0.14em] ${darkMode ? "text-emerald-200/80" : "text-emerald-700"}`}>Refine your estimate</p>
+          <p className={`mt-1 text-[12.5px] leading-5 ${darkMode ? "text-white/70" : "text-slate-600"}`}>Optional. Add time-of-use or tiered pricing, enter details from your bill, or compare two bills.</p>
+        </div>
+        <section className="wmb-light-panel mb-4 overflow-hidden rounded-3xl border border-emerald-950/[0.07] bg-white text-slate-950 shadow-sm" aria-labelledby="advanced-tariff-heading">
+          <button
+            type="button"
+            onClick={() => setShowAdvancedTariff((current) => !current)}
+            className="flex w-full cursor-pointer items-center justify-between gap-4 p-4 text-left sm:px-5"
+            aria-expanded={showAdvancedTariff}
+            aria-controls="advanced-tariff-content"
+          >
+            <div className="flex min-w-0 items-start gap-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-50 text-emerald-700"><SlidersHorizontal size={16} /></span>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 id="advanced-tariff-heading" className="text-base font-black tracking-tight">Advanced electricity pricing</h2>
+                  <span className="wmb-meta-pill">Optional</span>
+                </div>
+                <p className="mt-1 text-xs leading-5 text-slate-600">Use time-of-use, tiered prices, supply charges, tax, or solar export credit.</p>
+              </div>
+            </div>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-50 text-emerald-700 transition">
+              <ChevronDown size={18} className={`transition-transform duration-200 ${showAdvancedTariff ? "rotate-180" : ""}`} />
+            </span>
+          </button>
+
+          {showAdvancedTariff && <div id="advanced-tariff-content" className="border-t border-slate-200 p-4 sm:p-5">
+            <div className="inline-flex w-full rounded-2xl bg-slate-100 p-1 sm:w-auto" role="group" aria-label="Electricity pricing type">
+              {[
+                { id: "simple", label: "Single rate" },
+                { id: "timeOfUse", label: "Time-of-use" },
+                { id: "tiered", label: "Tiered" },
+              ].map((mode) => <button
+                key={mode.id}
+                type="button"
+                onClick={() => setTariffMode(mode.id)}
+                className={`flex-1 cursor-pointer rounded-xl px-3 py-2 text-[11px] font-black transition sm:flex-none ${tariffMode === mode.id ? "bg-emerald-700 text-white shadow-sm" : "text-slate-600 hover:bg-white hover:text-slate-950"}`}
+              >{mode.label}</button>)}
+            </div>
+
+            {tariffMode === "simple" && <p className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-3.5 py-3 text-xs leading-5 text-slate-700">The main electricity-rate field above is used for every kWh. Add the bill items below only if they apply.</p>}
+
+            {tariffMode === "timeOfUse" && <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Peak rate / kWh</span><input type="number" min="0" step="any" value={peakRate} onChange={(event) => setPeakRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} peak`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Off-peak rate / kWh</span><input type="number" min="0" step="any" value={offPeakRate} onChange={(event) => setOffPeakRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} off-peak`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Usage during peak</span><div className="relative"><input type="number" min="0" max="100" value={peakShare} onChange={(event) => setPeakShare(cleanCappedNumberInput(event.target.value, 100))} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-10 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">%</span></div></label>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Shoulder rate / kWh</span><input type="number" min="0" step="any" value={shoulderRate} onChange={(event) => setShoulderRate(cleanNonNegativeInput(event.target.value))} placeholder="Optional" className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Usage during shoulder</span><div className="relative"><input type="number" min="0" max="100" value={shoulderShare} onChange={(event) => setShoulderShare(cleanCappedNumberInput(event.target.value, 100))} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-10 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">%</span></div></label>
+            </div>}
+
+            {tariffMode === "timeOfUse" && <p className={`mt-2 text-[11px] leading-5 ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Enter peak and optional shoulder shares from your bill or meter. The remaining usage is assigned to off-peak.</p>}
+
+            {tariffMode === "tiered" && <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>First tier ends at</span><div className="relative"><input type="number" min="0" value={tierLimit} onChange={(event) => setTierLimit(cleanNonNegativeInput(event.target.value))} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-12 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">kWh</span></div></label>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>First-tier rate</span><input type="number" min="0" step="any" value={tierOneRate} onChange={(event) => setTierOneRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} / kWh`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Next-tier rate</span><input type="number" min="0" step="any" value={tierTwoRate} onChange={(event) => setTierTwoRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} / kWh`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none ring-1 ring-emerald-950/[0.04] focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
+            </div>}
+
+            {tariffMode === "tiered" && <p className={`mt-2 text-[11px] leading-5 ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Only the kWh above the first-tier threshold is charged at the next-tier rate.</p>}
+
+            {isAdvancedRateIncomplete && <p role="status" className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs font-bold leading-5 text-amber-900">{safeNumber(peakShare) + safeNumber(shoulderShare) > 100 ? "Peak and shoulder shares must total 100% or less." : safeNumber(shoulderShare) > 0 && safeNumber(shoulderRate) <= 0 ? "Add a shoulder rate for the shoulder usage share." : "Add both peak and off-peak rates to avoid treating a missing price as zero."}</p>}
+
+            {/* Prorating a monthly allowance is the right arithmetic, but it is
+                not what the bill literally says, so it is stated rather than
+                done quietly. */}
+            {tariffMode === "tiered" && tierProrated && (
+              <p role="status" className={`mt-3 rounded-2xl border px-3.5 py-2.5 text-xs font-semibold leading-5 ${darkMode ? "border-emerald-200/20 bg-emerald-200/10 text-emerald-100" : "border-emerald-200/70 bg-emerald-50/70 text-emerald-900"}`}>
+                Tier allowances are monthly, and this bill covers {billPeriodDays} days — so the first tier has been
+                scaled to {scaledTierLimit.toLocaleString(undefined, { maximumFractionDigits: 0 })} kWh for this period.
+              </p>
+            )}
+
+            <div className={`mt-4 grid gap-3 border-t pt-4 sm:grid-cols-2 lg:grid-cols-4 ${darkMode ? "border-white/[0.08]" : "border-slate-100"}`}>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Daily supply charge</span><input type="number" min="0" step="any" value={dailySupplyCharge} onChange={(event) => setDailySupplyCharge(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} / day`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Tax</span><div className="relative"><input type="number" min="0" max="100" value={taxPercent} onChange={(event) => setTaxPercent(cleanCappedNumberInput(event.target.value, 100))} placeholder="Optional" className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-10 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">%</span></div></label>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Solar exported</span><div className="relative"><input type="number" min="0" step="any" value={solarExportKwh} onChange={(event) => setSolarExportKwh(cleanNonNegativeInput(event.target.value))} placeholder="Optional" className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 pr-12 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500">kWh</span></div></label>
+              <label className="block"><span className={`mb-1.5 block text-[10px] font-black uppercase tracking-[0.08em] ${darkMode ? "text-slate-300" : "text-slate-500"}`}>Export credit / kWh</span><input type="number" min="0" step="any" value={solarExportRate} onChange={(event) => setSolarExportRate(cleanNonNegativeInput(event.target.value))} placeholder={`${displayCurrency || "Currency"} credit`} className="w-full rounded-2xl border border-slate-200 bg-[#f7f8f8] p-3.5 text-sm text-black outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200" /></label>
+            </div>
+
+            <p className={`mt-2 text-[11px] leading-5 ${darkMode ? "text-slate-300" : "text-slate-500"}`}>For solar, use exported grid kWh from your bill. Electricity used directly in the home is not export.</p>
+
+            {totalKwh > 0 && hasValidRateForEstimate && <div className={`mt-4 grid gap-2 rounded-2xl border p-3 sm:grid-cols-4 ${darkMode ? "border-emerald-300/10 bg-emerald-300/[0.05]" : "border-emerald-100 bg-emerald-50/55"}`}>
+              {[
+                ["Energy", formatCompactCurrency(usageCost)],
+                ["Supply + fixed", formatCompactCurrency(supplyChargeAmount + fixedChargeAmount)],
+                ["Solar credit", solarCreditAmount > 0 ? `-${formatCompactCurrency(solarCreditAmount)}` : formatCompactCurrency(0)],
+                ["Tax", formatCompactCurrency(taxAmount)],
+              ].map(([label, value]) => <div key={label}><p className={`text-[9px] font-black uppercase tracking-[0.1em] ${darkMode ? "text-slate-400" : "text-slate-500"}`}>{label}</p><p className="mt-1 text-sm font-black">{value}</p></div>)}
+            </div>}
+          </div>}
+        </section>
+        <section className="wmb-light-panel mb-4 overflow-hidden rounded-3xl border border-emerald-950/[0.07] bg-white text-slate-950 shadow-sm" aria-labelledby="bill-details-heading">
+          <button
+            type="button"
+            onClick={() => setShowBillDetails((current) => !current)}
+            className="flex w-full cursor-pointer items-center justify-between gap-4 p-4 text-left sm:px-5"
+            aria-expanded={showBillDetails}
+            aria-controls="bill-details-content"
+          >
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 id="bill-details-heading" className="text-base font-black tracking-tight">Bill details</h2>
+                <span className="wmb-meta-pill">Optional</span>
+              </div>
+              <p className="mt-1 text-xs leading-5 text-slate-500">Use details from your bill for a more precise estimate.</p>
+            </div>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-50 text-emerald-700 transition">
+              <ChevronDown size={18} className={`transition-transform duration-200 ${showBillDetails ? "rotate-180" : ""}`} />
+            </span>
+          </button>
+
+          {showBillDetails && <div id="bill-details-content" className="border-t border-slate-100 p-4 sm:p-5">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="block">
+              <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">Current bill total</span>
+              <input
+                type="number"
+                min="0"
+                className="w-full rounded-2xl border border-gray-200 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                placeholder={`${displayCurrency || "Currency"} total`}
+                value={actualBill}
+                onChange={(event) => setActualBill(cleanNonNegativeInput(event.target.value))}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">Billing period days</span>
+              <input
+                type="number"
+                min="1"
+                max="366"
+                className="w-full rounded-2xl border border-gray-200 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                value={billingDays}
+                onChange={(event) => setBillingDays(cleanCappedNumberInput(event.target.value, 366, { allowZero: false }))}
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">Fixed charges for period</span>
+              <input
+                type="number"
+                min="0"
+                step="any"
+                className="w-full rounded-2xl border border-gray-200 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                placeholder={`${displayCurrency || "Currency"} total`}
+                value={fixedCharge}
+                onChange={(event) => setFixedCharge(cleanNonNegativeInput(event.target.value))}
+              />
+              <p className="mt-1.5 text-[11px] leading-4 text-slate-500">Supply, standing, service, or other known fixed charges.</p>
+            </label>
+
+            <div>
+              <label className="block">
+                <span className="mb-1.5 block text-[12px] font-bold uppercase tracking-[0.055em] text-slate-500">kWh shown on your bill</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  className="w-full rounded-2xl border border-gray-200 bg-[#f7f8f8] p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                  placeholder="Billed energy use"
+                  value={billedKwh}
+                  onChange={(event) => setBilledKwh(cleanNonNegativeInput(event.target.value))}
+                />
+              </label>
+
+              {effectiveRate > 0 ? (
+                <div className="mt-2 flex items-center justify-between gap-3 rounded-xl bg-emerald-50 px-3 py-2">
+                  <p className="text-xs font-bold text-emerald-800">
+                    Effective rate: {displayCurrency}{effectiveRate.toLocaleString(undefined, { maximumFractionDigits: 4 })}/kWh
+                  </p>
+                  <button type="button" onClick={applyEffectiveRate} className="shrink-0 text-xs font-black text-emerald-700 underline underline-offset-4">
+                    Use rate
+                  </button>
+                </div>
+              ) : (
+                <p className="mt-1.5 text-[11px] leading-4 text-slate-500">Add your bill total and billed kWh to calculate an effective usage rate.</p>
+              )}
+            </div>
+          </div>
+
+          {fixedChargeAmount > 0 && (
+            <div className="mt-4 grid gap-2 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600 sm:grid-cols-3">
+              <p>Usage estimate: <span className="font-black">{formatCurrency(usageCost)}</span></p>
+              <p>Fixed charges: <span className="font-black">{formatCurrency(fixedChargeAmount)}</span></p>
+              <p>Combined estimate: <span className="font-black text-emerald-700">{formatCurrency(total)}</span></p>
+            </div>
+          )}
+          </div>}
+        </section>
+        <section className="wmb-light-panel mb-4 overflow-hidden rounded-3xl border border-emerald-950/[0.07] bg-white text-slate-950 shadow-sm" aria-labelledby="bill-detective-heading">
+          <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+            <div className="flex min-w-0 items-start gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
+                <SearchCheck size={22} strokeWidth={2.3} />
+              </span>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-[11px] font-black uppercase tracking-[0.14em] text-emerald-700">Explain a bill change</p>
+                  <span className="wmb-meta-pill">Beta</span>
+                </div>
+                <h2 id="bill-detective-heading" className="mt-1 text-xl font-black tracking-tight">Bill Detective</h2>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
+                  Compare two bills fairly and estimate whether usage, the effective rate, or fixed charges drove the change.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowBillDetective((current) => !current)}
+              aria-expanded={showBillDetective}
+              aria-controls="bill-detective-content"
+              className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-black text-emerald-800 transition hover:bg-emerald-100 sm:w-auto"
+            >
+              {showBillDetective ? "Hide comparison" : "Compare two bills"}
+              <ChevronDown size={16} className={`transition-transform ${showBillDetective ? "rotate-180" : ""}`} />
+            </button>
+          </div>
+
+          {showBillDetective && (
+            <div id="bill-detective-content" className="border-t border-emerald-950/[0.07] px-5 pb-6 pt-5 md:px-6">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-emerald-100 bg-white/80 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">{usesDashboardEstimateForDetective ? "Current estimate" : "Current bill"}</p>
+                    <span className={`rounded-full px-2 py-1 text-[10px] font-black ${hasCurrentDetectiveInputs ? "bg-emerald-50 text-emerald-700" : "text-slate-400"}`}>
+                      {usesDashboardEstimateForDetective ? "From dashboard" : hasCurrentDetectiveInputs ? "Bill details" : "Add details above"}
+                    </span>
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-slate-500">Total</p>
+                      <p className="mt-0.5 font-black">{currentBillValue > 0 ? formatCurrency(currentBillValue) : "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Usage</p>
+                      <p className="mt-0.5 font-black">{currentKwhValue > 0 ? `${formatCompactNumber(currentKwhValue)} kWh` : "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Period</p>
+                      <p className="mt-0.5 font-black">{billPeriodDays} days</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Effective rate</p>
+                      <p className="mt-0.5 font-black">{currentDetectiveEffectiveRate > 0 ? `${displayCurrency}${currentDetectiveEffectiveRate.toLocaleString(undefined, { maximumFractionDigits: 4 })}/kWh` : "—"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-emerald-100 bg-white/80 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">Previous bill</p>
+                    <span className={`text-[11px] font-bold ${hasPreviousDetectiveInputs ? "text-emerald-700" : "text-slate-400"}`}>
+                      {hasPreviousDetectiveInputs ? "Ready" : "Enter below"}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <label className="block sm:col-span-2">
+                      <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.08em] text-slate-500">Bill total</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        aria-label="Previous bill total"
+                        className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-black shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        placeholder={`${displayCurrency || "Currency"} total`}
+                        value={previousBill}
+                        onChange={(event) => setPreviousBill(cleanNonNegativeInput(event.target.value))}
+                      />
+                    </label>
+                    <label className="block sm:col-span-2">
+                      <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.08em] text-slate-500">Billed kWh</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        aria-label="Previous billed kWh"
+                        className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-black shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        placeholder="Energy use"
+                        value={previousBilledKwh}
+                        onChange={(event) => setPreviousBilledKwh(cleanNonNegativeInput(event.target.value))}
+                      />
+                    </label>
+                    <label className="block sm:col-span-2">
+                      <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.08em] text-slate-500">Period days</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="366"
+                        aria-label="Previous billing period days"
+                        className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-black shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        value={previousBillingDays}
+                        onChange={(event) => setPreviousBillingDays(cleanCappedNumberInput(event.target.value, 366, { allowZero: false }))}
+                      />
+                    </label>
+                    <label className="block sm:col-span-2">
+                      <span className="mb-1 block text-[10px] font-black uppercase tracking-[0.08em] text-slate-500">Fixed charges</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        aria-label="Previous fixed charges"
+                        className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-black shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        placeholder="Optional"
+                        value={previousFixedCharge}
+                        onChange={(event) => setPreviousFixedCharge(cleanNonNegativeInput(event.target.value))}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {!hasValidDetectiveCharges && hasCurrentDetectiveInputs && hasPreviousDetectiveInputs && (
+                <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold leading-5 text-amber-800">
+                  A fixed-charge value cannot be equal to or greater than its bill total. Check the current and previous fixed charges.
+                </p>
+              )}
+
+              <div className={`mt-4 rounded-[24px] border p-5 ${isBillDetectiveReady ? "border-emerald-200 bg-emerald-50/70" : "border-slate-200 bg-slate-50"}`}>
+                <div className="flex items-start gap-3">
+                  <BarChart3 className={`mt-0.5 shrink-0 ${isBillDetectiveReady ? "text-emerald-700" : "text-slate-400"}`} size={20} />
+                  <div>
+                    <p className={`text-[11px] font-black uppercase tracking-[0.12em] ${isBillDetectiveReady ? "text-emerald-700" : "text-slate-500"}`}>Detective result</p>
+                    <h3 className="mt-1 text-lg font-black leading-snug">{billDetectiveSummary}</h3>
+                    {isBillDetectiveReady && (
+                      <p className="mt-2 text-xs leading-5 text-slate-600">
+                        Comparison uses 30-day equivalents so different billing-period lengths do not distort the result.{usesDashboardEstimateForDetective ? " The current side comes from your calculator estimate, not a provider bill." : ""}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {isBillDetectiveReady && (
+                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                    {detectiveDrivers.map((driver) => {
+                      const isPrimary = driver.key === primaryDetectiveDriver.key;
+                      return (
+                        <div key={driver.key} className={`rounded-2xl border p-4 ${isPrimary ? "border-emerald-300 bg-white" : "border-emerald-100 bg-white/75"}`}>
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[10px] font-black uppercase tracking-[0.1em] text-slate-500">{driver.label}</p>
+                            {isPrimary && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.08em] text-emerald-800">Main driver</span>}
+                          </div>
+                          <p className={`mt-2 text-xl font-black ${driver.impact > 0 ? "text-rose-600" : driver.impact < 0 ? "text-emerald-700" : ""}`}>
+                            {formatSignedCurrency(driver.impact)}
+                          </p>
+                          <p className="mt-1 text-[11px] text-slate-500">estimated 30-day contribution</p>
+                          {driver.key === "usage" && <p className="mt-2 text-xs font-bold">Daily usage {formatSignedPercent(usageChangePercent)}</p>}
+                          {driver.key === "rate" && <p className="mt-2 text-xs font-bold">Effective rate {formatSignedPercent(rateChangePercent)}</p>}
+                          {driver.key === "fixed" && <p className="mt-2 text-xs font-bold">Fixed cost {formatSignedCurrency(fixedImpact)}</p>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {isBillDetectiveReady && (
+                  <p className="mt-4 text-[11px] leading-5 text-slate-500">
+                    The three contributions add up to the normalized bill change. The effective rate is blended and may include variable taxes or adjustments. This is a diagnostic estimate, not a provider audit.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </section>
+
+        <div className={`relative z-10 mt-1 mb-5 px-1 text-[14px] leading-relaxed ${
+          darkMode ? "text-slate-100/94" : "text-slate-800"
+        }`}>
+          <span className={darkMode ? "font-black text-emerald-300" : "font-black text-emerald-700"}>
+            Did you know?
+          </span>{" "}
+          <span key={didYouKnowIndex} className="inline font-medium leading-relaxed">
+            {currentMicroInsight}
+          </span>
+        </div>
         <section ref={howEstimatesSectionRef} className="mb-5 scroll-mt-32 rounded-3xl bg-white p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] sm:flex sm:items-center sm:justify-between sm:gap-5 sm:px-5">
           <div>
             <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">How the estimate works</p>
