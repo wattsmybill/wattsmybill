@@ -284,11 +284,11 @@ export default function RootLayout({ children }) {
             <defs>
               {/* Must stay identical to the ground in the app icon, since the
                   system splash draws that icon immediately before this. */}
-              <radialGradient id="wmbSplashTile" cx="50%" cy="42%" r="70%">
-                <stop offset="0%" stopColor="#123f52" />
-                <stop offset="55%" stopColor="#0a2036" />
-                <stop offset="100%" stopColor="#050f21" />
-              </radialGradient>
+              <linearGradient id="wmbSplashTile" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#0d7d76" />
+                <stop offset="60%" stopColor="#0a3347" />
+                <stop offset="100%" stopColor="#06142b" />
+              </linearGradient>
             </defs>
 
             <rect
