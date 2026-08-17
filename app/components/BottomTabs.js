@@ -12,8 +12,9 @@ import { BarChart3, BookOpen, Calculator, Globe2 } from "lucide-react";
  * They are the reason someone comes back, so they get a permanent, thumb-height
  * home instead.
  *
- * Shown on small screens and in the installed app; on a desktop browser the
- * header navigation already does this job, so the bar would only take up room.
+ * Shown below 1024px, matching the breakpoint where the header navigation takes
+ * over. The two must stay in step: if the bar hid earlier than the header nav
+ * appeared, that band of widths would have no primary navigation at all.
  */
 const TABS = [
   { href: "/", label: "Estimate", Icon: Calculator },
@@ -29,7 +30,7 @@ export default function BottomTabs() {
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <nav className="wmb-bottom-tabs md:hidden" aria-label="Main sections">
+    <nav className="wmb-bottom-tabs lg:hidden" aria-label="Main sections">
       <ul>
         {TABS.map(({ href, label, Icon }) => {
           const current = isCurrent(href);

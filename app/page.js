@@ -2569,9 +2569,6 @@ ${topUsage.trim()}` : ""}`;
             </button>
 
             <nav className="hidden items-center gap-4 translate-y-[10px] lg:flex lg:gap-5" aria-label="Main navigation">
-              <button type="button" onClick={() => scrollToSection(inputSectionRef)} className={`relative cursor-pointer px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
-                Explore
-              </button>
               <Link href="/learn" className={`relative px-0.5 py-2 text-sm font-bold transition after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${darkMode ? "text-white/88 hover:text-white after:bg-emerald-300/85" : "text-slate-700 hover:text-emerald-800 after:bg-emerald-500"}`}>
                 Learn
               </Link>
@@ -2631,18 +2628,12 @@ ${topUsage.trim()}` : ""}`;
                 : "border-emerald-950/[0.08] bg-white/95 text-slate-950"
             }`}>
               <div className="py-2">
-                <button type="button" onClick={() => scrollToSection(inputSectionRef)} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
-                  Explore
-                </button>
-                <Link href="/learn" onClick={() => setShowMobileMenu(false)} className={`block w-full px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
-                  Learning Hub
-                </Link>
-                <Link href="/rates" onClick={() => setShowMobileMenu(false)} className={`block w-full px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
-                  Rate Library
-                </Link>
                 <button type="button" onClick={handleInstallApp} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
                   {isAppInstalled ? "Installed" : "Install App"}
                 </button>
+                <Link href="/methodology" onClick={() => setShowMobileMenu(false)} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
+                  How it works
+                </Link>
                 <button type="button" onClick={() => openInfoSection("about")} className={`block w-full cursor-pointer px-5 py-2.5 text-left text-[15px] font-bold transition-colors ${darkMode ? "text-white/92 hover:text-emerald-200 active:text-emerald-200" : "text-slate-900 hover:text-emerald-700 active:text-emerald-700"}`}>
                   About
                 </button>

@@ -661,7 +661,7 @@ html.wmb-standalone #wmb-splash {
 [data-wmb-theme="dark"] .wmb-bottom-tabs a[data-current] { color: #6ee7b7; }
 
 /* Keeps page content clear of the bar, including the safe-area inset. */
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   body { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
 
   /* The live-estimate bar and the back-to-top pill were already anchored to the
