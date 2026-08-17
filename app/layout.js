@@ -282,10 +282,12 @@ export default function RootLayout({ children }) {
               finishing on the untiled logo. */}
           <svg className="wmb-splash-mark" viewBox="0 0 512 512" role="presentation">
             <defs>
-              <radialGradient id="wmbSplashTile" cx="50%" cy="44%" r="66%">
-                <stop offset="0%" stopColor="#12a49a" />
-                <stop offset="55%" stopColor="#0c7571" />
-                <stop offset="100%" stopColor="#102f33" />
+              {/* Must stay identical to the ground in the app icon, since the
+                  system splash draws that icon immediately before this. */}
+              <radialGradient id="wmbSplashTile" cx="50%" cy="42%" r="70%">
+                <stop offset="0%" stopColor="#123f52" />
+                <stop offset="55%" stopColor="#0a2036" />
+                <stop offset="100%" stopColor="#050f21" />
               </radialGradient>
             </defs>
 
