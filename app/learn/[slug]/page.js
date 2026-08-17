@@ -151,8 +151,10 @@ export default async function ArticlePage({ params }) {
               </section>
 
               <div className="mt-10 space-y-10">
+                {/* The scroll offset below only needs to clear a pinned header,
+                    and the header is pinned from 1024px up. */}
                 {article.sections.map((section) => (
-                  <section key={section.heading} id={headingId(section.heading)} className="scroll-mt-28">
+                  <section key={section.heading} id={headingId(section.heading)} className="scroll-mt-6 lg:scroll-mt-28">
                     <h2 className="text-2xl font-black tracking-tight">{section.heading}</h2>
                     <div className="mt-4 space-y-4 text-base leading-7 text-slate-700">
                       {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}

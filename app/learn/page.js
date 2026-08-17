@@ -120,8 +120,11 @@ export default function LearnPage() {
               </div>
 
               <div className="mt-7 grid max-w-3xl grid-cols-3 border-t border-white/12 pt-5">
+                {/* Padding is symmetric so the middle column is not squeezed against
+                    the divider to its left. It had padding-left: 0 while only the last
+                    column got any, leaving the columns 84 / 84 / 68 wide. */}
                 {[[ARTICLES.length, "practical guides"], ["Global", "local differences"], ["Official", "source links"]].map(([value, label]) => (
-                  <div key={label} className="border-r border-white/12 pr-3 last:border-0 last:pl-4 sm:px-4 sm:first:pl-0">
+                  <div key={label} className="border-r border-white/12 px-3 first:pl-0 last:border-0 last:pr-0 sm:px-4 sm:first:pl-0 sm:last:pr-0">
                     <p className="text-sm font-black text-white">{value}</p>
                     {/* These labels sit low in the hero, where the gradient is
                         at its lightest, and are only 10px — so they carry the

@@ -2553,7 +2553,7 @@ ${topUsage.trim()}` : ""}`;
 
   return (
     <div className={`min-h-screen p-4 md:p-6 transition-colors duration-300 ${theme} ${darkMode ? "wmb-dashboard-dark" : ""}`}>
-      <a href="#main-content" className="sr-only z-[200] rounded-full bg-white px-4 py-2 font-black text-emerald-800 shadow-lg focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
+      <a href="#main-content" className="wmb-skip-link">
         Skip to calculator
       </a>
       <div className="mx-auto w-full max-w-[1120px]">

@@ -26,12 +26,15 @@ export default function LearnHeader({ skipTo = "#main-content" }) {
   const pathname = usePathname();
   const isCurrent = (href) => pathname === href || pathname.startsWith(`${href}/`);
 
+  // Sticky only where it earns the space. Below 1024px the tab bar carries
+  // navigation, so this bar held nothing but a logo and a theme toggle while
+  // permanently occupying 77px above an already-fixed 57px — a sixth of a phone
+  // screen spent on chrome, on the pages people come to read. It now scrolls
+  // away there, as the calculator's header already does. At 1024px and up the
+  // tab bar is gone and these links are the only navigation, so it stays pinned.
   return (
-    <header className="learning-header sticky top-0 z-50 border-b border-emerald-950/10 bg-white/90 backdrop-blur-xl">
-      <a
-        href={skipTo}
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-black focus:text-emerald-800 focus:shadow-lg"
-      >
+    <header className="learning-header relative z-50 border-b border-emerald-950/10 bg-white/90 backdrop-blur-xl lg:sticky lg:top-0">
+      <a href={skipTo} className="wmb-skip-link">
         Skip to content
       </a>
 
