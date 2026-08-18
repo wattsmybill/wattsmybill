@@ -51,7 +51,7 @@ export default function RatesPage() {
     <LearningThemeShell>
     <div className="min-h-screen bg-[#eef3f1] text-slate-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <LearnHeader skipTo="#main-content" />
+      <LearnHeader />
 
       <main id="main-content" className="mx-auto max-w-6xl px-4 pb-16 pt-5 sm:px-6 sm:pt-8">
         <section className="overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#043a33_0%,#087157_62%,#0a7454_100%)] px-5 py-7 text-white shadow-[0_18px_44px_rgba(5,84,66,0.16)] sm:px-8 sm:py-9">

@@ -12,8 +12,6 @@ import { LearningThemeToggle } from "./LearningThemeShell";
  * navigation, and this header duplicating it put Learning Hub, Rate Library and
  * Bill History on screen twice at once. Above 1024px the tab bar is gone, so the
  * links appear here instead — one home per destination, per width.
- *
- * The skip link lives here so no route can forget one.
  */
 const LINKS = [
   { href: "/learn", label: "Learning Hub" },
@@ -22,7 +20,7 @@ const LINKS = [
   { href: "/methodology", label: "How it works" },
 ];
 
-export default function LearnHeader({ skipTo = "#main-content" }) {
+export default function LearnHeader() {
   const pathname = usePathname();
   const isCurrent = (href) => pathname === href || pathname.startsWith(`${href}/`);
 
@@ -34,10 +32,6 @@ export default function LearnHeader({ skipTo = "#main-content" }) {
   // tab bar is gone and these links are the only navigation, so it stays pinned.
   return (
     <header className="learning-header relative z-50 border-b border-emerald-950/10 bg-white/90 backdrop-blur-xl lg:sticky lg:top-0">
-      <a href={skipTo} className="wmb-skip-link">
-        Skip to content
-      </a>
-
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-4 sm:px-7">
         <Link href="/" className="flex items-center gap-3" aria-label="Watts My Bill home">
           <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl sm:h-[46px] sm:w-[46px]">

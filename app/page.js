@@ -2553,9 +2553,6 @@ ${topUsage.trim()}` : ""}`;
 
   return (
     <div className={`min-h-screen p-4 md:p-6 transition-colors duration-300 ${theme} ${darkMode ? "wmb-dashboard-dark" : ""}`}>
-      <a href="#main-content" className="wmb-skip-link">
-        Skip to calculator
-      </a>
       <div className="mx-auto w-full max-w-[1120px]">
         <header className="relative z-[80] mb-4 md:mb-6">
           <div className="flex items-start justify-between gap-3 md:items-center">
