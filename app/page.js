@@ -4301,8 +4301,20 @@ ${topUsage.trim()}` : ""}`;
               Power × quantity × time becomes kWh, then your electricity rate turns usage into an estimated cost.
             </p>
           </div>
-          <Link href="/learn" className="mt-3 inline-flex shrink-0 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-black text-emerald-800 transition hover:bg-emerald-100 sm:mt-0">
+          <Link href="/learn" className="mt-3 inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-black text-emerald-800 transition hover:bg-emerald-100 sm:mt-0">
             Visit Learning Hub
+          </Link>
+        </section>
+
+        <section className="mb-5 rounded-3xl bg-white p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] sm:flex sm:items-center sm:justify-between sm:gap-5 sm:px-5">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">Learn by playing</p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Not sure what your appliances draw? Guess five of them, see the real figures, and the boxes above get much easier to fill in.
+            </p>
+          </div>
+          <Link href="/game" className="mt-3 inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-black text-emerald-800 transition hover:bg-emerald-100 sm:mt-0">
+            Play Guess the Watts
           </Link>
         </section>
 
