@@ -19,12 +19,10 @@ const DEFAULT_APPLIANCE = {
   quantity: 1,
   hours: "",
   days: "",
-  // Fraction of its "hours" an appliance actually draws power. A fridge is
-  // plugged in around the clock but its compressor runs roughly a third of the
-  // time, so watts x hours-plugged-in overstated it by about three times and
-  // routinely crowned it the household's biggest energy user. Anything that
-  // genuinely draws continuously — a router, a camera — stays at 1.
-  duty: 1,
+  // Duty is deliberately absent rather than 1: resolveDuty falls back to a
+  // lookup by appliance name, and a default here would short-circuit it, so a
+  // hand-typed fridge would be costed at full nameplate draw while the same
+  // appliance added from the catalogue got its duty cycle.
 };
 
 /** Duty is a fraction of 1; anything outside that is treated as "always on". */
@@ -47,7 +45,13 @@ const DUTY_BY_NAME = new Map(
  * duplicated into each data file where it could silently fall out of step.
  */
 function resolveDuty(item) {
-  if (Number.isFinite(Number(item?.duty))) return safeDuty(item.duty);
+  // Only a genuine duty cycle — below 1 — is worth honouring on the row itself.
+  // A stored 1 means either "always on" or the old default that used to be
+  // written into every appliance, and sessions saved with it are still out
+  // there; treating it as unset lets the name lookup correct them on load
+  // rather than needing a migration, and lands on 1 anyway when nothing matches.
+  const stored = Number(item?.duty);
+  if (Number.isFinite(stored) && stored > 0 && stored < 1) return stored;
   return DUTY_BY_NAME.get(String(item?.name || "").trim().toLowerCase()) ?? 1;
 }
 
@@ -1948,7 +1952,10 @@ ${topUsage.trim()}` : ""}`;
   const buildEstimateLink = () => {
     if (typeof window === "undefined") return "https://wattsmybill.app";
     return buildShareUrl(window.location.origin, {
-      appliances,
+      // Duty is resolved before encoding. An unset value would travel as 1 and
+      // then short-circuit the name lookup on the recipient's side, so a shared
+      // fridge would cost three times what it does for the sender.
+      appliances: appliances.map((item) => ({ ...item, duty: resolveDuty(item) })),
       country: country?.isPlaceholder ? "" : country?.name,
       customRate,
       billingDays,
@@ -3764,7 +3771,7 @@ ${topUsage.trim()}` : ""}`;
                             min="1"
                             max="999999"
                             step="1"
-                            placeholder="Qty"
+                            placeholder="1"
                             value={item.quantity}
                             onChange={(e) => updateAppliance(i, "quantity", cleanDigitCappedNumberInput(e.target.value, 6, { allowZero: false }))}
                           />
@@ -3778,7 +3785,7 @@ ${topUsage.trim()}` : ""}`;
                             min="0"
                             max="9999999"
                             step="any"
-                            placeholder="W"
+                            placeholder="e.g. 150"
                             value={item.watts}
                             onChange={(e) => updateAppliance(i, "watts", cleanDigitCappedNumberInput(e.target.value, 7))}
                           />
@@ -3792,7 +3799,7 @@ ${topUsage.trim()}` : ""}`;
                             min="0"
                             max="24"
                             step="any"
-                            placeholder="Hours"
+                            placeholder="e.g. 8"
                             value={item.hours}
                             onChange={(e) => updateAppliance(i, "hours", cleanCappedNumberInput(e.target.value, 24))}
                           />
@@ -3806,7 +3813,7 @@ ${topUsage.trim()}` : ""}`;
                             min="0"
                             max="31"
                             step="any"
-                            placeholder="Days"
+                            placeholder="e.g. 30"
                             value={item.days}
                             onChange={(e) => updateAppliance(i, "days", cleanCappedNumberInput(e.target.value, 31))}
                           />
@@ -3854,14 +3861,19 @@ ${topUsage.trim()}` : ""}`;
                       <div className="min-w-0 md:text-center">
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500/90 md:text-[10.5px]">Consumption</p>
                         <h3 className={`mt-0.5 whitespace-nowrap font-black leading-tight text-slate-950 ${showUnusuallyHighWarning ? "text-[0.88rem] md:text-[0.92rem]" : "text-[0.98rem] md:text-[1.02rem]"}`}>
-                          {formatCompactNumber(item.kwh)} kWh
+                          {safeNumber(item.watts) > 0 ? `${formatCompactNumber(item.kwh)} kWh` : "—"}
                         </h3>
+                        {resolveDuty(item) < 1 && safeNumber(item.watts) > 0 && (
+                          <p className="mt-0.5 text-[10px] font-semibold leading-snug text-slate-500">
+                            runs ~{Math.round(resolveDuty(item) * 100)}% of those hours
+                          </p>
+                        )}
                       </div>
 
                       <div className="min-w-0 border-l border-emerald-200/55 pl-3 text-right md:pl-4 md:text-center">
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500/90 md:text-[10.5px]">Estimated cost</p>
                         <h3 className={`mt-0.5 whitespace-nowrap font-black leading-tight tracking-tight text-emerald-600 ${showUnusuallyHighWarning ? "text-[0.96rem] md:text-[1rem]" : "text-[1.18rem] md:text-[1.2rem]"}`}>
-                          {hasValidRateForEstimate ? formatCompactCurrency(item.cost) : "Add rate"}
+                          {safeNumber(item.watts) <= 0 ? "—" : hasValidRateForEstimate ? formatCompactCurrency(item.cost) : "Add rate"}
                         </h3>
                       </div>
                     </div>
