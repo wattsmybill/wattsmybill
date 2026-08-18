@@ -33,16 +33,24 @@ export default function GuessTheWatts() {
   const [best, setBest] = useState(0);
   const [copied, setCopied] = useState(false);
 
-  // Deferred a frame for the same reason LearningThemeShell defers: the round is
-  // drawn at random, so choosing it during render would hand the server one
-  // appliance and the browser another, and hydration would tear.
+  // The round is drawn on the client, not during render: it is random, so
+  // choosing it while rendering would hand the server one appliance and the
+  // browser another, and hydration would tear.
+  //
+  // This deliberately does not defer through requestAnimationFrame, which is
+  // what the theme shell does. rAF schedules against paint and a hidden tab
+  // never paints, so opening the game in a background tab left it stuck on
+  // "Shuffling appliances..." until the tab was focused. Losing a theme frame
+  // that way is cosmetic; losing the game is not.
+  // The cascading render this rule warns about is the intended behaviour here:
+  // the first paint is a placeholder precisely because the content cannot be
+  // decided until the client is running.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      setRounds(buildRound());
-      setBest(loadBestScore());
-    });
-    return () => window.cancelAnimationFrame(frame);
+    setRounds(buildRound());
+    setBest(loadBestScore());
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const guess = positionToWatts(position);
   const current = rounds?.[index] ?? null;
