@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Calculator, Home, CheckCircle2, Coffee, ArrowUp, X, SearchCheck, ChevronDown, ChevronLeft, ChevronRight, BookmarkPlus, Trash2, RotateCw, SlidersHorizontal } from "lucide-react";
+import { Moon, Sun, RotateCcw, Share2, Copy, BarChart3, Calculator, Gamepad2, Home, CheckCircle2, Coffee, ArrowUp, X, SearchCheck, ChevronDown, ChevronLeft, ChevronRight, BookmarkPlus, Trash2, RotateCw, SlidersHorizontal } from "lucide-react";
 
 import { COUNTRIES } from "./data/countries";
 import { PRESETS } from "./data/appliances";
@@ -2718,6 +2718,15 @@ ${topUsage.trim()}` : ""}`;
                   <span className="lg:hidden">{totalKwh > 0 && !hasValidRateForEstimate ? "Add rate" : totalKwh > 0 ? "Review" : "Start"}</span>
                   <span className="hidden lg:inline">{totalKwh > 0 && !hasValidRateForEstimate ? "Add a rate" : totalKwh > 0 ? "Review inputs" : "Get started"}</span>
                 </button>
+                {/* Offered only while the estimate is empty. The moment there are
+                    appliances this row fills with Review, Insights and Save, and a
+                    game has no business competing with somebody's actual numbers. */}
+                {totalKwh === 0 && <Link
+                  href="/game"
+                  className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-white/10 bg-emerald-950/20 px-3 py-2 text-[11px] font-black text-white/88 transition hover:bg-emerald-950/30 lg:gap-2 lg:px-4 lg:py-2.5 lg:text-xs"
+                >
+                  <Gamepad2 size={14} strokeWidth={2.2} /> Guess the Watts
+                </Link>}
                 {totalKwh > 0 && <button
                   type="button"
                   onClick={() => insightsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
