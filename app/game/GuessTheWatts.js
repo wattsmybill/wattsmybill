@@ -101,11 +101,11 @@ export default function GuessTheWatts() {
     return (
       <div className="rounded-[26px] bg-white p-6 shadow-sm ring-1 ring-emerald-950/[0.07] sm:p-7">
         <div className="text-center">
-          <Trophy className="mx-auto text-emerald-700" size={30} aria-hidden="true" />
+          <Trophy className="mx-auto text-amber-600" size={30} aria-hidden="true" />
           <h2 className="mt-3 text-2xl font-black tracking-tight">
             {total} / {ROUNDS * 100}
           </h2>
-          <p className="mt-1 text-sm font-bold text-emerald-700">{rankFor(total)}</p>
+          <p className="mt-1 text-sm font-bold text-amber-700">{rankFor(total)}</p>
           {best > 0 && <p className="mt-1 text-xs text-slate-500">Your best: {best}</p>}
         </div>
 
@@ -116,7 +116,7 @@ export default function GuessTheWatts() {
               <span className="shrink-0 text-slate-600">
                 {item.guess}W vs <strong className="font-black text-slate-950">{item.actual}W</strong>
               </span>
-              <span className="w-12 shrink-0 text-right font-black text-emerald-700">+{item.points}</span>
+              <span className="w-12 shrink-0 text-right font-black text-amber-700">+{item.points}</span>
             </li>
           ))}
         </ul>
@@ -153,7 +153,7 @@ export default function GuessTheWatts() {
   return (
     <div className="rounded-[26px] bg-white p-6 shadow-sm ring-1 ring-emerald-950/[0.07] sm:p-7">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">
+        <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
           Round {index + 1} of {ROUNDS}
         </p>
         <p className="text-xs font-bold text-slate-500">
@@ -163,13 +163,13 @@ export default function GuessTheWatts() {
 
       <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-emerald-950/10" aria-hidden="true">
         <div
-          className="h-full rounded-full bg-emerald-700 transition-all duration-300"
+          className="h-full rounded-full bg-amber-600 transition-all duration-300"
           style={{ width: `${((index + (revealed ? 1 : 0)) / ROUNDS) * 100}%` }}
         />
       </div>
 
       <div className="mt-5 text-center">
-        <span className="inline-block rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-emerald-700">
+        <span className="inline-block rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-amber-800">
           {current.category}
         </span>
         <h2 className="mt-2.5 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">{current.name}</h2>
@@ -191,7 +191,7 @@ export default function GuessTheWatts() {
           onChange={(event) => setPosition(Number(event.target.value))}
           aria-label={`Your guess for ${current.name}`}
           aria-valuetext={`${revealed ? lastResult.guess : guess} watts`}
-          className="mt-3 h-11 w-full cursor-pointer accent-emerald-700 disabled:cursor-default disabled:opacity-70"
+          className="mt-3 h-11 w-full cursor-pointer accent-amber-600 disabled:cursor-default disabled:opacity-70"
         />
         <div className="flex justify-between text-[11px] font-bold text-slate-500">
           <span>5W</span>
@@ -200,7 +200,7 @@ export default function GuessTheWatts() {
       </div>
 
       {revealed ? (
-        <div className="mt-5 rounded-2xl bg-emerald-50/70 p-4 text-center">
+        <div className="mt-5 rounded-2xl bg-amber-50 p-4 text-center ring-1 ring-amber-600/20">
           <p className={`text-sm font-black ${TONE_CLASS[verdict.tone]}`}>
             {verdict.label} · +{lastResult.points}
           </p>

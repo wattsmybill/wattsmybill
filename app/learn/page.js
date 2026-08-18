@@ -247,11 +247,11 @@ export default function LearnPage() {
             className="group flex flex-col gap-4 rounded-3xl border border-emerald-950/[0.07] bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex items-start gap-4">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-emerald-50 text-emerald-700">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-500 text-amber-950">
                 <Gamepad2 size={21} />
               </span>
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.15em] text-emerald-700">Five quick rounds</p>
+                <p className="text-xs font-black uppercase tracking-[0.15em] text-amber-800">Five quick rounds</p>
                 <h2 id="game-heading" className="mt-1 text-xl font-black tracking-tight">Guess the Watts</h2>
                 <p className="mt-1 max-w-xl text-sm leading-6 text-slate-600">
                   Can you tell a 60W fan from a 2000W oven? Guess a few appliances, see the real figures, and filling

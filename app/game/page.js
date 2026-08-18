@@ -47,7 +47,7 @@ export default function GamePage() {
         <main id="main-content" className="mx-auto max-w-3xl px-4 pb-16 pt-5 sm:px-6 sm:pt-8">
           <section className="overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#043a33_0%,#087157_62%,#0a7454_100%)] px-5 py-7 text-white shadow-[0_18px_44px_rgba(5,84,66,0.16)] sm:px-8 sm:py-9">
             <div className="max-w-2xl">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-200">Five quick rounds</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">Five quick rounds</p>
               <h1 className="mt-2 text-3xl font-black tracking-[-0.04em] sm:text-4xl">Guess the Watts</h1>
               <p className="mt-3 text-sm leading-6 text-emerald-50/90 sm:text-base">
                 The hardest part of estimating a bill is knowing what your appliances actually draw. Guess a few, see
