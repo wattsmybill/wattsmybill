@@ -18,6 +18,7 @@ export const urlList = [
   `${siteUrl}/learn`,
   `${siteUrl}/rates`,
   `${siteUrl}/history`,
+  `${siteUrl}/game`,
   `${siteUrl}/methodology`,
   ...ARTICLES.map((article) => `${siteUrl}/learn/${article.slug}`),
 ];

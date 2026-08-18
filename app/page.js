@@ -3840,6 +3840,13 @@ ${topUsage.trim()}` : ""}`;
                               View visual guide
                             </button>
 
+                            <Link
+                              href="/game"
+                              className="inline-flex items-center rounded-lg border border-emerald-100/80 bg-white/65 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50 hover:underline"
+                            >
+                              Play Guess the Watts
+                            </Link>
+
                             <a
                               href={`https://www.google.com/search?q=${encodeURIComponent(
                                 `${item.name} watts power consumption`
