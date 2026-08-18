@@ -110,18 +110,6 @@ function cleanDigitCappedNumberInput(value, maxDigits, { allowZero = true } = {}
     : cappedWholePart;
 }
 
-const DID_YOU_KNOW_INSIGHTS = [
-  "Cooling appliances usually become the biggest part of a household electricity bill.",
-  "Small wattage changes can create noticeable monthly differences over time.",
-  "Air-conditioners, refrigerators, and water heaters often drive the highest usage.",
-  "Reducing your top appliance by even 1 hour/day can lower your estimate noticeably.",
-  "Electricity prices can change over time, so updating your bill helps improve the estimate.",
-  "High-watt appliances are not always expensive if they are only used briefly.",
-  "Low-watt appliances can still add up when running continuously throughout the day.",
-  "Your bill is usually affected more by how long appliances run than by how many appliances you own.",
-  "Cooling settings and room insulation can greatly affect aircon electricity usage.",
-  "Your estimate becomes more accurate when you use the wattage printed on the appliance label."
-];
 
 function calculatePresetKwh(preset) {
   return preset.appliances.reduce((sum, item) => {
@@ -548,7 +536,6 @@ export default function Page() {
   const [replacedOwnEstimate, setReplacedOwnEstimate] = useState(false);
   const [showBackToEstimate, setShowBackToEstimate] = useState(false);
   const [showLiveEstimateBar, setShowLiveEstimateBar] = useState(false);
-  const [didYouKnowIndex, setDidYouKnowIndex] = useState(0);
   const [showWattageEducation, setShowWattageEducation] = useState(false);
   const [showSimpleTerms, setShowSimpleTerms] = useState(false);
   const [showAllAddedAppliances, setShowAllAddedAppliances] = useState(false);
@@ -980,16 +967,6 @@ export default function Page() {
 
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [country, countrySearchTerm, showCountryOptions]);
-
-  useEffect(() => {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return undefined;
-
-    const didYouKnowTimer = window.setInterval(() => {
-      setDidYouKnowIndex((current) => (current + 1) % DID_YOU_KNOW_INSIGHTS.length);
-    }, 9000);
-
-    return () => window.clearInterval(didYouKnowTimer);
-  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1491,7 +1468,6 @@ export default function Page() {
       : "Single rate";
   const breakdown = rawBreakdown.map((item) => ({ ...item, cost: item.kwh * effectiveEstimateRate }));
   const difference = actualBill ? safeNumber(actualBill) - total : 0;
-  const currentMicroInsight = DID_YOU_KNOW_INSIGHTS[didYouKnowIndex % DID_YOU_KNOW_INSIGHTS.length];
 
   const topAppliance = [...breakdown]
     .filter((item) => item.kwh > 0)
@@ -2214,7 +2190,7 @@ ${topUsage.trim()}` : ""}`;
         const logoX = marginX + (logoBoxSize - logoWidth) / 2;
         const logoY = headerTop + 1.5;
 
-        doc.addImage(logoImage.dataUrl, "PNG", logoX, logoY, logoWidth, logoHeight);
+        doc.addImage(logoImage.dataUrl, "PNG", logoX, logoY, logoWidth, logoHeight, "wmb-logo", "FAST");
       }
 
       doc.setFont("helvetica", "bold");
@@ -2231,16 +2207,21 @@ ${topUsage.trim()}` : ""}`;
 
       sectionTitle("Report Details", generatedLabel);
 
+      const countryChosen = displayCountry && displayCountry !== COUNTRY_PLACEHOLDER_NAME;
+
       const detailLines = [
         ...(reportName ? [["Name", cleanText(reportName)]] : []),
         ...(reportAddress ? [["Address", cleanText(reportAddress)]] : []),
-        ["Country", cleanText(displayCountry)],
+        ["Country", countryChosen ? cleanText(displayCountry) : "Not specified"],
         [
           "Rate Used",
           `${pdfCurrency}${safeNumber(activeRate).toLocaleString(undefined, {
             maximumFractionDigits: 4
-          })}/kWh`
-        ]
+          })} per kWh`
+        ],
+        // Without a country there is no currency, so every figure below would be
+        // a bare number. Say so rather than let the reader supply their own guess.
+        ...(pdfCurrency ? [] : [["Currency", "Not set - amounts are in your local currency"]])
       ];
 
       doc.setFontSize(10);
@@ -2288,8 +2269,7 @@ ${topUsage.trim()}` : ""}`;
       const summaryLines = [
         ["Total Usage", `${totalKwh.toFixed(2)} kWh`],
         ["Daily Average", `${money(dailyAverage)} / day`],
-        ["Top Energy User", topAppliance?.name || "Not available"],
-        ["Country", cleanText(displayCountry)]
+        ["Top Energy User", topAppliance?.name || "Not available"]
       ];
 
       summaryLines.forEach(([label, value]) => {
@@ -2337,11 +2317,15 @@ ${topUsage.trim()}` : ""}`;
         doc.text("Estimated Difference", marginX, y);
 
         doc.setFont("helvetica", "normal");
-        doc.text(money(Math.abs(difference)), marginX + 40, y);
+        doc.text(
+          cleanText(
+            `${money(Math.abs(difference))} ${difference > 0 ? "higher than this estimate" : difference < 0 ? "lower than this estimate" : "-"}`
+          ),
+          marginX + 40,
+          y
+        );
 
         y += 7;
-
-        
       }
 
       if (isBillDetectiveReady) {
@@ -2395,6 +2379,8 @@ ${topUsage.trim()}` : ""}`;
         (item) => item.name || item.kwh > 0 || item.cost > 0
       );
 
+      const cyclingRows = [];
+
       const tableX = marginX;
       const col = {
           appliance: tableX,
@@ -2447,7 +2433,12 @@ ${topUsage.trim()}` : ""}`;
         tableHeader();
 
         validRows.forEach((item) => {
-          const applianceName = cleanText(item.name || "Unnamed");
+          // A fridge shown as 150W for 24h across 30 days does not multiply out
+          // to the 37.80 kWh beside it, because it cycles. Marking the row and
+          // footnoting the factor keeps the arithmetic checkable by the reader.
+          const duty = resolveDuty(item);
+          if (duty < 1 && item.kwh > 0) cyclingRows.push([item.name, duty]);
+          const applianceName = cleanText(`${item.name || "Unnamed"}${duty < 1 && item.kwh > 0 ? " *" : ""}`);
           const applianceLines = doc.splitTextToSize(applianceName, 42);
           const rowHeight = Math.max(8, applianceLines.length * 4.5);
 
@@ -2472,40 +2463,188 @@ ${topUsage.trim()}` : ""}`;
 
           y += rowHeight;
         });
+
+        // The reader should not have to add up the column themselves.
+        checkPage(12);
+        doc.setDrawColor(150, 150, 150);
+        doc.setLineWidth(0.4);
+        doc.line(tableX, y - 3.5, pageWidth - marginX, y - 3.5);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7.8);
+        doc.setTextColor(30, 30, 30);
+        doc.text("Total", col.appliance + 1, y);
+        doc.text(totalKwh.toFixed(2), col.kwh, y);
+        doc.text(money(total), col.cost, y);
+        y += 8;
+      }
+
+      if (cyclingRows.length > 0) {
+        checkPage(14);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7.4);
+        doc.setTextColor(110, 110, 110);
+        // Two fridges in one estimate are two rows but one footnote.
+        const seenCycling = new Map();
+        cyclingRows.forEach(([name, duty]) => {
+          const key = cleanText(name).toLowerCase();
+          if (!seenCycling.has(key)) seenCycling.set(key, [cleanText(name), duty]);
+        });
+        const note = [...seenCycling.values()]
+          .map(([name, duty]) => `${name} runs about ${Math.round(duty * 100)}% of the hours shown`)
+          .join("; ");
+        y = writeWrappedText(
+          `* Thermostat-controlled appliances cycle on and off: ${note}. The kWh column already accounts for this, so those rows will not multiply out exactly.`,
+          marginX,
+          y,
+          contentWidth,
+          4.2
+        );
+        y += 4;
       }
 
       y += 10;
 
-      if (topAppliances.length > 0) {
-        sectionTitle("Top Appliance Highlights");
-
-        topAppliances.slice(0, 3).forEach((item) => {
-          checkPage(12);
-
-          const percent = totalKwh > 0 ? Math.min(100, (item.kwh / totalKwh) * 100) : 0;
-
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(9);
-          doc.setTextColor(45, 45, 45);
-          doc.text(cleanText(item.name || "Unnamed appliance"), marginX, y);
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(8);
-          doc.setTextColor(90, 90, 90);
-          doc.text(`${formatCompactNumber(item.kwh)} kWh`, pageWidth - marginX, y, { align: "right" });
-
-          y += 3.5;
-
-          doc.setFillColor(235, 245, 240);
-          doc.roundedRect(marginX, y, contentWidth, 3, 1.5, 1.5, "F");
-
-          doc.setFillColor(5, 150, 105);
-          doc.roundedRect(marginX, y, Math.max(8, (contentWidth * percent) / 100), 3, 1.5, 1.5, "F");
-
-          y += 10;
+      const usageGrouped = new Map();
+      breakdown
+        .filter((item) => item.kwh > 0)
+        .forEach((item) => {
+          const name = item.name || "Unnamed appliance";
+          const key = name.trim().toLowerCase();
+          const existing = usageGrouped.get(key);
+          if (existing) {
+            existing.kwh += item.kwh;
+            existing.cost += item.cost;
+            existing.count += 1;
+          } else {
+            usageGrouped.set(key, { name, kwh: item.kwh, cost: item.cost, count: 1 });
+          }
         });
 
-        y += 16;
+      const usageRanked = [...usageGrouped.values()].sort((a, b) => b.kwh - a.kwh);
+
+      if (usageRanked.length > 0 && totalKwh > 0) {
+        // Ordered by descending lightness rather than picked for variety, so the
+        // chart still reads as a sequence when the report is printed in black
+        // and white, which is how a report attached to an email usually ends up.
+        const USAGE_COLORS = [
+          [4, 120, 87],
+          [13, 148, 136],
+          [245, 158, 11],
+          [100, 116, 139],
+          [110, 231, 183],
+          [146, 64, 14],
+        ];
+        const OTHER_COLOR = [203, 213, 225];
+
+        const shown = usageRanked.slice(0, USAGE_COLORS.length);
+        const rest = usageRanked.slice(USAGE_COLORS.length);
+
+        const segments = shown.map((item, index) => ({
+          name: item.count > 1 ? `${item.name} x${item.count}` : item.name,
+          kwh: item.kwh,
+          cost: item.cost,
+          color: USAGE_COLORS[index],
+        }));
+
+        if (rest.length > 0) {
+          segments.push({
+            name: `Other (${rest.length} ${rest.length === 1 ? "appliance" : "appliances"})`,
+            kwh: rest.reduce((sum, item) => sum + item.kwh, 0),
+            cost: rest.reduce((sum, item) => sum + item.cost, 0),
+            color: OTHER_COLOR,
+          });
+        }
+
+        // A heading stranded at the foot of one page with its chart on the next
+        // is worse than a page break, so the whole block is reserved up front.
+        const chartHeight = Math.max(50, segments.length * 6.4 + 10);
+        checkPage(chartHeight + 26);
+
+        sectionTitle("Where Your Energy Goes", `${totalKwh.toFixed(2)} kWh total`);
+
+        const centreX = marginX + 25;
+        const centreY = y + 24;
+        const outerR = 22;
+        const innerR = 12.6;
+
+        // jsPDF has no arc primitive, so each wedge is a polygon fanned out from
+        // the centre and the hole is punched afterwards with a filled circle.
+        const drawWedge = (fromAngle, toAngle, color) => {
+          const sweep = toAngle - fromAngle;
+          const steps = Math.max(2, Math.ceil((sweep * 180) / Math.PI / 4));
+          const deltas = [];
+          let prevX = centreX;
+          let prevY = centreY;
+
+          for (let step = 0; step <= steps; step += 1) {
+            const angle = fromAngle + (sweep * step) / steps;
+            const pointX = centreX + outerR * Math.cos(angle);
+            const pointY = centreY + outerR * Math.sin(angle);
+            deltas.push([pointX - prevX, pointY - prevY]);
+            prevX = pointX;
+            prevY = pointY;
+          }
+
+          deltas.push([centreX - prevX, centreY - prevY]);
+          doc.setFillColor(color[0], color[1], color[2]);
+          doc.lines(deltas, centreX, centreY, [1, 1], "F", true);
+        };
+
+        // Starts at twelve o'clock and runs clockwise, which is how a reader
+        // expects to be walked through a share.
+        let angleCursor = -Math.PI / 2;
+
+        segments.forEach((segment) => {
+          const sweep = (segment.kwh / totalKwh) * Math.PI * 2;
+          drawWedge(angleCursor, angleCursor + sweep, segment.color);
+          angleCursor += sweep;
+        });
+
+        doc.setFillColor(255, 255, 255);
+        doc.circle(centreX, centreY, innerR, "F");
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(30, 30, 30);
+        doc.text(totalKwh.toFixed(1), centreX, centreY - 0.4, { align: "center" });
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7.2);
+        doc.setTextColor(120, 120, 120);
+        doc.text("kWh total", centreX, centreY + 4.2, { align: "center" });
+
+        // The legend sits beside the ring rather than under it, so the whole
+        // picture stays on one page instead of splitting from its own key.
+        const legendX = marginX + 54;
+        let legendY = y + 6;
+
+        segments.forEach((segment) => {
+          const share = (segment.kwh / totalKwh) * 100;
+
+          doc.setFillColor(segment.color[0], segment.color[1], segment.color[2]);
+          doc.circle(legendX + 1.5, legendY - 1, 1.5, "F");
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(8.2);
+          doc.setTextColor(45, 45, 45);
+          const fullLabel = cleanText(segment.name);
+          const labelLines = doc.splitTextToSize(fullLabel, 42);
+          doc.text(labelLines.length > 1 ? `${labelLines[0].trim()}...` : labelLines[0], legendX + 5, legendY);
+
+          doc.setFont("helvetica", "normal");
+          doc.setTextColor(95, 95, 95);
+          doc.text(`${segment.kwh.toFixed(2)} kWh`, marginX + 112, legendY, { align: "right" });
+          doc.text(money(segment.cost), marginX + 140, legendY, { align: "right" });
+
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(60, 60, 60);
+          doc.text(`${share.toFixed(1)}%`, pageWidth - marginX, legendY, { align: "right" });
+
+          legendY += 6.4;
+        });
+
+        y = Math.max(centreY + outerR, legendY) + 12;
       }
 
       sectionTitle("Important Note");
@@ -2695,7 +2834,7 @@ ${topUsage.trim()}` : ""}`;
                   <span title={hasExtraBillItems ? "The estimate includes at least one supply charge, fixed charge, tax, or solar credit" : "No supply charge, fixed charge, tax, or solar credit is included"} className="rounded-full border border-white/[0.09] bg-white/[0.055] px-2.5 py-1.5">{hasExtraBillItems ? "Bill items included" : "Energy only"}</span>
                 </div>}
 
-                <div className="mt-4 border-l-2 border-emerald-200/55 pl-3 sm:mt-5">
+                <div className="mt-3 border-l-2 border-emerald-200/55 pl-3 sm:mt-3.5">
                   <p className="text-[9.5px] font-black uppercase tracking-[0.14em] text-emerald-100/70">{nextBestStep.label}</p>
                   <p className="mt-1 max-w-md text-[12.5px] font-semibold leading-5 text-white/92">{nextBestStep.message}</p>
                   <button
@@ -2708,7 +2847,7 @@ ${topUsage.trim()}` : ""}`;
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2">
+              <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-3.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={() => inputSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
@@ -3924,7 +4063,7 @@ ${topUsage.trim()}` : ""}`;
             exists. These three panels used to stand between the rate field and
             the appliance list, so the path to a first number ran through tariff
             modelling, bill reconciliation and a diagnostic tool. */}
-        <div className="mb-3 mt-8 px-1">
+        <div className="mb-2 mt-5 px-1">
           <p className={`text-[11px] font-black uppercase tracking-[0.14em] ${darkMode ? "text-emerald-200/80" : "text-emerald-700"}`}>Refine your estimate</p>
           <p className={`mt-1 text-[12.5px] leading-5 ${darkMode ? "text-white/70" : "text-slate-600"}`}>Optional. Add time-of-use or tiered pricing, enter details from your bill, or compare two bills.</p>
         </div>
@@ -4290,16 +4429,6 @@ ${topUsage.trim()}` : ""}`;
           )}
         </section>
 
-        <div className={`relative z-10 mt-1 mb-5 px-1 text-[14px] leading-relaxed ${
-          darkMode ? "text-slate-100/94" : "text-slate-800"
-        }`}>
-          <span className={darkMode ? "font-black text-emerald-300" : "font-black text-emerald-700"}>
-            Did you know?
-          </span>{" "}
-          <span key={didYouKnowIndex} className="inline font-medium leading-relaxed">
-            {currentMicroInsight}
-          </span>
-        </div>
         <section ref={howEstimatesSectionRef} className="mb-5 scroll-mt-32 rounded-3xl bg-white p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] sm:flex sm:items-center sm:justify-between sm:gap-5 sm:px-5">
           <div>
             <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">How the estimate works</p>
