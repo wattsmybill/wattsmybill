@@ -2718,15 +2718,6 @@ ${topUsage.trim()}` : ""}`;
                   <span className="lg:hidden">{totalKwh > 0 && !hasValidRateForEstimate ? "Add rate" : totalKwh > 0 ? "Review" : "Start"}</span>
                   <span className="hidden lg:inline">{totalKwh > 0 && !hasValidRateForEstimate ? "Add a rate" : totalKwh > 0 ? "Review inputs" : "Get started"}</span>
                 </button>
-                {/* Offered only while the estimate is empty. The moment there are
-                    appliances this row fills with Review, Insights and Save, and a
-                    game has no business competing with somebody's actual numbers. */}
-                {totalKwh === 0 && <Link
-                  href="/game"
-                  className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-white/10 bg-emerald-950/20 px-3 py-2 text-[11px] font-black text-white/88 transition hover:bg-emerald-950/30 lg:gap-2 lg:px-4 lg:py-2.5 lg:text-xs"
-                >
-                  <Gamepad2 size={14} strokeWidth={2.2} /> Guess the Watts
-                </Link>}
                 {totalKwh > 0 && <button
                   type="button"
                   onClick={() => insightsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
@@ -2741,6 +2732,12 @@ ${topUsage.trim()}` : ""}`;
                 >
                   <BookmarkPlus size={14} strokeWidth={2.2} /> <span className="lg:hidden">{scenarioNotice || "Save"}</span><span className="hidden lg:inline">{scenarioNotice || "Save setup"}</span>
                 </button>}
+                <Link
+                  href="/game"
+                  className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-white/10 bg-emerald-950/20 px-3 py-2 text-[11px] font-black text-white/88 transition hover:bg-emerald-950/30 lg:gap-2 lg:px-4 lg:py-2.5 lg:text-xs"
+                >
+                  <Gamepad2 size={14} strokeWidth={2.2} /> Guess the Watts
+                </Link>
               </div>
             </div>
 
@@ -4315,15 +4312,21 @@ ${topUsage.trim()}` : ""}`;
           </Link>
         </section>
 
-        <section className="mb-5 rounded-3xl bg-white p-4 text-black shadow-sm ring-1 ring-emerald-950/[0.06] sm:flex sm:items-center sm:justify-between sm:gap-5 sm:px-5">
-          <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">Learn by playing</p>
-            <p className="mt-1 text-sm leading-6 text-slate-600">
-              Not sure what your appliances draw? Guess five of them, see the real figures, and the boxes above get much easier to fill in.
-            </p>
+        <section className="mb-5 rounded-3xl bg-emerald-50 p-4 text-black shadow-sm ring-1 ring-emerald-600/25 sm:flex sm:items-center sm:justify-between sm:gap-5 sm:px-5">
+          <div className="flex items-start gap-3.5">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-emerald-700 text-white">
+              <Gamepad2 size={21} strokeWidth={2.2} />
+            </span>
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">Learn by playing</p>
+              <p className="text-base font-black leading-6 text-slate-950">Guess the Watts</p>
+              <p className="mt-1 text-sm leading-6 text-slate-700">
+                Not sure what your appliances draw? Guess five of them, see the real figures, and the boxes above get much easier to fill in.
+              </p>
+            </div>
           </div>
-          <Link href="/game" className="mt-3 inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-black text-emerald-800 transition hover:bg-emerald-100 sm:mt-0">
-            Play Guess the Watts
+          <Link href="/game" className="mt-3 inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-emerald-700 px-5 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-emerald-800 sm:mt-0">
+            Play now
           </Link>
         </section>
 
