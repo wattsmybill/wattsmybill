@@ -12,8 +12,8 @@ import { join } from "node:path";
  * Two constraints shape the markup. Satori, which renders these, supports a
  * subset of CSS and needs an explicit `display: flex` on any element with more
  * than one child. And it has no emoji font unless one is fetched at build, so
- * no flags or symbols beyond what a text face carries — the identity comes from
- * the gradient and the bolt instead.
+ * there are no flags here — the mark is drawn as the same three SVG paths the
+ * launch animation uses, rather than approximated with a box.
  */
 
 export const size = { width: 1200, height: 630 };
@@ -52,28 +52,25 @@ export function renderCard({ eyebrow, title, subtitle, figure, figureLabel }) {
         }}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
-          <div
-            style={{
-              display: "flex",
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              background: AMBER,
-              alignItems: "center",
-              justifyContent: "center",
-              marginRight: 18,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                width: 10,
-                height: 22,
-                background: "#043a33",
-                transform: "skewX(-14deg)",
-              }}
+          <svg width="66" height="66" viewBox="0 0 512 512" style={{ marginRight: 18 }}>
+            <path
+              d="M212 360 C214 324 196 292 179.4 272.8 A107.5 107.5 0 1 1 356 190.5"
+              fill="none"
+              stroke="#eaeaea"
+              strokeWidth="32"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-          </div>
+            <path
+              d="M356 197 L300 270 L362 283 L288 370"
+              fill="none"
+              stroke="#eeb412"
+              strokeWidth="40"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="251.5" cy="432" r="24" fill="#eeb412" />
+          </svg>
           <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.02em" }}>
             Watts My Bill?
           </div>
