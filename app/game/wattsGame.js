@@ -184,3 +184,16 @@ export function saveBestScore(total) {
     // A blocked localStorage costs the player a remembered best score, nothing more.
   }
 }
+
+/**
+ * A score arriving from a shared URL.
+ *
+ * Anything that is not a whole number inside the possible range is not a score
+ * somebody could have got, so the page 404s rather than rendering a card for
+ * it. Without this, /game/score/999999 would mint a plausible-looking result.
+ */
+export function parseScore(raw) {
+  if (!/^\d{1,3}$/.test(String(raw))) return null;
+  const score = Number(raw);
+  return Number.isInteger(score) && score >= 0 && score <= ROUNDS * 100 ? score : null;
+}

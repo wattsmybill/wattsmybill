@@ -4,6 +4,7 @@ import {
   MIN_WATTS,
   ROUNDS,
   buildRound,
+  parseScore,
   positionToWatts,
   scoreGuess,
   wattsToPosition,
@@ -51,6 +52,15 @@ check(positionToWatts(0) === MIN_WATTS, `Slider floor should be ${MIN_WATTS}W, g
 check(positionToWatts(1000) === MAX_WATTS, `Slider ceiling should be ${MAX_WATTS}W, got ${positionToWatts(1000)}`);
 check(positionToWatts(-50) === MIN_WATTS && positionToWatts(9999) === MAX_WATTS, "Slider must clamp out-of-range input.");
 
+// A score arriving from a shared URL. Anything outside what a game can produce
+// must 404 rather than minting a plausible-looking result page and card.
+check(parseScore("0") === 0, "Zero is a real score.");
+check(parseScore("500") === 500, "A perfect score must parse.");
+check(parseScore("237") === 237, "An ordinary score must parse.");
+for (const bad of ["501", "9999", "-5", "abc", "4.5", "", " 12", "0x10", "1e2", null, undefined]) {
+  check(parseScore(bad) === null, `parseScore should reject ${JSON.stringify(bad)}`);
+}
+
 // Rounds: right count, no repeats, and a genuine spread rather than five kettles.
 let sawLow = 0;
 let sawHigh = 0;
@@ -73,5 +83,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `Game valid: ${GAME_APPLIANCES.length} appliances (${GAME_APPLIANCES[0].watts}W-${GAME_APPLIANCES.at(-1).watts}W), ratio scoring, slider round-trip, and ${ROUNDS}-round spread.`,
+  `Game valid: ${GAME_APPLIANCES.length} appliances (${GAME_APPLIANCES[0].watts}W-${GAME_APPLIANCES.at(-1).watts}W), ratio scoring, slider round-trip, shared-score parsing, and ${ROUNDS}-round spread.`,
 );

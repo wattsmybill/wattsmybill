@@ -86,11 +86,24 @@ export default function GuessTheWatts() {
     setCopied(false);
   };
 
-  const copyResult = async () => {
-    const lines = results.map((item) => `${item.name}: guessed ${item.guess}W, actual ${item.actual}W`);
-    const text = `Guess the Watts — ${total}/${ROUNDS * 100} (${rankFor(total)})\n${lines.join("\n")}\nhttps://www.wattsmybill.app/game`;
+  // Shares a link to the score rather than a wall of text. The score page
+  // renders its own social card, so what lands in a feed is the number and
+  // the rank instead of an unfurled homepage.
+  const shareResult = async () => {
+    const url = `https://www.wattsmybill.app/game/score/${total}`;
+    const text = `${rankFor(total)} — I scored ${total}/${ROUNDS * 100} on Guess the Watts.`;
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: "Guess the Watts", text, url });
+        return;
+      } catch {
+        // Dismissing the share sheet is not a failure; fall through to copying.
+      }
+    }
+
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(`${text} ${url}`);
       setCopied(true);
     } catch {
       setCopied(false);
@@ -139,11 +152,11 @@ export default function GuessTheWatts() {
           </button>
           <button
             type="button"
-            onClick={copyResult}
+            onClick={shareResult}
             className="inline-flex min-h-11 items-center gap-2 rounded-full border border-emerald-950/15 px-5 text-sm font-bold text-slate-700 transition hover:border-emerald-700 hover:text-emerald-700"
           >
             {copied ? <Check size={16} aria-hidden="true" /> : <Share2 size={16} aria-hidden="true" />}
-            {copied ? "Copied" : "Copy result"}
+            {copied ? "Link copied" : "Share score"}
           </button>
           <Link
             href="/#calculator"
