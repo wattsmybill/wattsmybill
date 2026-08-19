@@ -19,6 +19,10 @@ const PREFILLS = {
     "Electric Fan",
     "Split type aircon 1.0 HP (inverter)",
   ],
+  "inverter-vs-non-inverter-aircon-electricity-cost": [
+    "Split type aircon 1.0 HP (inverter)",
+    "Split type aircon 1.0 HP (non-inverter)",
+  ],
   "how-much-electricity-does-a-water-heater-use": ["Water Heater"],
   "watts-kwh-electricity-cost-explained": ["LED Bulb", "Electric Kettle"],
   "how-much-does-an-appliance-cost-to-run": ["Rice Cooker", "Microwave"],

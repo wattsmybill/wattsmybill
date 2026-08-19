@@ -1,5 +1,84 @@
 export const INSIGHT_ARTICLES = [
   {
+    slug: "inverter-vs-non-inverter-aircon-electricity-cost",
+    title: "Inverter vs Non-Inverter Aircon: What You Actually Save",
+    description:
+      "How an inverter compressor differs from a fixed-speed one, why the label wattage misleads, and the runtime at which the higher purchase price starts paying back.",
+    category: "Appliance costs",
+    readingTime: "8 min read",
+    published: "2026-08-19",
+    updated: "2026-08-19",
+    intro:
+      "An inverter air conditioner varies the speed of its compressor. A non-inverter one runs the compressor at a single speed and switches it on and off to hold a temperature. That single difference is why the two can cost very different amounts to run in one home and almost the same in another. The variable that decides it is not the machine. It is how long you run it.",
+    takeaways: [
+      "A non-inverter unit cycles between full power and nothing; an inverter settles at a lower steady draw once the room is cool.",
+      "The saving grows with runtime. Long continuous cooling favours the inverter; short bursts rarely recover the higher purchase price.",
+      "The label wattage of an inverter is closer to its maximum than its average, so comparing labels alone understates the gap.",
+      "An oversized unit loses much of the inverter advantage, because it reaches temperature quickly and spends its time cycling anyway.",
+    ],
+    sections: [
+      {
+        heading: "1. What the compressor is actually doing",
+        paragraphs: [
+          "Cooling a room means moving heat out of it, and the compressor is the part that does the work. In a non-inverter unit that compressor has one speed: full. To hold a room at 24 degrees it runs at full power until the room is cooler than the target, stops, waits for the room to warm, and starts again. The room temperature saws gently up and down, and each restart draws a surge of current.",
+          "An inverter unit can run its compressor at part speed. It typically starts hard to pull the room down, then slows to whatever rate matches the heat leaking in, and holds there. The room sits closer to the set temperature, and the machine spends most of its time drawing considerably less than its rated power.",
+          "This is why the two feel different as well as costing differently. The saw-tooth of a fixed-speed unit is audible, and it is the reason a non-inverter room can feel cold, then warm, then cold again.",
+        ],
+      },
+      {
+        heading: "2. Why the number on the label misleads",
+        paragraphs: [
+          "For a fixed-speed unit the rated input power is close to what it draws whenever the compressor is on, so the label is a fair guide. For an inverter it is not. The rated figure sits nearer the maximum the unit can draw than the average it settles at, which means a straight comparison of two labels understates the real difference.",
+          "Manufacturers publish a range for inverter models for exactly this reason, often something like 200 to 1,400 watts for a unit sold as 1.0 HP. Where in that range it spends its time depends on your room, your target temperature and the outdoor conditions.",
+          "The practical consequence: treat an inverter's label wattage as a ceiling, and expect the monthly figure to land below whatever a label-only comparison suggests.",
+        ],
+      },
+      {
+        heading: "3. The comparison, using catalogue figures",
+        paragraphs: [
+          "Take the two 1.0 HP split units in this site's appliance list — 750 W for the inverter and 1,000 W for the non-inverter — and run both for eight hours a day, twenty-five days a month.",
+          "That is 150 kWh against 200 kWh, a difference of 50 kWh every month. At an indicative Philippine rate of 12.38 pesos per kWh that is about 619 pesos a month, or roughly 7,400 pesos a year. At an Australian rate of 40 cents it is about 20 dollars a month.",
+          "Those figures are the conservative version, because they compare label to label. The real gap tends to be wider for the reason in the previous section, and narrower if the unit is oversized or only run in short bursts.",
+        ],
+        formula: "Monthly kWh = watts x hours per day x days per month / 1000",
+      },
+      {
+        heading: "4. When an inverter does not pay back",
+        paragraphs: [
+          "An inverter earns its premium by running for long stretches at part load. Three situations remove that opportunity. Short sessions: switching on for an hour before bed means the unit spends most of that hour at high output pulling the room down, which is the part where it behaves most like a fixed-speed machine.",
+          "Oversizing: a unit with far more capacity than the room needs reaches the set temperature quickly and then has little to do but cycle, which is the behaviour the inverter was supposed to avoid.",
+          "Very intermittent use: a room cooled twice a week does not accumulate enough running hours for a monthly saving to overtake a purchase price difference that is often substantial.",
+          "The reverse also holds. A bedroom cooled eight hours a night, every night, in a hot and humid climate is close to the ideal case, and there the payback period can be short.",
+        ],
+      },
+      {
+        heading: "5. What matters more than the label on the box",
+        paragraphs: [
+          "Correct sizing outranks the inverter question. A unit matched to the room will beat a badly sized one of either type, because both capacity shortfalls and excesses waste energy.",
+          "Maintenance comes next. A clogged filter or a dirty coil forces any compressor to work longer for the same result, and it is the most common reason a unit that used to be cheap to run stops being so.",
+          "Then the set temperature. Each degree lower is more heat to move and more hours of compressor time, and it applies to both types equally.",
+          "If you are choosing between two specific units, the honest test is not the label but your own runtime. Multiply each unit's figure by the hours you actually expect to run it, and compare the monthly totals rather than the wattages.",
+        ],
+      },
+    ],
+    calculatorPrompt:
+      "Add both aircon types as separate appliances at the hours you genuinely run them, then compare the monthly totals rather than the label wattages.",
+    sources: [
+      {
+        label: "ENERGY STAR: choosing the right room air conditioner capacity",
+        url: "https://www.energystar.gov/products/room_air_conditioners",
+      },
+      {
+        label: "US EIA: how energy is used in homes",
+        url: "https://www.eia.gov/energyexplained/use-of-energy/homes.php",
+      },
+      {
+        label: "IEA: The Future of Cooling",
+        url: "https://www.iea.org/reports/the-future-of-cooling",
+      },
+    ],
+  },
+  {
     slug: "smart-meter-display-does-not-match-electricity-bill",
     title: "Why Doesn’t My Smart Meter Display Match My Electricity Bill?",
     description:
