@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { toCountrySlug } from "../lib/countryPages";
 import { ArrowRight, ArrowUpRight, Search, ShieldCheck, X } from "lucide-react";
 
 export default function RateLibrary({ entries }) {
@@ -49,7 +50,11 @@ export default function RateLibrary({ entries }) {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-black uppercase tracking-[0.14em] text-emerald-700">{entry.currency} per kWh</p>
-                  <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">{entry.flag} {entry.name}</h2>
+                  <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">
+                    <Link href={`/rates/${toCountrySlug(entry.name)}`} className="hover:text-emerald-700 hover:underline">
+                      {entry.flag} {entry.name}
+                    </Link>
+                  </h2>
                 </div>
                 <span className="rate-default-pill inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-700 bg-emerald-700 px-3.5 py-2 text-[10px] font-black text-white shadow-[0_5px_12px_rgba(6,78,59,0.18)]" title="Indicative calculator default—not a live tariff">
                   <span>Indicative</span><span aria-hidden="true">·</span><span>{entry.currency}{formatRate(entry.rate)}</span>

@@ -1,5 +1,6 @@
 import { pathToFileURL } from "node:url";
 import { ARTICLES } from "../app/learn/articles.js";
+import { COUNTRY_SLUGS } from "../app/lib/countryPages.js";
 
 const host = "www.wattsmybill.app";
 const key = "ddc94ef336974a7ba3eb21e807622313";
@@ -22,6 +23,7 @@ export const urlList = [
   `${siteUrl}/privacy`,
   `${siteUrl}/methodology`,
   ...ARTICLES.map((article) => `${siteUrl}/learn/${article.slug}`),
+  ...COUNTRY_SLUGS.map((slug) => `${siteUrl}/rates/${slug}`),
 ];
 
 async function submit() {

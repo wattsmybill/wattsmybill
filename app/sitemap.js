@@ -1,4 +1,5 @@
 import { ARTICLES } from "./learn/articles";
+import { COUNTRY_SLUGS } from "./lib/countryPages";
 
 export default function sitemap() {
   const articleEntries = ARTICLES.map((article) => ({
@@ -6,6 +7,13 @@ export default function sitemap() {
     lastModified: new Date(article.updated),
     changeFrequency: "monthly",
     priority: 0.75,
+  }));
+
+  const countryEntries = COUNTRY_SLUGS.map((slug) => ({
+    url: `https://www.wattsmybill.app/rates/${slug}`,
+    lastModified: new Date("2026-08-19"),
+    changeFrequency: "monthly",
+    priority: 0.7,
   }));
 
   return [
@@ -52,5 +60,6 @@ export default function sitemap() {
       priority: 0.65,
     },
     ...articleEntries,
+    ...countryEntries,
   ];
 }

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ARTICLES } from "../app/learn/articles.js";
 import { urlList as indexNowUrls } from "./submit-indexnow.mjs";
+import { COUNTRY_SLUGS } from "../app/lib/countryPages.js";
 
 const appOutput = join(process.cwd(), ".next", "server", "app");
 const siteUrl = "https://www.wattsmybill.app";
@@ -50,6 +51,15 @@ checkPage({ path: join(appOutput, "game.html"), label: "Guess the Watts", canoni
 checkPage({ path: join(appOutput, "privacy.html"), label: "privacy policy", canonical: `${siteUrl}/privacy`, structuredTypes: ["WebPage"] });
 checkPage({ path: join(appOutput, "methodology.html"), label: "methodology page", canonical: `${siteUrl}/methodology`, structuredTypes: ["AboutPage"] });
 
+for (const slug of COUNTRY_SLUGS) {
+  checkPage({
+    path: join(appOutput, "rates", `${slug}.html`),
+    label: `country page ${slug}`,
+    canonical: `${siteUrl}/rates/${slug}`,
+    structuredTypes: ["WebPage", "BreadcrumbList"],
+  });
+}
+
 for (const article of ARTICLES) {
   checkPage({
     path: join(appOutput, "learn", `${article.slug}.html`),
@@ -60,7 +70,7 @@ for (const article of ARTICLES) {
 }
 
 const sitemap = readRequired(join(appOutput, "sitemap.xml.body"), "sitemap");
-for (const url of [siteUrl, `${siteUrl}/learn`, `${siteUrl}/rates`, `${siteUrl}/history`, `${siteUrl}/game`, `${siteUrl}/privacy`, `${siteUrl}/methodology`, ...ARTICLES.map((article) => `${siteUrl}/learn/${article.slug}`)]) {
+for (const url of [siteUrl, `${siteUrl}/learn`, `${siteUrl}/rates`, `${siteUrl}/history`, `${siteUrl}/game`, `${siteUrl}/privacy`, `${siteUrl}/methodology`, ...COUNTRY_SLUGS.map((slug) => `${siteUrl}/rates/${slug}`), ...ARTICLES.map((article) => `${siteUrl}/learn/${article.slug}`)]) {
   if (!sitemap.includes(`<loc>${url}</loc>`)) errors.push(`Missing sitemap URL: ${url}`);
 }
 
@@ -69,7 +79,7 @@ for (const favicon of ["/favicon-v2.ico", "/favicon-32x32-v2.png", "/icon-192-v2
   if (!home.includes(favicon)) errors.push(`Missing favicon declaration: ${favicon}`);
 }
 
-const knownRoutes = new Set(["/", "/learn", "/rates", "/history", "/game", "/privacy", "/methodology", ...ARTICLES.map((article) => `/learn/${article.slug}`)]);
+const knownRoutes = new Set(["/", "/learn", "/rates", "/history", "/game", "/privacy", "/methodology", ...ARTICLES.map((article) => `/learn/${article.slug}`), ...COUNTRY_SLUGS.map((slug) => `/rates/${slug}`)]);
 const builtHtml = [
   join(appOutput, "index.html"),
   join(appOutput, "learn.html"),
@@ -79,6 +89,7 @@ const builtHtml = [
   join(appOutput, "privacy.html"),
   join(appOutput, "methodology.html"),
   ...ARTICLES.map((article) => join(appOutput, "learn", `${article.slug}.html`)),
+  ...COUNTRY_SLUGS.map((slug) => join(appOutput, "rates", `${slug}.html`)),
 ];
 
 for (const file of builtHtml) {
@@ -105,5 +116,5 @@ if (errors.length) {
   console.error(errors.join("\n"));
   process.exitCode = 1;
 } else {
-  console.log(`Build valid: ${ARTICLES.length + 7} public HTML pages, ${ARTICLES.length + 7} sitemap URLs, internal links, canonical/social metadata, structured data, and favicon declarations.`);
+  console.log(`Build valid: ${ARTICLES.length + COUNTRY_SLUGS.length + 7} public HTML pages, ${ARTICLES.length + COUNTRY_SLUGS.length + 7} sitemap URLs, internal links, canonical/social metadata, structured data, and favicon declarations.`);
 }
