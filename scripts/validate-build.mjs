@@ -103,6 +103,27 @@ for (const file of builtHtml) {
   }
 }
 
+// Every public route must generate its own social card, and must actually point
+// at it. The whole site shared one static JPEG until these existed, so a route
+// added later that quietly inherits nothing is the regression worth catching.
+for (const route of knownRoutes) {
+  const segment = route === "/" ? "" : route.slice(1);
+  const cardPath = join(appOutput, segment, "opengraph-image.body");
+  if (!existsSync(cardPath)) {
+    errors.push(`Missing generated Open Graph card for ${route} (expected ${cardPath})`);
+  }
+}
+
+for (const file of builtHtml) {
+  const html = readFileSync(file, "utf8");
+  const ogImage = html.match(/property="og:image" content="([^"]+)"/)?.[1];
+  if (!ogImage) {
+    errors.push(`No og:image meta tag in ${file}`);
+  } else if (!ogImage.includes("/opengraph-image")) {
+    errors.push(`${file} still points at a shared image rather than its own card: ${ogImage}`);
+  }
+}
+
 // The IndexNow list has to cover every public route, or a new page ships and is
 // never announced to search engines. This drifted once already.
 for (const route of knownRoutes) {

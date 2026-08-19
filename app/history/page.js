@@ -15,13 +15,11 @@ export const metadata = {
       "Log each electricity bill and separate the part of the change you caused from the part your provider did.",
     url: `${siteUrl}/history`,
     type: "website",
-    images: [{ url: `${siteUrl}/og-image-final.jpg`, width: 1200, height: 630, alt: "Watts My Bill? electricity calculator and learning hub" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Electricity Bill History Tracker | Watts My Bill?",
     description: "Track electricity bills over time and see what actually changed.",
-    images: [`${siteUrl}/og-image-final.jpg`],
   },
 };
 

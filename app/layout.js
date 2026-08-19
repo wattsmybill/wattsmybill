@@ -101,21 +101,12 @@ export const metadata = {
     siteName,
     type: "website",
     locale: "en_US",
-    images: [
-      {
-        url: ogImage,
-        width: 1200,
-        height: 630,
-        alt: "Watts My Bill? app shown on laptop and phone with the message Understand. Estimate. Save.",
-      },
-    ],
   },
 
   twitter: {
     card: "summary_large_image",
     title: "Watts My Bill? | Estimate & Understand Your Electricity Bill",
     description: siteDescription,
-    images: [ogImage],
   },
 
   // Icon filenames carry a version suffix deliberately. Vercel serves files from

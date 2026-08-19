@@ -34,13 +34,11 @@ export async function generateMetadata({ params }) {
       description,
       url: `${siteUrl}/rates/${slug}`,
       type: "article",
-      images: [{ url: `${siteUrl}/og-image-final.jpg`, width: 1200, height: 630, alt: `Electricity rates in ${country.name}` }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${title} | Watts My Bill?`,
       description,
-      images: [`${siteUrl}/og-image-final.jpg`],
     },
   };
 }

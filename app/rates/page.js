@@ -14,13 +14,11 @@ export const metadata = {
     title: "Electricity Rate Sources by Country | Watts My Bill?",
     description: "A transparent worldwide directory of official electricity tariff starting points.",
     url: `${siteUrl}/rates`,
-    images: [`${siteUrl}/og-image-final.jpg`],
   },
   twitter: {
     card: "summary_large_image",
     title: "Electricity Rate Sources by Country | Watts My Bill?",
     description: "Find official electricity tariff starting points and understand why your own bill rate is more precise.",
-    images: [`${siteUrl}/og-image-final.jpg`],
   },
 };
 

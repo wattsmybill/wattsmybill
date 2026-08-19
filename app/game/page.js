@@ -16,13 +16,11 @@ export const metadata = {
     description: "Five rounds. Guess what a kettle, a fridge or a dryer really draws.",
     url: `${siteUrl}/game`,
     type: "website",
-    images: [{ url: `${siteUrl}/og-image-final.jpg`, width: 1200, height: 630, alt: "Watts My Bill? electricity calculator and learning hub" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Guess the Watts | Watts My Bill?",
     description: "Can you tell a 60W fan from a 2000W oven? Five rounds to find out.",
-    images: [`${siteUrl}/og-image-final.jpg`],
   },
 };
 

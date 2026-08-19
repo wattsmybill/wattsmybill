@@ -15,13 +15,11 @@ export const metadata = {
     description: "What is stored, what is not, and the limits of the estimates.",
     url: `${siteUrl}/privacy`,
     type: "website",
-    images: [{ url: `${siteUrl}/og-image-final.jpg`, width: 1200, height: 630, alt: "Watts My Bill? electricity calculator and learning hub" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Privacy, Terms and Disclaimer | Watts My Bill?",
     description: "What is stored, what is not, and the limits of the estimates.",
-    images: [`${siteUrl}/og-image-final.jpg`],
   },
 };
 

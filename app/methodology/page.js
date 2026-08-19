@@ -13,13 +13,11 @@ export const metadata = {
     title: "How Watts My Bill Works",
     description: "Calculation, sourcing, privacy, uncertainty, and correction standards for Watts My Bill.",
     url: `${siteUrl}/methodology`,
-    images: [`${siteUrl}/og-image-final.jpg`],
   },
   twitter: {
     card: "summary_large_image",
     title: "How Watts My Bill Works",
     description: "Calculation, sourcing, privacy, uncertainty, and correction standards for Watts My Bill.",
-    images: [`${siteUrl}/og-image-final.jpg`],
   },
 };
 

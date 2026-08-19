@@ -6,7 +6,6 @@ import LearningThemeShell from "../LearningThemeShell";
 import { ARTICLES, getArticle } from "../articles";
 
 const siteUrl = "https://www.wattsmybill.app";
-const socialImage = `${siteUrl}/og-image-final.jpg`;
 
 function headingId(heading) {
   return heading
@@ -51,13 +50,11 @@ export async function generateMetadata({ params }) {
       type: "article",
       publishedTime: article.published,
       modifiedTime: article.updated,
-      images: [{ url: socialImage, width: 1200, height: 630, alt: "Watts My Bill? electricity calculator and learning hub" }],
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description: article.description,
-      images: [socialImage],
     },
   };
 }

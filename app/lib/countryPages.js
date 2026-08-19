@@ -104,6 +104,34 @@ export function costedAppliances(rate) {
     .sort((a, b) => b.cost - a.cost);
 }
 
+/**
+ * Currency labels for the social card only.
+ *
+ * The card is rendered by Satori against a single embedded face, and three of
+ * these symbols do not survive it: the won and the dong have no glyph in Geist
+ * and came out as empty boxes, and the dirham mark reorders against Latin
+ * digits under bidi. A three-letter code is unambiguous at thumbnail size and
+ * cannot fail to render, so those three use one. The rest keep their symbol,
+ * which is more recognisable to the people who actually use it.
+ */
+const CARD_CURRENCY_CODES = {
+  "₩": "KRW ",
+  "₫": "VND ",
+  "د.إ": "AED ",
+};
+
+export function cardMoney(value, currency) {
+  const code = CARD_CURRENCY_CODES[currency];
+  if (!code) return formatMoney(value, currency);
+
+  const number = Number(value) || 0;
+  const decimals = number >= 100 ? 0 : 2;
+  return `${code}${number.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })}`;
+}
+
 /** Money for a country page: its own currency symbol, two decimals. */
 export function formatMoney(value, currency) {
   const number = Number(value) || 0;
