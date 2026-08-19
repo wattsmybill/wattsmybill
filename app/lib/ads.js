@@ -12,6 +12,12 @@
  * These are read as static property accesses, not through a computed key,
  * because Next.js inlines NEXT_PUBLIC_* at build time and only replaces
  * literal references.
+ *
+ * Which ads are allowed to appear is NOT set here. Ad content rating and
+ * sensitive-category blocking are account-wide AdSense dashboard settings with
+ * no code equivalent, and the defaults are more permissive than a household
+ * utility used by families should accept. See .env.example for the list to
+ * apply before switching these variables on.
  */
 
 export const AD_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
