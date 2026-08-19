@@ -47,6 +47,7 @@ checkPage({ path: join(appOutput, "learn.html"), label: "Learning Hub", canonica
 checkPage({ path: join(appOutput, "rates.html"), label: "Rate Library", canonical: `${siteUrl}/rates`, structuredTypes: ["CollectionPage", "ItemList"] });
 checkPage({ path: join(appOutput, "history.html"), label: "bill history", canonical: `${siteUrl}/history`, structuredTypes: ["WebApplication"] });
 checkPage({ path: join(appOutput, "game.html"), label: "Guess the Watts", canonical: `${siteUrl}/game`, structuredTypes: ["WebApplication"] });
+checkPage({ path: join(appOutput, "privacy.html"), label: "privacy policy", canonical: `${siteUrl}/privacy`, structuredTypes: ["WebPage"] });
 checkPage({ path: join(appOutput, "methodology.html"), label: "methodology page", canonical: `${siteUrl}/methodology`, structuredTypes: ["AboutPage"] });
 
 for (const article of ARTICLES) {
@@ -59,7 +60,7 @@ for (const article of ARTICLES) {
 }
 
 const sitemap = readRequired(join(appOutput, "sitemap.xml.body"), "sitemap");
-for (const url of [siteUrl, `${siteUrl}/learn`, `${siteUrl}/rates`, `${siteUrl}/history`, `${siteUrl}/game`, `${siteUrl}/methodology`, ...ARTICLES.map((article) => `${siteUrl}/learn/${article.slug}`)]) {
+for (const url of [siteUrl, `${siteUrl}/learn`, `${siteUrl}/rates`, `${siteUrl}/history`, `${siteUrl}/game`, `${siteUrl}/privacy`, `${siteUrl}/methodology`, ...ARTICLES.map((article) => `${siteUrl}/learn/${article.slug}`)]) {
   if (!sitemap.includes(`<loc>${url}</loc>`)) errors.push(`Missing sitemap URL: ${url}`);
 }
 
@@ -68,13 +69,14 @@ for (const favicon of ["/favicon-v2.ico", "/favicon-32x32-v2.png", "/icon-192-v2
   if (!home.includes(favicon)) errors.push(`Missing favicon declaration: ${favicon}`);
 }
 
-const knownRoutes = new Set(["/", "/learn", "/rates", "/history", "/game", "/methodology", ...ARTICLES.map((article) => `/learn/${article.slug}`)]);
+const knownRoutes = new Set(["/", "/learn", "/rates", "/history", "/game", "/privacy", "/methodology", ...ARTICLES.map((article) => `/learn/${article.slug}`)]);
 const builtHtml = [
   join(appOutput, "index.html"),
   join(appOutput, "learn.html"),
   join(appOutput, "rates.html"),
   join(appOutput, "history.html"),
   join(appOutput, "game.html"),
+  join(appOutput, "privacy.html"),
   join(appOutput, "methodology.html"),
   ...ARTICLES.map((article) => join(appOutput, "learn", `${article.slug}.html`)),
 ];
@@ -103,5 +105,5 @@ if (errors.length) {
   console.error(errors.join("\n"));
   process.exitCode = 1;
 } else {
-  console.log(`Build valid: ${ARTICLES.length + 6} public HTML pages, ${ARTICLES.length + 6} sitemap URLs, internal links, canonical/social metadata, structured data, and favicon declarations.`);
+  console.log(`Build valid: ${ARTICLES.length + 7} public HTML pages, ${ARTICLES.length + 7} sitemap URLs, internal links, canonical/social metadata, structured data, and favicon declarations.`);
 }

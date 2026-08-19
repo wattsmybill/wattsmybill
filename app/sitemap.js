@@ -40,6 +40,12 @@ export default function sitemap() {
       priority: 0.7,
     },
     {
+      url: "https://www.wattsmybill.app/privacy",
+      lastModified: new Date("2026-08-19"),
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
+    {
       url: "https://www.wattsmybill.app/methodology",
       lastModified: new Date("2026-08-14"),
       changeFrequency: "monthly",

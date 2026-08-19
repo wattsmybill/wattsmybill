@@ -682,3 +682,40 @@ html.wmb-standalone #wmb-splash {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Advertising slots.
+
+   The label is required reading, not decoration: a unit that sits inside the
+   page's own card styling reads as part of the product unless it says
+   otherwise. An unfilled slot collapses entirely, because a reserved 250px of
+   nothing is worse than the shift the reservation was there to prevent. */
+.wmb-ad {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem;
+  border: 1px solid rgb(2 44 34 / 0.08);
+  border-radius: 1.25rem;
+  background: rgb(255 255 255 / 0.55);
+  text-align: center;
+}
+
+.wmb-ad-label {
+  margin: 0 0 0.5rem;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.wmb-ad:has(ins.adsbygoogle[data-ad-status="unfilled"]) {
+  display: none;
+}
+
+[data-wmb-theme="dark"] .wmb-ad {
+  border-color: rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.04);
+}
+
+[data-wmb-theme="dark"] .wmb-ad-label {
+  color: #94a8b8;
+}

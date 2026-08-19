@@ -12,6 +12,8 @@ import { getRateReference } from "./data/rateReferences";
 import { calculateTariffEstimate } from "./lib/tariff";
 import { readTheme, writeTheme } from "./lib/theme";
 import { buildShareUrl, readSetupFromUrl } from "./lib/shareState";
+import AdSlot from "./components/AdSlot";
+import { INFO_SECTIONS } from "./data/infoSections";
 
 const DEFAULT_APPLIANCE = {
   name: "",
@@ -318,38 +320,6 @@ function getPersonalizedSavingTip(applianceName = "", category = "", savingsText
 }
 
 
-const INFO_SECTIONS = [
-  {
-    id: "about",
-    title: "About Watts My Bill?",
-    description:
-      "Watts My Bill? is a free electricity calculator that helps users estimate monthly electricity costs based on appliance wattage, quantity, usage hours, days per month, and electricity rate. It is built to help everyday users understand how appliances may affect their bill."
-  },
-  {
-    id: "privacy",
-    title: "Privacy Policy",
-    description:
-      "Watts My Bill? stores your calculator inputs locally in your browser using localStorage so your session can be restored when you revisit the page. Calculator inputs stay on your device and are not sent to our server by the calculator. We use Google Analytics to understand general site traffic and usage. Google Analytics may use cookies or similar technologies and process information such as device, browser, and interaction data. Do not enter sensitive personal or billing information into the calculator or report fields."
-  },
-  {
-    id: "terms",
-    title: "Terms of Use",
-    description:
-      "By using Watts My Bill?, you understand that the tool provides estimates for learning and personal budgeting only. Please still check your actual utility bill, electricity rate, and appliance label before making financial or household decisions."
-  },
-  {
-    id: "disclaimer",
-    title: "Disclaimer",
-    description:
-      "Watts My Bill? is not an electricity provider and is not connected to any utility company. Results are estimates only. Actual electric bills may include electricity supply charges, delivery charges, service fees, VAT/taxes, fuel adjustments, and other provider charges. Watts My Bill? is an electricity bill usage calculator that helps estimate monthly electricity costs based on appliance wattage, quantity, usage hours, days per month, and electricity provider rates."
-  },
-  {
-    id: "contact",
-    title: "Contact",
-    description:
-      "For questions, feedback, corrections, or suggestions, you can contact Watts My Bill? at hello@wattsmybill.app. Please avoid sending account numbers, billing references, exact addresses, or other sensitive personal billing information."
-  }
-];
 
 
 
@@ -4459,6 +4429,7 @@ ${topUsage.trim()}` : ""}`;
           </Link>
         </section>
 
+
         <section className="hidden">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -4768,6 +4739,8 @@ ${topUsage.trim()}` : ""}`;
         )}
 
 
+
+        <AdSlot placement="calculator" />
 
         </main>
 

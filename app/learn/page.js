@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Calculator, Gamepad2, Plug, Search, SearchCheck, X } from "lucide-react";
 import LearnHeader from "./LearnHeader";
+import AdSlot from "../components/AdSlot";
 import LearningThemeShell from "./LearningThemeShell";
 import { ARTICLES } from "./articles";
 import { searchArticles } from "./searchIndex";
@@ -240,6 +241,10 @@ export default function LearnPage() {
           ))}
           </div>
         </section>
+
+        <div className="mx-auto max-w-6xl px-5 sm:px-7">
+          <AdSlot placement="learn" />
+        </div>
 
         <section className="mx-auto max-w-6xl px-5 pb-4 sm:px-7" aria-labelledby="game-heading">
           <Link

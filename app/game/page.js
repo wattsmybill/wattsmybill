@@ -2,6 +2,7 @@ import Link from "next/link";
 import LearnHeader from "../learn/LearnHeader";
 import LearningThemeShell from "../learn/LearningThemeShell";
 import GuessTheWatts from "./GuessTheWatts";
+import AdSlot from "../components/AdSlot";
 
 const siteUrl = "https://www.wattsmybill.app";
 
@@ -59,6 +60,10 @@ export default function GamePage() {
           <section className="mt-6" aria-label="Guess the Watts game">
             <GuessTheWatts />
           </section>
+
+          <div className="mt-6">
+            <AdSlot placement="game" />
+          </div>
 
           <p className="mt-6 text-center text-sm text-slate-600">
             Ready for the real thing?{" "}

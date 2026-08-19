@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import { AD_CLIENT, adsEnabled } from "./lib/ads";
 import "./globals.css";
 import { THEME_BOOTSTRAP_SCRIPT } from "./lib/theme";
 import { LAUNCH_SCREEN_SCRIPT } from "./lib/launchScreen";
@@ -324,6 +325,15 @@ export default function RootLayout({ children }) {
             <circle className="wmb-mark-dot" cx="251.5" cy="432" r="24" />
           </svg>
         </div>
+
+        {adsEnabled && (
+          <Script
+            id="adsbygoogle"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CLIENT}`}
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+          />
+        )}
 
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-BVVJPKW2ZT"
