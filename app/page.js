@@ -570,8 +570,15 @@ export default function Page() {
     };
   }, [activeInfoPage, pendingHouseholdPreset, showDonate, showInstallHelp, showProviderRateGuide, showWattageGuideImage]);
 
+  // Restores the saved session, and sets hasLoaded, which gates the theme, the
+  // URL setup and every save back to storage. This ran inside
+  // requestAnimationFrame, which schedules against paint — and a hidden tab
+  // never paints. Opening the app in a background tab therefore restored
+  // nothing: no saved appliances, and no link contents either, because the
+  // setup effect waits on hasLoaded. It stayed empty until the tab was focused.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const restoreFrame = window.requestAnimationFrame(() => {
+    {
       try {
         const savedData = localStorage.getItem("watts-my-bill-data");
 
@@ -653,10 +660,9 @@ export default function Page() {
       }
 
       setHasLoaded(true);
-    });
-
-    return () => window.cancelAnimationFrame(restoreFrame);
+    }
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // The theme belongs to the visitor, not to a route. The root layout has
   // already stamped it on <html>; adopt that, then keep the two in step so
@@ -704,7 +710,15 @@ export default function Page() {
       priorSession = null;
     }
 
-    const applyFrame = window.requestAnimationFrame(() => {
+    // Applied directly, not deferred through requestAnimationFrame. rAF
+    // schedules against paint and a hidden tab never paints, so a link opened
+    // in a background tab — middle-clicked from a guide, "open in new tab" from
+    // a message — landed on an empty calculator and stayed empty until the tab
+    // was focused. That silently emptied every shared estimate, every Rate
+    // Library country link and every guide prefill. Verified with
+    // document.hidden true: the callback did not run within a second.
+    /* eslint-disable react-hooks/set-state-in-effect */
+    {
       urlSetupApplied.current = true;
       if (priorSession) setReplacedOwnEstimate(true);
 
@@ -753,9 +767,8 @@ export default function Page() {
       }
 
       inputSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-
-    return () => window.cancelAnimationFrame(applyFrame);
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [hasLoaded]);
 
   useEffect(() => {

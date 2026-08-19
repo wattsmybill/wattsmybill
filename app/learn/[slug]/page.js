@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Clock3, ExternalLink, List } from 
 import LearnHeader from "../LearnHeader";
 import LearningThemeShell from "../LearningThemeShell";
 import { ARTICLES, getArticle } from "../articles";
+import { articlePrefillHref, prefillNames } from "../../lib/articlePrefill";
 
 const siteUrl = "https://www.wattsmybill.app";
 
@@ -64,6 +65,9 @@ export default async function ArticlePage({ params }) {
   const article = getArticle(slug);
 
   if (!article) notFound();
+
+  const prefillHref = articlePrefillHref(article.slug);
+  const prefilled = prefillNames(article.slug);
 
   const related = ARTICLES.filter((item) => item.slug !== article.slug)
     .sort((a, b) => Number(b.category === article.category) - Number(a.category === article.category))
@@ -169,9 +173,17 @@ export default async function ArticlePage({ params }) {
                 <p className="text-xs font-black uppercase tracking-[0.15em] text-emerald-300">Try it with your numbers</p>
                 <h2 className="mt-3 text-2xl font-black">Turn the explanation into an estimate.</h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-white/75">{article.calculatorPrompt}</p>
-                <Link href="/#calculator" className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-400 px-5 py-3 text-sm font-black text-emerald-950 transition hover:bg-emerald-300">
-                  Open calculator <ArrowRight size={16} />
+                <Link
+                  href={prefillHref || "/#calculator"}
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-400 px-5 py-3 text-sm font-black text-emerald-950 transition hover:bg-emerald-300"
+                >
+                  {prefillHref ? "Open calculator with these appliances" : "Open calculator"} <ArrowRight size={16} />
                 </Link>
+                {prefilled && (
+                  <p className="mt-3 text-xs leading-5 text-white/60">
+                    Loads {prefilled.join(", ")} at typical usage. Change anything once it opens.
+                  </p>
+                )}
               </section>
 
               <section className="mt-10 border-t border-slate-200 pt-8" aria-labelledby="sources-heading">

@@ -3,6 +3,8 @@ import { PRESETS } from "../app/data/appliances.js";
 import { HOUSEHOLD_PRESETS } from "../app/data/householdPresets.js";
 import { COUNTRIES } from "../app/data/countries.js";
 import { getRateReference } from "../app/data/rateReferences.js";
+import { PREFILL_SLUGS, articlePrefillHref, prefillNames } from "../app/lib/articlePrefill.js";
+import { decodeSetup } from "../app/lib/shareState.js";
 
 const errors = [];
 const seenSlugs = new Set();
@@ -80,11 +82,41 @@ for (const country of namedCountries) {
   if (!getRateReference(country.name)) errors.push(`Missing rate reference: ${country.name}`);
 }
 
+// Guides that hand their appliances to the calculator. A preset renamed in the
+// catalogue would otherwise leave the link silently short an appliance, or drop
+// the prefill entirely, with nothing failing.
+for (const slug of PREFILL_SLUGS) {
+  if (!ARTICLES.some((article) => article.slug === slug)) {
+    errors.push(`Prefill points at a guide that does not exist: ${slug}`);
+    continue;
+  }
+
+  for (const name of prefillNames(slug)) {
+    if (!PRESETS.some((preset) => preset.name === name)) {
+      errors.push(`Prefill for ${slug} names an appliance not in the catalogue: ${name}`);
+    }
+  }
+
+  const href = articlePrefillHref(slug);
+  if (!href) {
+    errors.push(`Prefill for ${slug} produced no link`);
+    continue;
+  }
+
+  const expected = prefillNames(slug).length;
+  const decoded = decodeSetup(href.match(/setup=([^#]+)/)?.[1] || "");
+  if (decoded?.appliances?.length !== expected) {
+    errors.push(
+      `Prefill for ${slug} does not round-trip: expected ${expected}, decoded ${decoded?.appliances?.length ?? 0}`,
+    );
+  }
+}
+
 if (errors.length > 0) {
   console.error(errors.join("\n"));
   process.exitCode = 1;
 } else {
   console.log(
-    `Content valid: ${ARTICLES.length} guides, ${PRESETS.length} appliance presets, ${HOUSEHOLD_PRESETS.length} household presets, ${namedCountries.length} named countries, ${sourcedCountries.length} with official rate context.`
+    `Content valid: ${ARTICLES.length} guides, ${PRESETS.length} appliance presets, ${HOUSEHOLD_PRESETS.length} household presets, ${namedCountries.length} named countries, ${sourcedCountries.length} with official rate context, ${PREFILL_SLUGS.length} guide prefills round-trip.`
   );
 }
